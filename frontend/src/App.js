@@ -308,7 +308,44 @@ function App() {
         setGeneratedRecipe(response.data);
       } catch (error) {
         console.error('Recipe generation error:', error);
-        alert('Failed to generate recipe. Please try again.');
+        
+        // If backend is not accessible, show demo recipe
+        if (error.code === 'ERR_NETWORK') {
+          alert('Demo Mode: Backend not accessible. Showing sample recipe.');
+          const demoRecipe = {
+            id: 'demo-recipe-' + Date.now(),
+            title: genRequest.cuisine_type ? `${genRequest.cuisine_type.charAt(0).toUpperCase() + genRequest.cuisine_type.slice(1)} Demo Recipe` : 'Demo Recipe',
+            description: `A delicious ${genRequest.cuisine_type || 'international'} dish perfect for ${genRequest.servings} people.`,
+            ingredients: [
+              '2 cups main ingredient',
+              '1 onion, diced',
+              '2 cloves garlic, minced',
+              '2 tbsp olive oil',
+              'Salt and pepper to taste',
+              'Fresh herbs for garnish'
+            ],
+            instructions: [
+              'Prepare all ingredients by washing and chopping as needed.',
+              'Heat olive oil in a large pan over medium heat.',
+              'Add onion and cook until translucent, about 5 minutes.',
+              'Add garlic and cook for another minute until fragrant.',
+              'Add main ingredient and season with salt and pepper.',
+              'Cook according to ingredient requirements.',
+              'Garnish with fresh herbs and serve hot.',
+              'Enjoy your delicious meal!'
+            ],
+            prep_time: parseInt(genRequest.prep_time_max) || 15,
+            cook_time: 20,
+            servings: genRequest.servings,
+            cuisine_type: genRequest.cuisine_type || 'international',
+            dietary_tags: genRequest.dietary_preferences,
+            difficulty: genRequest.difficulty,
+            demo: true
+          };
+          setGeneratedRecipe(demoRecipe);
+        } else {
+          alert('Failed to generate recipe. Please try again.');
+        }
       } finally {
         setLoading(false);
       }
