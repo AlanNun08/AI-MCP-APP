@@ -181,14 +181,34 @@ async def generate_recipe(request: RecipeGenRequest):
         response = openai_client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
-                {"role": "system", "content": "You are a professional chef and recipe developer. Always respond with valid JSON only."},
+                {"role": "system", "content": "You are a professional chef and recipe developer. Always respond with valid JSON only. Do not include any text before or after the JSON."},
                 {"role": "user", "content": prompt}
             ],
             temperature=0.7,
             max_tokens=1000
         )
         
-        recipe_data = json.loads(response.choices[0].message.content)
+        # Extract and clean the response content
+        response_content = response.choices[0].message.content.strip()
+        
+        # Remove any markdown formatting if present
+        if response_content.startswith('```json'):
+            response_content = response_content[7:]
+        if response_content.endswith('```'):
+            response_content = response_content[:-3]
+        
+        # Clean any extra whitespace
+        response_content = response_content.strip()
+        
+        # Log the response for debugging
+        logging.info(f"OpenAI Response: {response_content}")
+        
+        try:
+            recipe_data = json.loads(response_content)
+        except json.JSONDecodeError as json_error:
+            logging.error(f"JSON parsing error: {json_error}")
+            logging.error(f"Response content: {response_content}")
+            raise HTTPException(status_code=500, detail="Failed to parse recipe from AI response")
         
         # Create recipe object
         recipe = Recipe(
