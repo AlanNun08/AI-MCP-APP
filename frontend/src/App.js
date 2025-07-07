@@ -453,7 +453,52 @@ function App() {
         setGroceryCart(response.data);
       } catch (error) {
         console.error('Grocery cart error:', error);
-        alert('Failed to create grocery cart. Please try again.');
+        
+        // If backend is not accessible, show demo cart
+        if (error.code === 'ERR_NETWORK') {
+          alert('Demo Mode: Showing sample grocery cart with Walmart URL.');
+          const demoCart = {
+            id: 'demo-cart-' + Date.now(),
+            user_id: user.id,
+            recipe_id: recipe.id,
+            items: [
+              {
+                product_id: "123456789",
+                name: "Main Ingredient",
+                quantity: 2,
+                price: 4.99,
+                original_ingredient: recipe.ingredients[0] || "Main ingredient"
+              },
+              {
+                product_id: "987654321", 
+                name: "Fresh Onion",
+                quantity: 1,
+                price: 1.99,
+                original_ingredient: "1 onion, diced"
+              },
+              {
+                product_id: "456789123",
+                name: "Fresh Garlic",
+                quantity: 1,
+                price: 2.49,
+                original_ingredient: "2 cloves garlic, minced"
+              },
+              {
+                product_id: "789123456",
+                name: "Olive Oil",
+                quantity: 1,
+                price: 5.99,
+                original_ingredient: "2 tbsp olive oil"
+              }
+            ],
+            total_price: 15.46,
+            walmart_url: "https://affil.walmart.com/cart/addToCart?items=123456789_2,987654321,456789123,789123456",
+            demo: true
+          };
+          setGroceryCart(demoCart);
+        } else {
+          alert('Failed to create grocery cart. Please try again.');
+        }
       } finally {
         setLoading(false);
       }
