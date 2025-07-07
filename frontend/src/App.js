@@ -2,7 +2,18 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 import axios from 'axios';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+// Dynamic backend URL detection
+const getBackendURL = () => {
+  const hostname = window.location.hostname;
+  if (hostname === 'localhost' || hostname === '127.0.0.1') {
+    return 'http://localhost:8001';
+  } else {
+    // Try to use the same domain with /api path for production
+    return `${window.location.protocol}//${window.location.hostname}`;
+  }
+};
+
+const BACKEND_URL = getBackendURL();
 const API = `${BACKEND_URL}/api`;
 
 // Main App Component
