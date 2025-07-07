@@ -2,19 +2,31 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 import axios from 'axios';
 
-// Dynamic backend URL detection
+// Dynamic backend URL detection with fallback
 const getBackendURL = () => {
   const hostname = window.location.hostname;
   if (hostname === 'localhost' || hostname === '127.0.0.1') {
     return 'http://localhost:8001';
   } else {
-    // Try to use the same domain with /api path for production
-    return `${window.location.protocol}//${window.location.hostname}`;
+    // For production, try the public backend URL
+    return 'https://ae98d8a0-e0fa-4434-aadf-fe1df1f1101d.preview.emergentagent.com';
   }
 };
 
 const BACKEND_URL = getBackendURL();
 const API = `${BACKEND_URL}/api`;
+
+// Add axios interceptor for better error handling
+axios.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    console.error('API Error:', error);
+    if (error.code === 'ERR_NETWORK') {
+      alert('Network error: Unable to connect to the server. Please try again.');
+    }
+    return Promise.reject(error);
+  }
+);
 
 // Main App Component
 function App() {
