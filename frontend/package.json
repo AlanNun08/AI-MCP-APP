@@ -7,6 +7,7 @@
     "@capacitor/cli": "^7.4.1",
     "@capacitor/core": "^7.4.1",
     "@capacitor/ios": "^7.4.1",
+    "@capacitor/splash-screen": "^7.0.1",
     "axios": "^1.8.4",
     "cra-template": "1.2.0",
     "react": "^19.0.0",
