@@ -445,10 +445,10 @@ class SimpleCartRequest(BaseModel):
 
 # Simple cart generation with just ingredient names (no portions)
 @api_router.post("/grocery/simple-cart")
-async def create_simple_grocery_cart(recipe_id: str, user_id: str):
+async def create_simple_grocery_cart(request: SimpleCartRequest):
     """Create simple grocery cart with just ingredient names (no portions) for easier shopping"""
     # Get recipe
-    recipe = await db.recipes.find_one({"id": recipe_id})
+    recipe = await db.recipes.find_one({"id": request.recipe_id})
     if not recipe:
         raise HTTPException(status_code=404, detail="Recipe not found")
     
@@ -511,8 +511,8 @@ async def create_simple_grocery_cart(recipe_id: str, user_id: str):
     # Create simple cart
     simple_cart = {
         "id": str(uuid.uuid4()),
-        "user_id": user_id,
-        "recipe_id": recipe_id,
+        "user_id": request.user_id,
+        "recipe_id": request.recipe_id,
         "simple_items": simple_items,
         "total_price": round(total_price, 2),
         "walmart_url": walmart_url,
