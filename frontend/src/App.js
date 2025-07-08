@@ -1466,11 +1466,11 @@ function App() {
       case 'dashboard':
         return <DashboardScreen />;
       case 'generate-recipe':
-        return <OtherScreen screenName="Recipe Generation" />;
+        return <RecipeGenerationScreen />;
       case 'all-recipes':
-        return <OtherScreen screenName="Recipe History" />;
+        return <RecipeHistoryScreen />;
       case 'recipe-detail':
-        return <OtherScreen screenName="Recipe Detail" />;
+        return <RecipeDetailScreen recipe={window.currentRecipe} showBackButton={true} />;
       default:
         return <LandingScreen />;
     }
