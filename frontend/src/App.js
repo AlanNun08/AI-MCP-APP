@@ -2,18 +2,8 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 import axios from 'axios';
 
-// Dynamic backend URL detection with fallback
-const getBackendURL = () => {
-  const hostname = window.location.hostname;
-  if (hostname === 'localhost' || hostname === '127.0.0.1') {
-    return 'http://localhost:8001';
-  } else {
-    // For production, try the public backend URL
-    return 'https://ae98d8a0-e0fa-4434-aadf-fe1df1f1101d.preview.emergentagent.com';
-  }
-};
-
-const BACKEND_URL = getBackendURL();
+// Use environment variable for backend URL
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
 const API = `${BACKEND_URL}/api`;
 
 // Add axios interceptor for better error handling
