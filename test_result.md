@@ -111,11 +111,14 @@ backend:
     file: "server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "OpenAI integration appears to be implemented with gpt-3.5-turbo, healthy/budget modes included"
+      - working: true
+        agent: "testing"
+        comment: "Successfully tested recipe generation with different parameters. Healthy mode with calorie limits works correctly (tested with 400 calories limit). Budget mode also works correctly. Combined healthy+budget mode also works as expected."
   
   - task: "Walmart API Integration"
     implemented: true
@@ -123,11 +126,14 @@ backend:
     file: "server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "Walmart API integration with product search and affiliate URL generation implemented"
+      - working: true
+        agent: "testing"
+        comment: "Successfully tested grocery cart with options endpoint (/api/grocery/cart-options) and custom cart endpoint (/api/grocery/custom-cart). Both work correctly. The simple cart endpoint (/api/grocery/simple-cart) has an issue with MongoDB ObjectId serialization and returns a 500 error."
   
   - task: "User Management & Recipe Saving"
     implemented: true
@@ -135,11 +141,14 @@ backend:
     file: "server.py"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "User models and recipe storage functionality implemented"
+      - working: true
+        agent: "testing"
+        comment: "Successfully tested user creation, retrieval, and update. Recipe saving and retrieval also work correctly."
   
   - task: "API Endpoints"
     implemented: true
@@ -147,11 +156,14 @@ backend:
     file: "server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "Basic API endpoint /api/ responding correctly, need to test all endpoints"
+      - working: true
+        agent: "testing"
+        comment: "All API endpoints tested and working correctly except for /api/grocery/simple-cart which has a MongoDB ObjectId serialization issue."
 
 frontend:
   - task: "React App Loading"
