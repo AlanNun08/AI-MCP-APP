@@ -765,26 +765,31 @@ class AIRecipeAppTester:
         
         return success
         
-    def test_resend_to_nonexistent_user(self):
-        """Test resending code to non-existent user"""
-        # Try to resend code to non-existent user
-        resend_data = {
-            "email": f"nonexistent_{uuid.uuid4()}@example.com"
+    def test_login_with_invalid_credentials(self):
+        """Test login with invalid credentials"""
+        if not self.test_email:
+            print("❌ No test email available")
+            return False
+            
+        # Try with wrong password
+        login_data = {
+            "email": self.test_email,
+            "password": "WrongPassword123"
         }
         
-        # We expect this to fail with 404 status code
+        # We expect this to fail with 401 status code
         success, response = self.run_test(
-            "Resend to Non-existent User",
+            "Login with Invalid Password",
             "POST",
-            "auth/resend-code",
-            404,
-            data=resend_data
+            "auth/login",
+            401,
+            data=login_data
         )
         
-        # Check if the error message mentions user not found
+        # Check if the error message mentions invalid credentials
         if success and 'detail' in response:
-            if 'not found' in response['detail'].lower():
-                print("✅ Resend to non-existent user correctly rejected")
+            if 'invalid' in response['detail'].lower():
+                print("✅ Invalid credentials correctly rejected")
                 return True
         
         return success
