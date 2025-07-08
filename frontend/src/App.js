@@ -228,63 +228,142 @@ function App() {
   };
 
   // Dashboard Component
-  const DashboardScreen = () => (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm p-4">
-        <div className="max-w-md mx-auto flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold text-gray-800">Hi, {user?.name}! 👋</h1>
-            <p className="text-sm text-gray-600">What would you like to cook today?</p>
-          </div>
-          <button
-            onClick={() => setCurrentScreen('profile')}
-            className="w-10 h-10 bg-gradient-to-r from-green-500 to-blue-500 rounded-full flex items-center justify-center text-white font-semibold"
-          >
-            {user?.name?.[0]}
-          </button>
-        </div>
-      </div>
+  const DashboardScreen = () => {
+    const [userRecipes, setUserRecipes] = useState([]);
+    const [loadingRecipes, setLoadingRecipes] = useState(false);
 
-      {/* Main Content */}
-      <div className="p-4 max-w-md mx-auto">
-        <div className="space-y-4">
-          {/* Generate Recipe Button */}
-          <button
-            onClick={() => setCurrentScreen('generate')}
-            className="w-full bg-gradient-to-r from-orange-400 to-red-500 text-white font-semibold py-6 px-6 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 flex items-center justify-center space-x-3"
-          >
-            <span className="text-2xl">🤖</span>
-            <span className="text-lg">Generate AI Recipe</span>
-          </button>
+    // Load user's recipes when dashboard mounts
+    useEffect(() => {
+      const loadUserRecipes = async () => {
+        setLoadingRecipes(true);
+        try {
+          const response = await axios.get(`${API}/recipes?user_id=${user.id}`);
+          setUserRecipes(response.data);
+        } catch (error) {
+          console.error('Error loading user recipes:', error);
+        } finally {
+          setLoadingRecipes(false);
+        }
+      };
 
-          {/* My Recipes */}
-          <div className="bg-white rounded-2xl shadow-sm p-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">My Recipes</h3>
+      if (user?.id) {
+        loadUserRecipes();
+      }
+    }, [user?.id]);
+
+    return (
+      <div className="min-h-screen bg-gray-50">
+        {/* Header */}
+        <div className="bg-white shadow-sm p-4">
+          <div className="max-w-md mx-auto flex items-center justify-between">
+            <div>
+              <h1 className="text-xl font-bold text-gray-800">Hi, {user?.name}! 👋</h1>
+              <p className="text-sm text-gray-600">What would you like to cook today?</p>
+            </div>
             <button
-              onClick={() => setCurrentScreen('recipes')}
-              className="w-full bg-gray-100 text-gray-700 font-medium py-4 px-6 rounded-xl hover:bg-gray-200 transition-all"
+              onClick={() => setCurrentScreen('profile')}
+              className="w-10 h-10 bg-gradient-to-r from-green-500 to-blue-500 rounded-full flex items-center justify-center text-white font-semibold"
             >
-              View All Recipes ({recipes.length})
+              {user?.name?.[0]}
             </button>
           </div>
+        </div>
 
-          {/* Quick Actions */}
-          <div className="bg-white rounded-2xl shadow-sm p-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">Quick Actions</h3>
-            <div className="grid grid-cols-2 gap-3">
-              <button className="bg-yellow-100 text-yellow-800 font-medium py-3 px-4 rounded-xl hover:bg-yellow-200 transition-all text-sm">
-                🛒 Previous Orders
-              </button>
-              <button className="bg-purple-100 text-purple-800 font-medium py-3 px-4 rounded-xl hover:bg-purple-200 transition-all text-sm">
-                ❤️ Favorites
-              </button>
+        {/* Main Content */}
+        <div className="p-4 max-w-md mx-auto">
+          <div className="space-y-4">
+            {/* Generate Recipe Button */}
+            <button
+              onClick={() => setCurrentScreen('generate')}
+              className="w-full bg-gradient-to-r from-orange-400 to-red-500 text-white font-semibold py-6 px-6 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 flex items-center justify-center space-x-3"
+            >
+              <span className="text-2xl">🤖</span>
+              <span className="text-lg">Generate AI Recipe</span>
+            </button>
+
+            {/* My Recipes */}
+            <div className="bg-white rounded-2xl shadow-sm p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-800">My Recipes</h3>
+                <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded-full">
+                  {userRecipes.length}
+                </span>
+              </div>
+              
+              {loadingRecipes ? (
+                <div className="text-center py-4">
+                  <div className="loading text-gray-500">Loading recipes...</div>
+                </div>
+              ) : userRecipes.length > 0 ? (
+                <div className="space-y-3">
+                  {userRecipes.slice(0, 3).map((recipe) => (
+                    <div
+                      key={recipe.id}
+                      onClick={() => {
+                        setCurrentScreen('recipe-detail');
+                        // You'll need to pass the recipe data
+                        window.currentRecipe = recipe;
+                      }}
+                      className="p-3 bg-gray-50 rounded-xl hover:bg-gray-100 cursor-pointer transition-colors"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <h4 className="font-medium text-gray-800 text-sm">{recipe.title}</h4>
+                          <div className="flex items-center space-x-3 mt-1">
+                            <span className="text-xs text-gray-500">⏱️ {recipe.prep_time + recipe.cook_time}m</span>
+                            <span className="text-xs text-gray-500">👥 {recipe.servings}</span>
+                            {recipe.is_healthy && (
+                              <span className="text-xs text-green-600">🍃 {recipe.calories_per_serving}cal</span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="text-gray-400">
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  
+                  {userRecipes.length > 3 && (
+                    <button
+                      onClick={() => setCurrentScreen('all-recipes')}
+                      className="w-full bg-blue-50 text-blue-700 font-medium py-3 px-4 rounded-xl hover:bg-blue-100 transition-all text-sm"
+                    >
+                      View All {userRecipes.length} Recipes
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <div className="text-center py-6">
+                  <div className="text-4xl mb-2">📝</div>
+                  <p className="text-gray-500 text-sm">No recipes yet</p>
+                  <p className="text-gray-400 text-xs">Generate your first AI recipe above!</p>
+                </div>
+              )}
+            </div>
+
+            {/* Quick Actions */}
+            <div className="bg-white rounded-2xl shadow-sm p-6">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">Quick Actions</h3>
+              <div className="grid grid-cols-2 gap-3">
+                <button className="bg-yellow-100 text-yellow-800 font-medium py-3 px-4 rounded-xl hover:bg-yellow-200 transition-all text-sm">
+                  🛒 Order History
+                </button>
+                <button 
+                  onClick={() => setCurrentScreen('all-recipes')}
+                  className="bg-purple-100 text-purple-800 font-medium py-3 px-4 rounded-xl hover:bg-purple-200 transition-all text-sm"
+                >
+                  ❤️ All Recipes
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   // Recipe Generation Component
   const GenerateScreen = () => {
