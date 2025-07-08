@@ -240,12 +240,15 @@ frontend:
       - working: true
         agent: "testing"
         comment: "Recipe generation is now working correctly. Successfully generated an Italian recipe with proper ingredients and instructions. The recipe details page displays correctly with all expected information including prep time, cook time, servings, and calorie information."
+      - working: true
+        agent: "testing"
+        comment: "Confirmed recipe generation is working correctly. Successfully generated a Mediterranean Grilled Chicken with Quinoa Salad recipe with healthy mode (380 calories per serving). The recipe details page displays correctly with all expected information."
   
   - task: "Grocery Cart Integration"
     implemented: true
     working: false
     file: "App.js"
-    stuck_count: 1
+    stuck_count: 2
     priority: "high"
     needs_retesting: false
     status_history:
@@ -255,6 +258,9 @@ frontend:
       - working: false
         agent: "testing"
         comment: "Grocery cart integration is partially working. The Order Groceries button appears correctly on the recipe detail page, but clicking it results in a 500 error from the /api/grocery/simple-cart endpoint. Console shows 'Auto grocery generation error: AxiosError'. This is consistent with the known issue in the backend where the simple-cart endpoint has a MongoDB ObjectId serialization error."
+      - working: false
+        agent: "testing"
+        comment: "Grocery cart integration is still not working correctly. The 'Order Groceries from Walmart' button is not visible on the recipe detail page. Network requests show that the app is making a POST request to /api/grocery/cart-options endpoint, but there's no response shown in the network logs, suggesting the request might be failing silently. The recipe generation works correctly, but the grocery cart functionality is not accessible."
 
 metadata:
   created_by: "main_agent"
