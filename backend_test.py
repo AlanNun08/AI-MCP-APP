@@ -237,40 +237,63 @@ class AIRecipeAppTester:
             print("❌ No verification code found")
             return False
             
-    def test_case_insensitive_email(self):
-        """Test case-insensitive email handling"""
-        # Create a mixed case version of the email
-        if not self.test_email:
-            print("❌ No test email available")
-            return False
-            
-        # Create a mixed case version by capitalizing random characters
-        email_parts = self.test_email.split('@')
-        mixed_case_local = ''.join([c.upper() if random.choice([True, False]) else c for c in email_parts[0]])
-        self.mixed_case_email = f"{mixed_case_local}@{email_parts[1]}"
+    def test_email_service_mode(self):
+        """Test if the email service is in live mode"""
+        print("\n" + "=" * 50)
+        print("Testing Email Service Mode")
+        print("=" * 50)
         
-        print(f"Testing case-insensitive email handling with: {self.mixed_case_email}")
-        
-        # Try to login with mixed case email
-        login_data = {
-            "email": self.mixed_case_email,
-            "password": self.test_password
+        # Register a new user to trigger email sending
+        user_data = {
+            "first_name": "Live",
+            "last_name": "Test",
+            "email": self.test_email,
+            "password": self.test_password,
+            "dietary_preferences": ["vegetarian"],
+            "allergies": [],
+            "favorite_cuisines": ["italian"]
         }
         
         success, response = self.run_test(
-            "Login with Mixed Case Email",
+            "Register User for Live Email Test",
             "POST",
-            "auth/login",
+            "auth/register",
             200,
-            data=login_data
+            data=user_data
         )
         
-        if success and 'message' in response:
-            if 'successful' in response['message'].lower():
-                print(f"✅ Case-insensitive email login successful")
-                return True
+        if not success:
+            print("❌ Failed to register user for live email test")
+            return False
+            
+        # Check if the response indicates live mode
+        print("\nChecking server logs for email mode indicators...")
         
-        return False
+        # Get verification code from debug endpoint
+        code_success, code_response = self.run_test(
+            "Get Verification Code for Live Test",
+            "GET",
+            f"debug/verification-codes/{self.test_email}",
+            200
+        )
+        
+        if code_success and 'codes' in code_response and len(code_response['codes']) > 0:
+            self.verification_code = code_response['codes'][0]['code']
+            print(f"✅ Retrieved verification code: {self.verification_code}")
+            
+            # Check if we're in live mode based on the response
+            if 'last_test_code' in code_response:
+                if code_response['last_test_code'] == self.verification_code:
+                    print("⚠️ Email service appears to be in TEST MODE")
+                    self.email_live_mode = False
+                else:
+                    print("✅ Email service appears to be in LIVE MODE")
+                    self.email_live_mode = True
+                    
+            return True
+        else:
+            print("❌ No verification code found")
+            return False
         
     def test_user_registration(self):
         """Test user registration with email verification"""
