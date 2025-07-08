@@ -775,20 +775,30 @@ function App() {
     };
 
     const handleSendToWalmart = () => {
-      console.log('🚀 Opening Walmart...');
+      console.log('🚀 Opening Walmart (user-triggered)...');
       
       if (groceryCart && groceryCart.walmart_url) {
         const walmartUrl = groceryCart.walmart_url;
         console.log('🛒 Walmart URL:', walmartUrl);
         
-        // ONLY use window.open - stay on the app
+        // DIRECT USER INTERACTION: This should bypass popup blockers
         try {
           const opened = window.open(walmartUrl, '_blank');
           if (opened) {
             console.log('✅ Successfully opened Walmart URL');
             alert('✅ Successfully opened Walmart! Check your new tab.');
           } else {
-            alert(`🛒 WALMART CART:\n\nPopup blocked. Copy this URL:\n\n${walmartUrl}`);
+            // Fallback: Use invisible link click
+            const link = document.createElement('a');
+            link.href = walmartUrl;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            console.log('✅ Opened Walmart via link click');
+            alert('✅ Successfully opened Walmart! Check your new tab.');
           }
         } catch (e) {
           console.log('❌ Failed to open URL:', e);
