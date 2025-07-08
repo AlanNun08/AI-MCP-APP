@@ -478,9 +478,20 @@ function App() {
       try {
         const response = await axios.post(`${API}/api/auth/login`, formData);
         
-        setUser(response.data.user);
-        setCurrentScreen('dashboard');
-        showNotification(`🎉 Welcome back, ${response.data.user.first_name}!`, 'success');
+        // Check if user is unverified
+        if (response.data.status === 'unverified' && response.data.needs_verification) {
+          setPendingVerificationEmail(response.data.email);
+          setCurrentScreen('verify-email');
+          showNotification('📧 Please verify your email to continue', 'error');
+          return;
+        }
+        
+        // Successful login
+        if (response.data.status === 'success') {
+          setUser(response.data.user);
+          setCurrentScreen('dashboard');
+          showNotification(`🎉 Welcome back, ${response.data.user.first_name}!`, 'success');
+        }
         
       } catch (error) {
         console.error('Login failed:', error);
@@ -550,7 +561,14 @@ function App() {
             </button>
           </form>
 
-          <div className="mt-6 text-center">
+          <div className="mt-6 text-center space-y-3">
+            <button
+              onClick={() => setCurrentScreen('forgot-password')}
+              className="text-sm text-blue-600 hover:text-blue-800 font-medium underline"
+            >
+              🔒 Forgot your password?
+            </button>
+            
             <p className="text-sm text-gray-600">
               Don't have an account?{' '}
               <button
