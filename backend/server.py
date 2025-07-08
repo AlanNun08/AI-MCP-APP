@@ -149,6 +149,12 @@ class Recipe(BaseModel):
     created_at: datetime = Field(default_factory=datetime.utcnow)
     user_id: Optional[str] = None
 
+    class Config:
+        json_encoders = {
+            ObjectId: str,
+            datetime: lambda v: v.isoformat()
+        }
+
 class WalmartProduct(BaseModel):
     product_id: str
     name: str
