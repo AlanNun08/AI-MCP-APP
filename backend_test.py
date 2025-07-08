@@ -189,17 +189,21 @@ class AIRecipeAppTester:
         print("Cleaning up test data")
         print("=" * 50)
         
-        success, response = self.run_test(
-            "Cleanup Test Data",
-            "DELETE",
-            "debug/cleanup-test-data",
-            200
-        )
-        
-        if success and 'message' in response:
-            print(f"✅ Test data cleaned up: {response.get('users_deleted', 0)} users and {response.get('codes_deleted', 0)} codes deleted")
-            return True
-        return False
+        try:
+            success, response = self.run_test(
+                "Cleanup Test Data",
+                "DELETE",
+                "debug/cleanup-test-data",
+                200
+            )
+            
+            if success and 'message' in response:
+                print(f"✅ Test data cleaned up: {response.get('users_deleted', 0)} users and {response.get('codes_deleted', 0)} codes deleted")
+                return True
+            return False
+        except Exception as e:
+            print(f"⚠️ Error cleaning up test data: {str(e)}")
+            return False
     
     def test_get_verification_code(self, email):
         """Test getting verification code from debug endpoint"""
