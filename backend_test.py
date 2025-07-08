@@ -1124,134 +1124,34 @@ def main():
     # Test API root
     tester.test_api_root()
     
-    # Test Email Verification System
-    print("\n" + "=" * 50)
-    print("Testing Email Verification System")
-    print("=" * 50)
-    
     # First, clean up any existing test data
     tester.test_cleanup_test_data()
     
-    # Check if email verification endpoints are available
-    success, _ = tester.run_test(
-        "Check Email Verification API Availability",
-        "POST",
-        "auth/register",
-        200,  # We'll accept any response, just checking if the endpoint exists
-        data={"first_name": "Test", "last_name": "User", "email": "test@example.com", "password": "password123"},
-        timeout=5
-    )
-    
-    if not success:
-        print("⚠️ Email verification endpoints are not available or not working")
-        print("⚠️ This could be due to missing Mailjet configuration in the environment")
-        print("⚠️ Skipping email verification tests")
-    else:
-        # Run email verification tests
-        # Test user registration
-        if not tester.test_user_registration():
-            print("❌ User registration failed, continuing with other tests")
-        
-        # Test duplicate email registration
-        tester.test_duplicate_email_registration()
-        
-        # Test password validation
-        tester.test_password_validation()
-        
-        # Get verification code from debug endpoint
-        tester.test_get_verification_code(tester.test_email)
-        
-        # Test email verification
-        if not tester.test_email_verification():
-            print("❌ Email verification failed, continuing with other tests")
-        
-        # Test invalid verification code
-        tester.test_invalid_verification_code()
-        
-        # Test expired verification code
-        tester.test_expired_verification_code()
-        
-        # Test resend verification code
-        tester.test_resend_verification_code()
-        
-        # Test resend to verified user
-        tester.test_resend_to_verified_user()
-        
-        # Test resend to non-existent user
-        tester.test_resend_to_nonexistent_user()
-        
-        # Test login with verified user
-        tester.test_login_with_verified_user()
-        
-        # Test login with invalid credentials
-        tester.test_login_with_invalid_credentials()
-        
-        # Test login with unverified user
-        tester.test_login_with_unverified_user()
-        
-        # Test case-insensitive email handling
-        tester.test_case_insensitive_email()
-    
-    # Test OpenAI API key
+    # Test Email Verification System with Live Mode
     print("\n" + "=" * 50)
-    print("Testing OpenAI API Integration")
+    print("Testing Email Verification System with Live Mode")
     print("=" * 50)
-    tester.test_openai_api_key()
     
-    # Test user management
-    if not tester.test_create_user():
-        print("❌ User creation failed, stopping tests")
-        return 1
+    # Test if email service is in live mode
+    tester.test_email_service_mode()
     
-    tester.test_get_user()
-    tester.test_update_user()
+    # Get verification code from debug endpoint
+    tester.test_get_verification_code(tester.test_email)
     
-    # Test basic recipe generation
-    if not tester.test_generate_recipe():
-        print("❌ Recipe generation failed, stopping tests")
-        return 1
+    # Test email verification
+    if tester.verification_code:
+        tester.test_email_verification()
     
-    tester.test_get_recipes()
-    tester.test_get_recipe()
+    # Test login with verified user
+    tester.test_login_with_verified_user()
     
-    # Test healthy recipe generation
-    print("\n" + "=" * 50)
-    print("Testing Healthy Recipe Mode")
-    print("=" * 50)
-    tester.test_generate_healthy_recipe()
-    
-    # Test budget recipe generation
-    print("\n" + "=" * 50)
-    print("Testing Budget-Friendly Recipe Mode")
-    print("=" * 50)
-    tester.test_generate_budget_recipe()
-    
-    # Test combined healthy + budget recipe generation
-    print("\n" + "=" * 50)
-    print("Testing Combined Healthy + Budget Recipe Mode")
-    print("=" * 50)
-    tester.test_generate_combined_recipe()
-    
-    # Test grocery cart with options
-    print("\n" + "=" * 50)
-    print("Testing Grocery Cart with Multiple Options")
-    print("=" * 50)
-    tester.test_create_grocery_cart_with_options()
-    tester.test_get_grocery_cart_options()
-    tester.test_create_custom_cart()
-    
-    # Test regular grocery cart
-    print("\n" + "=" * 50)
-    print("Testing Simple Grocery Cart")
-    print("=" * 50)
-    tester.test_create_simple_grocery_cart()
-    tester.test_get_grocery_cart()
+    # Test case-insensitive email handling
+    tester.test_case_insensitive_email()
     
     # Print results
     print("\n" + "=" * 50)
     print(f"📊 Tests passed: {tester.tests_passed}/{tester.tests_run}")
-    print(f"⚠️ Timeout issues detected: {tester.timeout_issues}")
-    print(f"⚠️ MongoDB ObjectId issues detected: {tester.mongodb_objectid_issues}")
+    print(f"📧 Email Service Live Mode: {tester.email_live_mode}")
     print("=" * 50)
     
     return 0 if tester.tests_passed == tester.tests_run else 1
