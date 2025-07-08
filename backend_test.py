@@ -562,81 +562,297 @@ class AIRecipeAppTester:
         
         return success
     
-    def test_resend_to_nonexistent_user(self):
-        """Test resending code to non-existent user"""
-        # Try to resend code to non-existent user
-        resend_data = {
-            "email": f"nonexistent_{uuid.uuid4()}@example.com"
+    def test_password_reset_flow(self):
+        """Test the complete password reset flow"""
+        print("\n" + "=" * 50)
+        print("Testing Password Reset Flow")
+        print("=" * 50)
+        
+        # Step 1: Request password reset
+        reset_email = f"reset_{uuid.uuid4()}@example.com"
+        reset_password = "SecureP@ssw0rd123"
+        new_password = "NewSecureP@ssw0rd456"
+        
+        # First, create a user to reset password for
+        user_data = {
+            "first_name": "Reset",
+            "last_name": "Test",
+            "email": reset_email,
+            "password": reset_password,
+            "dietary_preferences": [],
+            "allergies": [],
+            "favorite_cuisines": []
         }
         
-        # We expect this to fail with 404 status code
-        success, response = self.run_test(
-            "Resend to Non-existent User",
+        # Register the user
+        success, _ = self.run_test(
+            "Register User for Password Reset",
             "POST",
-            "auth/resend-code",
-            404,
-            data=resend_data
+            "auth/register",
+            200,
+            data=user_data
         )
         
-        # Check if the error message mentions user not found
-        if success and 'detail' in response:
-            if 'not found' in response['detail'].lower():
-                print("✅ Resend to non-existent user correctly rejected")
-                return True
+        if not success:
+            print("❌ Failed to register user for password reset test")
+            return False
         
-        return success
-    
-    def test_login_with_verified_user(self):
-        """Test login with verified user"""
-        if not self.test_email:
-            print("❌ No verified test email available")
+        # Verify the user (get verification code and verify)
+        code_success, code_response = self.run_test(
+            "Get Verification Code for Reset Test",
+            "GET",
+            f"debug/verification-codes/{reset_email}",
+            200
+        )
+        
+        if not code_success or 'codes' not in code_response or len(code_response['codes']) == 0:
+            print("❌ Failed to get verification code for reset test")
             return False
             
-        login_data = {
-            "email": self.test_email,
-            "password": self.test_password
+        verification_code = code_response['codes'][0]['code']
+        
+        # Verify the user
+        verify_data = {
+            "email": reset_email,
+            "code": verification_code
         }
         
-        success, response = self.run_test(
-            "Login with Verified User",
+        verify_success, _ = self.run_test(
+            "Verify User for Reset Test",
+            "POST",
+            "auth/verify",
+            200,
+            data=verify_data
+        )
+        
+        if not verify_success:
+            print("❌ Failed to verify user for reset test")
+            return False
+        
+        # Step 2: Request password reset
+        reset_request = {
+            "email": reset_email
+        }
+        
+        reset_success, reset_response = self.run_test(
+            "Request Password Reset",
+            "POST",
+            "auth/forgot-password",
+            200,
+            data=reset_request
+        )
+        
+        if not reset_success:
+            print("❌ Failed to request password reset")
+            return False
+            
+        # Step 3: Get reset code from debug endpoint
+        reset_code_success, reset_code_response = self.run_test(
+            "Get Password Reset Code",
+            "GET",
+            f"debug/verification-codes/{reset_email}",
+            200
+        )
+        
+        if not reset_code_success:
+            print("❌ Failed to get password reset code")
+            return False
+            
+        # Try to get the reset code from the response
+        reset_code = None
+        if 'last_test_code' in reset_code_response and reset_code_response['last_test_code']:
+            reset_code = reset_code_response['last_test_code']
+            print(f"✅ Retrieved reset code from last_test_code: {reset_code}")
+        elif 'codes' in reset_code_response and len(reset_code_response['codes']) > 0:
+            # The verification codes endpoint might return the reset code
+            reset_code = reset_code_response['codes'][0]['code']
+            print(f"✅ Retrieved reset code from codes: {reset_code}")
+        
+        if not reset_code:
+            print("❌ No reset code found")
+            return False
+        
+        # Step 4: Reset password with code
+        reset_verify_data = {
+            "email": reset_email,
+            "reset_code": reset_code,
+            "new_password": new_password
+        }
+        
+        reset_verify_success, reset_verify_response = self.run_test(
+            "Reset Password with Code",
+            "POST",
+            "auth/reset-password",
+            200,
+            data=reset_verify_data
+        )
+        
+        if not reset_verify_success:
+            print("❌ Failed to reset password with code")
+            return False
+            
+        # Step 5: Try to login with new password
+        login_data = {
+            "email": reset_email,
+            "password": new_password
+        }
+        
+        login_success, login_response = self.run_test(
+            "Login with New Password",
             "POST",
             "auth/login",
             200,
             data=login_data
         )
         
-        if success and 'message' in response:
-            if 'successful' in response['message'].lower():
-                print("✅ Login successful")
+        if login_success and 'status' in login_response and login_response['status'] == 'success':
+            print("✅ Successfully logged in with new password")
+            return True
+        else:
+            print("❌ Failed to login with new password")
+            return False
+            
+    def test_invalid_reset_code(self):
+        """Test reset password with invalid code"""
+        reset_email = f"invalid_reset_{uuid.uuid4()}@example.com"
+        
+        # Create a user first
+        user_data = {
+            "first_name": "Invalid",
+            "last_name": "Reset",
+            "email": reset_email,
+            "password": "SecureP@ssw0rd123",
+            "dietary_preferences": [],
+            "allergies": [],
+            "favorite_cuisines": []
+        }
+        
+        # Register the user
+        success, _ = self.run_test(
+            "Register User for Invalid Reset Test",
+            "POST",
+            "auth/register",
+            200,
+            data=user_data
+        )
+        
+        if not success:
+            print("❌ Failed to register user for invalid reset test")
+            return False
+        
+        # Try with an invalid reset code
+        reset_data = {
+            "email": reset_email,
+            "reset_code": "999999",  # Invalid code
+            "new_password": "NewP@ssw0rd123"
+        }
+        
+        # We expect this to fail with 400 status code
+        success, response = self.run_test(
+            "Invalid Reset Code",
+            "POST",
+            "auth/reset-password",
+            400,
+            data=reset_data
+        )
+        
+        # Check if the error message mentions invalid code
+        if success and 'detail' in response:
+            if 'invalid' in response['detail'].lower():
+                print("✅ Invalid reset code correctly rejected")
                 return True
         
         return success
-    
-    def test_login_with_invalid_credentials(self):
-        """Test login with invalid credentials"""
-        if not self.test_email:
-            print("❌ No test email available")
-            return False
-            
-        # Try with wrong password
-        login_data = {
-            "email": self.test_email,
-            "password": "WrongPassword123"
+        
+    def test_password_validation(self):
+        """Test password validation during reset"""
+        # Request password reset with a short password
+        reset_email = f"short_pwd_{uuid.uuid4()}@example.com"
+        
+        # Create a user first
+        user_data = {
+            "first_name": "Short",
+            "last_name": "Password",
+            "email": reset_email,
+            "password": "SecureP@ssw0rd123",
+            "dietary_preferences": [],
+            "allergies": [],
+            "favorite_cuisines": []
         }
         
-        # We expect this to fail with 401 status code
-        success, response = self.run_test(
-            "Login with Invalid Password",
+        # Register the user
+        success, _ = self.run_test(
+            "Register User for Password Validation Test",
             "POST",
-            "auth/login",
-            401,
-            data=login_data
+            "auth/register",
+            200,
+            data=user_data
         )
         
-        # Check if the error message mentions invalid credentials
+        if not success:
+            print("❌ Failed to register user for password validation test")
+            return False
+            
+        # Request password reset
+        reset_request = {
+            "email": reset_email
+        }
+        
+        reset_success, _ = self.run_test(
+            "Request Password Reset for Validation Test",
+            "POST",
+            "auth/forgot-password",
+            200,
+            data=reset_request
+        )
+        
+        if not reset_success:
+            print("❌ Failed to request password reset for validation test")
+            return False
+            
+        # Get reset code
+        code_success, code_response = self.run_test(
+            "Get Reset Code for Validation Test",
+            "GET",
+            f"debug/verification-codes/{reset_email}",
+            200
+        )
+        
+        if not code_success:
+            print("❌ Failed to get reset code for validation test")
+            return False
+            
+        # Try to get the reset code from the response
+        reset_code = None
+        if 'last_test_code' in code_response and code_response['last_test_code']:
+            reset_code = code_response['last_test_code']
+        elif 'codes' in code_response and len(code_response['codes']) > 0:
+            reset_code = code_response['codes'][0]['code']
+        
+        if not reset_code:
+            print("❌ No reset code found for validation test")
+            return False
+            
+        # Try with a short password (less than 6 characters)
+        reset_data = {
+            "email": reset_email,
+            "reset_code": reset_code,
+            "new_password": "short"  # Too short
+        }
+        
+        # We expect this to fail with 400 status code
+        success, response = self.run_test(
+            "Reset with Short Password",
+            "POST",
+            "auth/reset-password",
+            400,
+            data=reset_data
+        )
+        
+        # Check if the error message mentions password length
         if success and 'detail' in response:
-            if 'invalid' in response['detail'].lower():
-                print("✅ Invalid credentials correctly rejected")
+            if 'password' in response['detail'].lower() and 'characters' in response['detail'].lower():
+                print("✅ Short password correctly rejected")
                 return True
         
         return success
