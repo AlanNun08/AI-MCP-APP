@@ -445,6 +445,28 @@ async def get_verification_codes_debug(email: str):
         logging.error(f"Debug endpoint error: {str(e)}")
         raise HTTPException(status_code=500, detail="Debug endpoint failed")
 
+@api_router.delete("/debug/cleanup-test-data")
+async def cleanup_test_data():
+    """Debug endpoint to clean up test data"""
+    try:
+        # Only allow in development/test mode
+        if os.getenv('NODE_ENV') == 'production':
+            raise HTTPException(status_code=404, detail="Not found")
+        
+        # Delete test users and verification codes
+        users_deleted = await db.users.delete_many({"email": {"$regex": "@example.com$"}})
+        codes_deleted = await db.verification_codes.delete_many({"email": {"$regex": "@example.com$"}})
+        
+        return {
+            "message": "Test data cleaned up",
+            "users_deleted": users_deleted.deleted_count,
+            "codes_deleted": codes_deleted.deleted_count
+        }
+        
+    except Exception as e:
+        logging.error(f"Cleanup error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Cleanup failed")
+
 # Keep all existing routes for backward compatibility
 @api_router.get("/")
 async def root():
