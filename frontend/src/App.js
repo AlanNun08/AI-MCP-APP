@@ -534,9 +534,16 @@ function App() {
             <button
               type="submit"
               disabled={generatingRecipe}
-              className="w-full bg-gradient-to-r from-green-500 to-blue-500 text-white font-semibold py-4 px-6 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 disabled:opacity-50"
+              className="w-full bg-gradient-to-r from-green-500 to-blue-500 text-white font-semibold py-4 px-6 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
             >
-              {generatingRecipe ? 'Generating Recipe...' : 'Generate Recipe'}
+              {generatingRecipe ? (
+                <div className="flex items-center justify-center space-x-2">
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <span>AI is cooking up your recipe...</span>
+                </div>
+              ) : (
+                '🤖 Generate Recipe'
+              )}
             </button>
           </form>
         </div>
