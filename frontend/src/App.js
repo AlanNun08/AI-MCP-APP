@@ -1024,6 +1024,16 @@ function App() {
               </div>
             </div>
           ) : (
+          {/* Generate Cart Button - show when no cart exists and not generating */}
+          {!generating && !groceryCart && (
+            <button
+              onClick={handleGenerateCart}
+              className="w-full bg-gradient-to-r from-green-500 to-blue-500 text-white font-semibold py-4 px-6 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 disabled:opacity-50 mb-4"
+            >
+              🛒 Generate Walmart Cart
+            </button>
+          )}
+
           {/* Cart Ready State - Prominent and Easy */}
           {!generating && groceryCart && (
             <div className="bg-gradient-to-r from-green-50 to-blue-50 border-2 border-green-300 rounded-2xl shadow-lg p-6 mb-4">
