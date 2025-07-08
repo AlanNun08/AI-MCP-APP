@@ -298,9 +298,7 @@ metadata:
 test_plan:
   current_focus:
     - "Recipe Generation"
-    - "Email Verification System"
-  stuck_tasks: 
-    - "Email Verification System"
+  stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 
