@@ -862,14 +862,29 @@ function App() {
             )}
           </div>
 
-          {/* Order Groceries Button */}
-          <button
-            onClick={handleOrderGroceries}
-            disabled={loading}
-            className="w-full bg-gradient-to-r from-green-500 to-blue-500 text-white font-semibold py-4 px-6 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 disabled:opacity-50"
-          >
-            {loading ? 'Creating Cart...' : '🛒 Order Groceries from Walmart'}
-          </button>
+          {/* Auto-generating groceries indicator */}
+          {autoGenerating && (
+            <div className="bg-blue-50 border border-blue-300 rounded-2xl shadow-sm p-6 mb-4">
+              <div className="flex items-center space-x-3">
+                <div className="loading w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                <div>
+                  <h4 className="text-blue-800 font-semibold">Finding Walmart Products...</h4>
+                  <p className="text-blue-600 text-sm">Automatically generating grocery list for your recipe</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Order Groceries Button - only show if not auto-generating and no cart yet */}
+          {!autoGenerating && !groceryCart && (
+            <button
+              onClick={handleOrderGroceries}
+              disabled={loading}
+              className="w-full bg-gradient-to-r from-green-500 to-blue-500 text-white font-semibold py-4 px-6 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 disabled:opacity-50 mb-4"
+            >
+              {loading ? 'Creating Cart...' : '🛒 Order Groceries from Walmart'}
+            </button>
+          )}
         </div>
       </div>
     );
