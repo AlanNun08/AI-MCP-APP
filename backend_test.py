@@ -1019,6 +1019,49 @@ def main():
     # Test API root
     tester.test_api_root()
     
+    # Test Email Verification System
+    print("\n" + "=" * 50)
+    print("Testing Email Verification System")
+    print("=" * 50)
+    
+    # Test user registration
+    if not tester.test_user_registration():
+        print("❌ User registration failed, continuing with other tests")
+    
+    # Test duplicate email registration
+    tester.test_duplicate_email_registration()
+    
+    # Test password validation
+    tester.test_password_validation()
+    
+    # Test email verification
+    if not tester.test_email_verification():
+        print("❌ Email verification failed, continuing with other tests")
+    
+    # Test invalid verification code
+    tester.test_invalid_verification_code()
+    
+    # Test expired verification code
+    tester.test_expired_verification_code()
+    
+    # Test resend verification code
+    tester.test_resend_verification_code()
+    
+    # Test resend to verified user
+    tester.test_resend_to_verified_user()
+    
+    # Test resend to non-existent user
+    tester.test_resend_to_nonexistent_user()
+    
+    # Test login with verified user
+    tester.test_login_with_verified_user()
+    
+    # Test login with invalid credentials
+    tester.test_login_with_invalid_credentials()
+    
+    # Test login with unverified user
+    tester.test_login_with_unverified_user()
+    
     # Test OpenAI API key
     print("\n" + "=" * 50)
     print("Testing OpenAI API Integration")
