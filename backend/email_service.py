@@ -17,7 +17,7 @@ class EmailService:
         self.api_key = None
         self.secret_key = None
         self.sender_email = None
-        self.test_mode = False  # Switch to live mode
+        self.test_mode = False  # Always use live mode
         self.last_verification_code = None  # Store for testing
         self.initialized = False
         
@@ -36,9 +36,9 @@ class EmailService:
             logger.error(f"  MAILJET_SECRET_KEY: {'✅' if self.secret_key else '❌'}")
             logger.error(f"  SENDER_EMAIL: {'✅' if self.sender_email else '❌'}")
             
-            # Set test mode if missing configuration
-            logger.warning("Missing Mailjet config, falling back to test mode")
-            self.test_mode = True
+            # Force live mode even if configuration is missing
+            logger.warning("Missing some Mailjet config, but continuing in LIVE mode")
+            self.test_mode = False
         
         self.initialized = True
         logger.info(f"EmailService initialized - Live mode: {not self.test_mode}, Sender: {self.sender_email}")
