@@ -196,6 +196,12 @@ class GroceryCart(BaseModel):
     walmart_url: str
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
+    class Config:
+        json_encoders = {
+            ObjectId: str,
+            datetime: lambda v: v.isoformat()
+        }
+
 # Password hashing utilities
 def hash_password(password: str) -> str:
     """Hash a password using bcrypt"""
