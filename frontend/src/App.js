@@ -794,39 +794,25 @@ function App() {
     };
 
     const handleSendToWalmart = () => {
-      console.log('🚀 TESTING URL OPENING...');
+      console.log('🚀 Opening Walmart...');
       
       if (groceryCart && groceryCart.walmart_url) {
         const walmartUrl = groceryCart.walmart_url;
-        console.log('🛒 Walmart URL to open:', walmartUrl);
+        console.log('🛒 Walmart URL:', walmartUrl);
         
-        // Validate URL first
-        if (!walmartUrl || walmartUrl === '' || !walmartUrl.includes('walmart.com')) {
-          alert('❌ Invalid Walmart URL. Please try generating the cart again.');
-          setShowWalmartConfirm(false);
-          return;
-        }
-        
-        // TEST METHOD 1: Simple window.open
-        console.log('Testing Method 1: window.open');
+        // ONLY use window.open - stay on the app
         try {
-          window.open(walmartUrl, '_blank');
-          console.log('✅ Method 1 executed');
+          const opened = window.open(walmartUrl, '_blank');
+          if (opened) {
+            console.log('✅ Successfully opened Walmart URL');
+            alert('✅ Successfully opened Walmart! Check your new tab.');
+          } else {
+            alert(`🛒 WALMART CART:\n\nPopup blocked. Copy this URL:\n\n${walmartUrl}`);
+          }
         } catch (e) {
-          console.log('❌ Method 1 failed:', e);
+          console.log('❌ Failed to open URL:', e);
+          alert(`🛒 WALMART CART:\n\nCopy this URL:\n\n${walmartUrl}`);
         }
-        
-        // TEST METHOD 2: Location assignment 
-        console.log('Testing Method 2: location.assign');
-        try {
-          window.location.assign(walmartUrl);
-          console.log('✅ Method 2 executed');
-        } catch (e) {
-          console.log('❌ Method 2 failed:', e);
-        }
-        
-        // Always show the URL for manual testing
-        alert(`🛒 WALMART URL (copy this):\n\n${walmartUrl}\n\nDid any tab open? Check your browser!`);
         
         setShowWalmartConfirm(false);
         
