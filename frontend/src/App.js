@@ -738,7 +738,8 @@ function App() {
           console.log('💾 Updated recipe with NEW cart URL');
         }
         
-        setShowWalmartConfirm(true); // Show confirmation dialog
+        // Skip confirmation dialog since we opened immediately
+        // setShowWalmartConfirm(true);
         
       } catch (error) {
         console.error('❌ Grocery cart generation error:', error);
