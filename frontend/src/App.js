@@ -775,62 +775,36 @@ function App() {
     };
 
     const handleSendToWalmart = () => {
-      console.log('🚀 Opening Walmart (Safari-optimized)...');
+      console.log('🚀 Opening Walmart (fixed method)...');
       
       if (groceryCart && groceryCart.walmart_url) {
         const walmartUrl = groceryCart.walmart_url;
         console.log('🛒 Walmart URL:', walmartUrl);
         
-        // SAFARI-SPECIFIC METHOD: Immediate link creation and click
+        // ONLY METHOD: Create proper link and click - NO window navigation
         try {
-          // Create link immediately without any delay
           const link = document.createElement('a');
           link.href = walmartUrl;
           link.target = '_blank';
           link.rel = 'noopener noreferrer';
           link.style.display = 'none';
           
-          // Add to DOM and click immediately
           document.body.appendChild(link);
-          
-          // For Safari: Simulate user click more directly
-          const clickEvent = new MouseEvent('click', {
-            view: window,
-            bubbles: true,
-            cancelable: true
-          });
-          
-          link.dispatchEvent(clickEvent);
-          
-          // Clean up
+          link.click();
           document.body.removeChild(link);
           
-          console.log('✅ Opened via Safari-optimized link click');
+          console.log('✅ Successfully opened Walmart via link click');
           alert('✅ Successfully opened Walmart! Check your new tab.');
           
         } catch (e) {
-          console.log('❌ Safari method failed, trying alternatives:', e);
+          console.log('❌ Link click failed:', e);
           
-          // FALLBACK 1: Try standard window.open
+          // FALLBACK: Copy URL only - NO window operations
           try {
-            const opened = window.open(walmartUrl, '_blank');
-            if (opened && !opened.closed) {
-              console.log('✅ Successfully opened via window.open');
-              alert('✅ Successfully opened Walmart! Check your new tab.');
-            } else {
-              throw new Error('Popup blocked');
-            }
+            navigator.clipboard.writeText(walmartUrl);
+            alert(`🛒 WALMART CART READY!\n\nURL copied to clipboard:\n\n${walmartUrl}\n\nPaste in a new browser tab to open your cart.`);
           } catch (e2) {
-            // FALLBACK 2: Ask user to manually open
-            console.log('❌ All methods blocked, showing manual instructions');
-            
-            // Copy to clipboard automatically for Safari
-            try {
-              navigator.clipboard.writeText(walmartUrl);
-              alert(`🍎 SAFARI POPUP BLOCKED!\n\nURL automatically copied to clipboard!\n\nSteps:\n1. Open a new tab (⌘+T)\n2. Paste (⌘+V) and press Enter\n\nURL: ${walmartUrl}`);
-            } catch (e3) {
-              alert(`🍎 SAFARI POPUP BLOCKED!\n\nCopy this URL manually:\n\n${walmartUrl}\n\nSteps:\n1. Select and copy the URL above\n2. Open new tab (⌘+T)\n3. Paste (⌘+V) and press Enter`);
-            }
+            alert(`🛒 WALMART CART READY!\n\nCopy this URL and open in a new tab:\n\n${walmartUrl}`);
           }
         }
         
