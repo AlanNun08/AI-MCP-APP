@@ -990,18 +990,19 @@ function App() {
                     const walmartUrl = recipe.walmart_url;
                     console.log('🚀 Opening saved Walmart URL immediately:', walmartUrl);
                     
-                    // IMMEDIATE REDIRECT
+                    // ONLY use window.open - NO navigation of current tab
                     try {
-                      window.open(walmartUrl, '_blank');
-                      console.log('✅ Successfully opened saved Walmart URL');
-                      alert('✅ Successfully opened Walmart! Check your new tab.');
+                      const opened = window.open(walmartUrl, '_blank');
+                      if (opened) {
+                        console.log('✅ Successfully opened saved Walmart URL');
+                        alert('✅ Successfully opened Walmart! Check your new tab.');
+                      } else {
+                        console.log('⚠️ Popup blocked');
+                        alert(`🛒 WALMART CART:\n\nPopup blocked. Copy this URL and paste in a new tab:\n\n${walmartUrl}`);
+                      }
                     } catch (e) {
                       console.log('❌ Failed to open saved URL:', e);
-                      try {
-                        window.location.assign(walmartUrl);
-                      } catch (e2) {
-                        alert(`🛒 WALMART URL:\n\n${walmartUrl}`);
-                      }
+                      alert(`🛒 WALMART CART:\n\nCopy this URL and paste in a new tab:\n\n${walmartUrl}`);
                     }
                   }}
                   className="w-full bg-gradient-to-r from-green-500 to-blue-500 text-white font-semibold py-4 px-6 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 mb-2"
