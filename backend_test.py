@@ -28,6 +28,11 @@ class AIRecipeAppTester:
         self.cart_options_id = None
         self.timeout_issues = False
         self.mongodb_objectid_issues = False
+        # Email verification test variables
+        self.test_email = f"test_{uuid.uuid4()}@example.com"
+        self.test_password = "SecureP@ssw0rd123"
+        self.verification_code = None
+        self.verified_user_id = None
 
     def run_test(self, name, method, endpoint, expected_status, data=None, params=None, timeout=30):
         """Run a single API test with configurable timeout"""
