@@ -279,10 +279,8 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Grocery Cart Integration"
     - "Recipe Generation"
-  stuck_tasks:
-    - "Grocery Cart Integration"
+  stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 
