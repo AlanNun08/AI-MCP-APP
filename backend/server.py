@@ -10,6 +10,7 @@ from typing import List, Optional, Dict, Any
 import uuid
 from datetime import datetime, timedelta
 from dateutil import parser
+from bson import ObjectId
 import openai
 from openai import OpenAI
 import json
