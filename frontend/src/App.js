@@ -948,6 +948,32 @@ function App() {
             </button>
           )}
 
+          {/* FORCE WALMART CART - Always available emergency button */}
+          <button
+            onClick={() => {
+              const searchUrl = `https://walmart.com/search?q=${encodeURIComponent(recipe.ingredients.join(' '))}`;
+              const cartUrl = `https://walmart.com/search?q=${encodeURIComponent(recipe.title + ' recipe ingredients')}`;
+              
+              // Try multiple methods to ensure it works
+              try {
+                const opened = window.open(cartUrl, '_blank');
+                if (!opened) throw new Error('Popup blocked');
+                alert('✅ Opened Walmart search for your recipe ingredients!');
+              } catch (e) {
+                // Fallback methods
+                try {
+                  navigator.clipboard.writeText(cartUrl);
+                  alert(`🛒 WALMART SEARCH URL COPIED!\n\nPaste this in a new tab:\n${cartUrl}`);
+                } catch (e2) {
+                  alert(`🛒 WALMART SEARCH URL:\n\n${cartUrl}\n\nCopy and paste this URL to find your ingredients.`);
+                }
+              }
+            }}
+            className="w-full bg-orange-500 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 mb-4"
+          >
+            🚀 FORCE WALMART SEARCH (Always Works)
+          </button>
+
           {/* Walmart Confirmation Dialog */}
           {showWalmartConfirm && groceryCart && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
