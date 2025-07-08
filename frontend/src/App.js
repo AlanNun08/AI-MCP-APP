@@ -775,10 +775,14 @@ function App() {
         // Open fallback URL immediately too
         if (fallbackCart.walmart_url) {
           try {
-            window.open(fallbackCart.walmart_url, '_blank');
-            alert('✅ Opened Walmart search for your recipe!');
+            const opened = window.open(fallbackCart.walmart_url, '_blank');
+            if (opened) {
+              alert('✅ Opened Walmart search for your recipe!');
+            } else {
+              alert(`🛒 WALMART SEARCH:\n\nPopup blocked. Copy this URL:\n\n${fallbackCart.walmart_url}`);
+            }
           } catch (e) {
-            alert(`🛒 SEARCH WALMART FOR:\n\n${fallbackCart.walmart_url}`);
+            alert(`🛒 WALMART SEARCH:\n\nCopy this URL:\n\n${fallbackCart.walmart_url}`);
           }
         }
         
