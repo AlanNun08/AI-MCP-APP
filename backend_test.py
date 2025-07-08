@@ -183,59 +183,82 @@ class AIRecipeAppTester:
         return success
         
     # Email Verification System Tests
-    def test_user_registration(self):
-        """Test user registration with email verification"""
+    def test_cleanup_test_data(self):
+        """Test cleanup of test data"""
         print("\n" + "=" * 50)
-        print("Testing User Registration with Email Verification")
+        print("Cleaning up test data")
         print("=" * 50)
         
-        # Test valid registration
-        user_data = {
-            "first_name": "Test",
-            "last_name": "User",
-            "email": self.test_email,
-            "password": self.test_password,
-            "dietary_preferences": ["vegetarian"],
-            "allergies": ["nuts"],
-            "favorite_cuisines": ["italian", "mexican"]
+        success, response = self.run_test(
+            "Cleanup Test Data",
+            "DELETE",
+            "debug/cleanup-test-data",
+            200
+        )
+        
+        if success and 'message' in response:
+            print(f"✅ Test data cleaned up: {response.get('users_deleted', 0)} users and {response.get('codes_deleted', 0)} codes deleted")
+            return True
+        return False
+    
+    def test_get_verification_code(self, email):
+        """Test getting verification code from debug endpoint"""
+        if not email:
+            print("❌ No email provided")
+            return False
+            
+        success, response = self.run_test(
+            "Get Verification Code",
+            "GET",
+            f"debug/verification-codes/{email}",
+            200
+        )
+        
+        if success and 'codes' in response and len(response['codes']) > 0:
+            self.verification_code = response['codes'][0]['code']
+            print(f"✅ Retrieved verification code: {self.verification_code}")
+            return True
+        elif success and 'last_test_code' in response and response['last_test_code']:
+            self.verification_code = response['last_test_code']
+            print(f"✅ Retrieved last test verification code: {self.verification_code}")
+            return True
+        else:
+            print("❌ No verification code found")
+            return False
+            
+    def test_case_insensitive_email(self):
+        """Test case-insensitive email handling"""
+        # Create a mixed case version of the email
+        if not self.test_email:
+            print("❌ No test email available")
+            return False
+            
+        # Create a mixed case version by capitalizing random characters
+        email_parts = self.test_email.split('@')
+        mixed_case_local = ''.join([c.upper() if random.choice([True, False]) else c for c in email_parts[0]])
+        self.mixed_case_email = f"{mixed_case_local}@{email_parts[1]}"
+        
+        print(f"Testing case-insensitive email handling with: {self.mixed_case_email}")
+        
+        # Try to login with mixed case email
+        login_data = {
+            "email": self.mixed_case_email,
+            "password": self.test_password
         }
         
         success, response = self.run_test(
-            "User Registration",
+            "Login with Mixed Case Email",
             "POST",
-            "auth/register",
+            "auth/login",
             200,
-            data=user_data
+            data=login_data
         )
         
-        if success and 'user_id' in response:
-            self.verified_user_id = response['user_id']
-            print(f"✅ User registered with ID: {self.verified_user_id}")
-            
-            # Extract verification code from response or logs
-            # In a real scenario, we would get this from the email
-            # For testing, we'll mock this by generating a code
-            # This is a hack for testing purposes only
-            try:
-                # Try to extract code from logs or response
-                if 'verification_code' in str(response):
-                    match = re.search(r'verification_code[\'"]?\s*[:=]\s*[\'"]?(\d{6})[\'"]?', str(response))
-                    if match:
-                        self.verification_code = match.group(1)
-                        print(f"✅ Extracted verification code: {self.verification_code}")
-                
-                # If we couldn't extract it, we'll need to get it from the database
-                # In a real test, we would mock the email service
-                if not self.verification_code:
-                    print("⚠️ Could not extract verification code from response")
-                    print("⚠️ In a real scenario, we would get this from the email or mock the service")
-                    # For testing purposes, we'll use a mock code
-                    self.verification_code = "123456"
-            except Exception as e:
-                print(f"⚠️ Error extracting verification code: {str(e)}")
-                self.verification_code = "123456"  # Mock code for testing
-            
-            return True
+        if success and 'message' in response:
+            if 'successful' in response['message'].lower():
+                print(f"✅ Case-insensitive email login successful")
+                return True
+        
         return False
     
     def test_duplicate_email_registration(self):
