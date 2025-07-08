@@ -439,6 +439,84 @@ async def save_recipe(recipe_id: str, user_id: str):
     
     return {"message": "Recipe saved successfully"}
 
+# Simple cart generation with just ingredient names (no portions)
+@api_router.post("/grocery/simple-cart")
+async def create_simple_grocery_cart(recipe_id: str, user_id: str):
+    """Create simple grocery cart with just ingredient names (no portions) for easier shopping"""
+    # Get recipe
+    recipe = await db.recipes.find_one({"id": recipe_id})
+    if not recipe:
+        raise HTTPException(status_code=404, detail="Recipe not found")
+    
+    simple_items = []
+    total_price = 0
+    walmart_product_ids = []
+    
+    logging.info(f"Processing {len(recipe['ingredients'])} ingredients for simple Walmart cart")
+    
+    # Process ingredients in parallel for better performance
+    search_tasks = []
+    for ingredient in recipe["ingredients"]:
+        # Extract just the main ingredient name without quantities
+        clean_name = clean_ingredient_name(ingredient)
+        search_tasks.append(search_walmart_products(clean_name))
+    
+    # Execute all searches concurrently
+    walmart_products = await asyncio.gather(*search_tasks, return_exceptions=True)
+    
+    for i, ingredient in enumerate(recipe["ingredients"]):
+        walmart_product = walmart_products[i]
+        clean_name = clean_ingredient_name(ingredient)
+        
+        if isinstance(walmart_product, WalmartProduct) and walmart_product.product_id:
+            # Successfully found Walmart product - use quantity 1 for all items
+            simple_items.append({
+                "name": walmart_product.name,
+                "original_ingredient": ingredient,
+                "product_id": walmart_product.product_id,
+                "price": walmart_product.price,
+                "thumbnail": walmart_product.thumbnail_image
+            })
+            
+            total_price += walmart_product.price
+            walmart_product_ids.append(walmart_product.product_id)  # Quantity = 1 for all
+                
+        else:
+            # Product not found
+            simple_items.append({
+                "name": clean_name,
+                "original_ingredient": ingredient,
+                "product_id": None,
+                "price": 0.0,
+                "status": "not_found"
+            })
+            
+            logging.warning(f"Could not find Walmart product for: {ingredient}")
+    
+    # Generate simple Walmart affiliate URL (all items with quantity 1)
+    if walmart_product_ids:
+        walmart_url = f"https://affil.walmart.com/cart/addToCart?items={','.join(walmart_product_ids)}"
+    else:
+        walmart_url = "https://walmart.com"  # Fallback URL
+    
+    # Create simple cart
+    simple_cart = {
+        "id": str(uuid.uuid4()),
+        "user_id": user_id,
+        "recipe_id": recipe_id,
+        "simple_items": simple_items,
+        "total_price": round(total_price, 2),
+        "walmart_url": walmart_url,
+        "created_at": datetime.utcnow()
+    }
+    
+    # Save to database
+    await db.simple_grocery_carts.insert_one(simple_cart)
+    
+    logging.info(f"Created simple grocery cart with {len([item for item in simple_items if 'status' not in item])} found items out of {len(simple_items)} total")
+    
+    return simple_cart
+
 # Enhanced Walmart integration with multiple options per ingredient
 @api_router.post("/grocery/cart-options", response_model=GroceryCartWithOptions)
 async def create_grocery_cart_with_options(recipe_id: str, user_id: str):
