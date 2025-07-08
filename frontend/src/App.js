@@ -951,6 +951,487 @@ function App() {
     );
   };
 
+  // Recipe Generation Screen Component
+  const RecipeGenerationScreen = () => {
+    const [formData, setFormData] = useState({
+      cuisine_type: '',
+      dietary_preferences: [],
+      ingredients_on_hand: '',
+      prep_time_max: '',
+      servings: 4,
+      difficulty: 'medium',
+      is_healthy: false,
+      max_calories_per_serving: 400,
+      is_budget_friendly: false,
+      max_budget: 20
+    });
+    const [isGenerating, setIsGenerating] = useState(false);
+
+    const cuisineOptions = ['italian', 'mexican', 'chinese', 'indian', 'mediterranean', 'american', 'thai', 'japanese'];
+    const dietaryOptions = ['vegetarian', 'vegan', 'gluten-free', 'dairy-free', 'keto', 'paleo'];
+    const difficultyOptions = ['easy', 'medium', 'hard'];
+
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+      
+      if (!formData.cuisine_type) {
+        showNotification('❌ Please select a cuisine type', 'error');
+        return;
+      }
+
+      setIsGenerating(true);
+      try {
+        const requestData = {
+          user_id: user.id,
+          cuisine_type: formData.cuisine_type,
+          dietary_preferences: formData.dietary_preferences,
+          ingredients_on_hand: formData.ingredients_on_hand ? formData.ingredients_on_hand.split(',').map(i => i.trim()) : [],
+          prep_time_max: formData.prep_time_max ? parseInt(formData.prep_time_max) : null,
+          servings: formData.servings,
+          difficulty: formData.difficulty,
+          is_healthy: formData.is_healthy,
+          max_calories_per_serving: formData.is_healthy ? formData.max_calories_per_serving : null,
+          is_budget_friendly: formData.is_budget_friendly,
+          max_budget: formData.is_budget_friendly ? formData.max_budget : null
+        };
+
+        const response = await axios.post(`${API}/api/recipes/generate`, requestData);
+        
+        // Store recipe and navigate to detail
+        window.currentRecipe = response.data;
+        setCurrentScreen('recipe-detail');
+        showNotification('🎉 Recipe generated successfully!', 'success');
+        
+      } catch (error) {
+        console.error('Recipe generation failed:', error);
+        const errorMessage = error.response?.data?.detail || 'Failed to generate recipe. Please try again.';
+        showNotification(`❌ ${errorMessage}`, 'error');
+      } finally {
+        setIsGenerating(false);
+      }
+    };
+
+    const toggleArrayItem = (array, item, setField) => {
+      const newArray = array.includes(item)
+        ? array.filter(i => i !== item)
+        : [...array, item];
+      setField(newArray);
+    };
+
+    return (
+      <div className="min-h-screen bg-gray-50 p-4">
+        <div className="max-w-md mx-auto">
+          <div className="bg-white rounded-2xl shadow-sm p-6 mb-4">
+            <div className="flex items-center space-x-3 mb-6">
+              <button
+                onClick={() => setCurrentScreen('dashboard')}
+                className="text-gray-600 hover:text-gray-800"
+              >
+                ← Back
+              </button>
+              <div>
+                <h2 className="text-xl font-bold text-gray-800">🤖 Generate AI Recipe</h2>
+                <p className="text-gray-600 text-sm">Create a personalized recipe just for you</p>
+              </div>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Cuisine Type */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Cuisine Type *</label>
+                <select
+                  value={formData.cuisine_type}
+                  onChange={(e) => setFormData({...formData, cuisine_type: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  required
+                >
+                  <option value="">Select cuisine...</option>
+                  {cuisineOptions.map(cuisine => (
+                    <option key={cuisine} value={cuisine}>
+                      {cuisine.charAt(0).toUpperCase() + cuisine.slice(1)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Dietary Preferences */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Dietary Preferences</label>
+                <div className="grid grid-cols-2 gap-2">
+                  {dietaryOptions.map(option => (
+                    <label key={option} className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-50 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={formData.dietary_preferences.includes(option)}
+                        onChange={() => toggleArrayItem(formData.dietary_preferences, option, 
+                          (newArray) => setFormData({...formData, dietary_preferences: newArray}))}
+                        className="rounded text-green-500"
+                      />
+                      <span className="text-sm capitalize">{option}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Healthy Mode Toggle */}
+              <div className="bg-green-50 p-4 rounded-xl">
+                <label className="flex items-center space-x-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={formData.is_healthy}
+                    onChange={(e) => setFormData({...formData, is_healthy: e.target.checked})}
+                    className="rounded text-green-500"
+                  />
+                  <div>
+                    <span className="font-medium text-green-800">🍃 Healthy Mode</span>
+                    <p className="text-sm text-green-600">Limit calories per serving</p>
+                  </div>
+                </label>
+                {formData.is_healthy && (
+                  <div className="mt-3">
+                    <label className="block text-sm font-medium text-green-700 mb-1">Max Calories per Serving</label>
+                    <input
+                      type="number"
+                      value={formData.max_calories_per_serving}
+                      onChange={(e) => setFormData({...formData, max_calories_per_serving: parseInt(e.target.value)})}
+                      className="w-full px-3 py-2 border border-green-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                      min="200"
+                      max="800"
+                      placeholder="400"
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* Budget Mode Toggle */}
+              <div className="bg-blue-50 p-4 rounded-xl">
+                <label className="flex items-center space-x-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={formData.is_budget_friendly}
+                    onChange={(e) => setFormData({...formData, is_budget_friendly: e.target.checked})}
+                    className="rounded text-blue-500"
+                  />
+                  <div>
+                    <span className="font-medium text-blue-800">💰 Budget Mode</span>
+                    <p className="text-sm text-blue-600">Set maximum budget</p>
+                  </div>
+                </label>
+                {formData.is_budget_friendly && (
+                  <div className="mt-3">
+                    <label className="block text-sm font-medium text-blue-700 mb-1">Max Budget ($)</label>
+                    <input
+                      type="number"
+                      value={formData.max_budget}
+                      onChange={(e) => setFormData({...formData, max_budget: parseInt(e.target.value)})}
+                      className="w-full px-3 py-2 border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      min="5"
+                      max="100"
+                      placeholder="20"
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* Servings and Difficulty */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Servings</label>
+                  <input
+                    type="number"
+                    value={formData.servings}
+                    onChange={(e) => setFormData({...formData, servings: parseInt(e.target.value)})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    min="1"
+                    max="12"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Difficulty</label>
+                  <select
+                    value={formData.difficulty}
+                    onChange={(e) => setFormData({...formData, difficulty: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  >
+                    {difficultyOptions.map(difficulty => (
+                      <option key={difficulty} value={difficulty}>
+                        {difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Optional Fields */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Ingredients on Hand (optional)</label>
+                <input
+                  type="text"
+                  value={formData.ingredients_on_hand}
+                  onChange={(e) => setFormData({...formData, ingredients_on_hand: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  placeholder="chicken, rice, onions (comma separated)"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Max Prep Time (optional)</label>
+                <input
+                  type="number"
+                  value={formData.prep_time_max}
+                  onChange={(e) => setFormData({...formData, prep_time_max: e.target.value})}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  placeholder="30 minutes"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={isGenerating}
+                className="w-full bg-gradient-to-r from-green-500 to-blue-500 text-white font-semibold py-4 px-6 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
+              >
+                {isGenerating ? (
+                  <div className="flex items-center justify-center space-x-2">
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <span>AI is cooking up your recipe...</span>
+                  </div>
+                ) : (
+                  '🤖 Generate Recipe'
+                )}
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Recipe Detail Screen Component
+  const RecipeDetailScreen = ({ recipe, showBackButton = false }) => {
+    const [generatingCart, setGeneratingCart] = useState(false);
+
+    const generateGroceryCart = async () => {
+      if (!recipe) return;
+      
+      setGeneratingCart(true);
+      try {
+        const response = await axios.post(`${API}/api/grocery/cart-options?recipe_id=${recipe.id}&user_id=${user.id}`);
+        
+        if (response.data && response.data.ingredient_options) {
+          // For demo, create a Walmart URL
+          const productIds = response.data.ingredient_options
+            .flatMap(ing => ing.options || [])
+            .map(opt => opt.product_id)
+            .slice(0, 5); // Limit to first 5 products
+          
+          const walmartUrl = `https://www.walmart.com/cart?items=${productIds.join(',')}`;
+          
+          // Open Walmart in new tab
+          window.open(walmartUrl, '_blank');
+          showNotification('🛒 Walmart cart opened! Happy shopping!', 'success');
+        }
+      } catch (error) {
+        console.error('Cart generation failed:', error);
+        showNotification('❌ Failed to generate cart. Please try again.', 'error');
+      } finally {
+        setGeneratingCart(false);
+      }
+    };
+
+    if (!recipe) {
+      return (
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-gray-800 mb-4">No Recipe Found</h1>
+            <button
+              onClick={() => setCurrentScreen('dashboard')}
+              className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600"
+            >
+              Back to Dashboard
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="min-h-screen bg-gray-50 p-4">
+        <div className="max-w-2xl mx-auto">
+          {showBackButton && (
+            <button
+              onClick={() => setCurrentScreen('dashboard')}
+              className="mb-4 text-gray-600 hover:text-gray-800 flex items-center space-x-2"
+            >
+              <span>←</span>
+              <span>Back to Dashboard</span>
+            </button>
+          )}
+
+          <div className="bg-white rounded-2xl shadow-sm p-6 mb-4">
+            <div className="text-center mb-6">
+              <h1 className="text-2xl font-bold text-gray-800 mb-2">{recipe.title}</h1>
+              <p className="text-gray-600">{recipe.description}</p>
+              
+              <div className="flex justify-center space-x-4 mt-4 text-sm">
+                <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full">
+                  ⏱️ {recipe.prep_time}min prep
+                </span>
+                <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full">
+                  🍽️ {recipe.servings} servings
+                </span>
+                {recipe.calories_per_serving && (
+                  <span className="bg-orange-100 text-orange-800 px-3 py-1 rounded-full">
+                    🔥 {recipe.calories_per_serving} cal
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Ingredients */}
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold text-gray-800 mb-3">🥘 Ingredients</h3>
+              <ul className="space-y-2">
+                {recipe.ingredients?.map((ingredient, index) => (
+                  <li key={index} className="flex items-start space-x-2">
+                    <span className="text-green-500 mt-1">•</span>
+                    <span className="text-gray-700">{ingredient}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Instructions */}
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold text-gray-800 mb-3">👨‍🍳 Instructions</h3>
+              <ol className="space-y-3">
+                {recipe.instructions?.map((instruction, index) => (
+                  <li key={index} className="flex items-start space-x-3">
+                    <span className="bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-medium flex-shrink-0 mt-0.5">
+                      {index + 1}
+                    </span>
+                    <span className="text-gray-700">{instruction}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+
+            {/* Grocery Cart Button */}
+            <div className="border-t pt-6">
+              <button
+                onClick={generateGroceryCart}
+                disabled={generatingCart}
+                className="w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold py-4 px-6 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
+              >
+                {generatingCart ? (
+                  <div className="flex items-center justify-center space-x-2">
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <span>Generating Cart...</span>
+                  </div>
+                ) : (
+                  '🛒 Order Groceries from Walmart'
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Recipe History Screen Component  
+  const RecipeHistoryScreen = () => {
+    const [recipes, setRecipes] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+      const fetchRecipes = async () => {
+        try {
+          const response = await axios.get(`${API}/api/users/${user.id}/recipes`);
+          setRecipes(response.data);
+        } catch (error) {
+          console.error('Failed to fetch recipes:', error);
+          showNotification('❌ Failed to load recipes', 'error');
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      if (user?.id) {
+        fetchRecipes();
+      }
+    }, [user]);
+
+    if (loading) {
+      return (
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="text-center">
+            <div className="w-8 h-8 border-4 border-green-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading your recipes...</p>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="min-h-screen bg-gray-50 p-4">
+        <div className="max-w-md mx-auto">
+          <div className="flex items-center space-x-3 mb-6">
+            <button
+              onClick={() => setCurrentScreen('dashboard')}
+              className="text-gray-600 hover:text-gray-800"
+            >
+              ← Back
+            </button>
+            <div>
+              <h2 className="text-xl font-bold text-gray-800">📚 Recipe History</h2>
+              <p className="text-gray-600 text-sm">{recipes.length} saved recipes</p>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            {recipes.length === 0 ? (
+              <div className="bg-white rounded-2xl shadow-sm p-8 text-center">
+                <div className="text-4xl mb-4">🍽️</div>
+                <h3 className="text-lg font-semibold text-gray-800 mb-2">No Recipes Yet</h3>
+                <p className="text-gray-600 mb-4">Generate your first AI recipe to get started!</p>
+                <button
+                  onClick={() => setCurrentScreen('generate-recipe')}
+                  className="bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600"
+                >
+                  Generate Recipe
+                </button>
+              </div>
+            ) : (
+              recipes.map((recipe) => (
+                <div key={recipe.id} className="bg-white rounded-2xl shadow-sm p-4 hover:shadow-md transition-shadow cursor-pointer"
+                     onClick={() => {
+                       window.currentRecipe = recipe;
+                       setCurrentScreen('recipe-detail');
+                     }}>
+                  <h3 className="font-semibold text-gray-800 mb-1">{recipe.title}</h3>
+                  <p className="text-gray-600 text-sm mb-2">{recipe.description}</p>
+                  <div className="flex space-x-2 text-xs">
+                    <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                      {recipe.prep_time}min
+                    </span>
+                    <span className="bg-green-100 text-green-800 px-2 py-1 rounded">
+                      {recipe.servings} servings
+                    </span>
+                    {recipe.calories_per_serving && (
+                      <span className="bg-orange-100 text-orange-800 px-2 py-1 rounded">
+                        {recipe.calories_per_serving} cal
+                      </span>
+                    )}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   // For now, let me add a placeholder for other screens
   const OtherScreen = ({ screenName }) => (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
