@@ -55,6 +55,11 @@ class AIRecipeAppTester:
                 response = requests.post(url, json=data, headers=headers, params=params, timeout=timeout)
             elif method == 'PUT':
                 response = requests.put(url, json=data, headers=headers, timeout=timeout)
+            elif method == 'DELETE':
+                response = requests.delete(url, headers=headers, timeout=timeout)
+            else:
+                print(f"❌ Unsupported method: {method}")
+                return False, {}
             
             elapsed_time = time.time() - start_time
             print(f"⏱️ Request completed in {elapsed_time:.2f} seconds")
