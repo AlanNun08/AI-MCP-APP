@@ -250,18 +250,28 @@ async def register_user(user_data: UserRegistration):
 async def verify_email(verify_request: VerifyCodeRequest):
     """Verify email with 6-digit code"""
     try:
-        # Find the verification code
+        # Find the most recent valid verification code
         code_doc = await db.verification_codes.find_one({
             "email": verify_request.email,
             "code": verify_request.code,
             "is_used": False
-        })
+        }, sort=[("created_at", -1)])
         
         if not code_doc:
-            raise HTTPException(status_code=400, detail="Invalid verification code")
+            raise HTTPException(status_code=400, detail="Invalid or expired verification code")
         
-        # Check if code is expired
-        if datetime.utcnow() > code_doc["expires_at"]:
+        # Check if code is expired (convert string to datetime if needed)
+        expires_at = code_doc["expires_at"]
+        if isinstance(expires_at, str):
+            from dateutil import parser
+            expires_at = parser.parse(expires_at)
+        
+        if datetime.utcnow() > expires_at:
+            # Mark expired codes as used
+            await db.verification_codes.update_one(
+                {"_id": code_doc["_id"]},
+                {"$set": {"is_used": True}}
+            )
             raise HTTPException(status_code=400, detail="Verification code has expired")
         
         # Mark code as used
