@@ -395,6 +395,90 @@ function App() {
               </select>
             </div>
 
+            {/* Healthy Eating Toggle */}
+            <div className="bg-green-50 p-4 rounded-xl">
+              <div className="flex items-center justify-between mb-3">
+                <label className="text-sm font-medium text-green-800">🍃 Healthy Recipe Mode</label>
+                <button
+                  type="button"
+                  onClick={() => setGenRequest({...genRequest, is_healthy: !genRequest.is_healthy})}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                    genRequest.is_healthy ? 'bg-green-500' : 'bg-gray-300'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      genRequest.is_healthy ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
+              </div>
+              
+              {genRequest.is_healthy && (
+                <div>
+                  <label className="block text-xs font-medium text-green-700 mb-2">
+                    Max Calories Per Serving
+                  </label>
+                  <select
+                    value={genRequest.max_calories_per_serving}
+                    onChange={(e) => setGenRequest({...genRequest, max_calories_per_serving: parseInt(e.target.value)})}
+                    className="w-full px-3 py-2 border border-green-300 rounded-lg focus:ring-2 focus:ring-green-500 text-sm"
+                  >
+                    <option value={300}>300 calories (Very Light)</option>
+                    <option value={400}>400 calories (Light)</option>
+                    <option value={500}>500 calories (Moderate)</option>
+                    <option value={600}>600 calories (Balanced)</option>
+                    <option value={700}>700 calories (Hearty)</option>
+                  </select>
+                  <p className="text-xs text-green-600 mt-1">
+                    AI will focus on lean proteins, vegetables, and whole grains
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Budget-Friendly Toggle */}
+            <div className="bg-yellow-50 p-4 rounded-xl">
+              <div className="flex items-center justify-between mb-3">
+                <label className="text-sm font-medium text-yellow-800">💰 Budget-Friendly Mode</label>
+                <button
+                  type="button"
+                  onClick={() => setGenRequest({...genRequest, is_budget_friendly: !genRequest.is_budget_friendly})}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                    genRequest.is_budget_friendly ? 'bg-yellow-500' : 'bg-gray-300'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      genRequest.is_budget_friendly ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
+              </div>
+              
+              {genRequest.is_budget_friendly && (
+                <div>
+                  <label className="block text-xs font-medium text-yellow-700 mb-2">
+                    Max Budget for Ingredients
+                  </label>
+                  <select
+                    value={genRequest.max_budget}
+                    onChange={(e) => setGenRequest({...genRequest, max_budget: parseFloat(e.target.value)})}
+                    className="w-full px-3 py-2 border border-yellow-300 rounded-lg focus:ring-2 focus:ring-yellow-500 text-sm"
+                  >
+                    <option value={10.0}>$10 (Ultra Budget)</option>
+                    <option value={15.0}>$15 (Budget)</option>
+                    <option value={20.0}>$20 (Economical)</option>
+                    <option value={25.0}>$25 (Moderate)</option>
+                    <option value={30.0}>$30 (Comfortable)</option>
+                  </select>
+                  <p className="text-xs text-yellow-600 mt-1">
+                    AI will use affordable ingredients like beans, rice, and seasonal produce
+                  </p>
+                </div>
+              )}
+            </div>
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Max Prep Time (minutes)</label>
               <input
