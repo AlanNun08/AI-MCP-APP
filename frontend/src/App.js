@@ -652,36 +652,27 @@ function App() {
 
     const handleGenerateCart = async () => {
       if (!user) {
-        alert('❌ Error: User not logged in! Please go back to dashboard and try again.');
+        alert('❌ Please log in to generate your cart.');
         return;
       }
       
       if (!recipe) {
-        alert('❌ Error: Recipe data missing! Please go back and select the recipe again.');
+        alert('❌ Recipe not found. Please try again.');
         return;
       }
       
       setGenerating(true);
-      
-      // Clear any existing grocery cart to force fresh generation
       setGroceryCart(null);
       
       try {
-        console.log('🔄 Starting FRESH cart generation...');
-        
-        // Create grocery cart with options using the working endpoint
         const response = await axios.post(`${API}/grocery/cart-options?recipe_id=${recipe.id}&user_id=${user.id}`);
         
-        console.log('✅ Cart generated successfully:', response.data);
-        
-        // Convert cart options to simple cart format for display
         const cartOptions = response.data;
         const simpleCart = {
           id: cartOptions.id,
           user_id: cartOptions.user_id,
           recipe_id: cartOptions.recipe_id,
           simple_items: cartOptions.ingredient_options.map(option => {
-            // Use first available product option or create placeholder
             if (option.options && option.options.length > 0) {
               const firstOption = option.options[0];
               return {
@@ -709,25 +700,23 @@ function App() {
             "https://walmart.com"
         };
         
-        console.log('🛒 NEW Walmart URL generated:', simpleCart.walmart_url);
-        console.log('🆔 NEW Cart ID:', simpleCart.id);
-        
         setGroceryCart(simpleCart);
         
-        // FORCE UPDATE: Save the NEW Walmart URL to the recipe (overwrite any old one)
+        // Save URL to recipe for future use
         if (recipe && recipe.id && simpleCart.walmart_url) {
-          window.currentRecipe = { ...recipe, walmart_url: simpleCart.walmart_url, cart_generated: true, cart_id: simpleCart.id, last_updated: new Date().toISOString() };
-          console.log('💾 Updated recipe with NEW cart URL');
+          window.currentRecipe = { 
+            ...recipe, 
+            walmart_url: simpleCart.walmart_url, 
+            cart_generated: true, 
+            cart_id: simpleCart.id, 
+            last_updated: new Date().toISOString() 
+          };
         }
         
-        // Skip confirmation dialog - go straight to ready state
-        // setShowWalmartConfirm(true);
-        
       } catch (error) {
-        console.error('❌ Grocery cart generation error:', error);
+        console.error('Cart generation failed:', error);
         
-        // FALLBACK: Create guaranteed working cart with basic Walmart search
-        console.log('🔄 Creating fallback cart...');
+        // Fallback cart
         const fallbackCart = {
           id: 'fallback-cart-' + Date.now(),
           user_id: user.id,
@@ -738,47 +727,25 @@ function App() {
               name: cleanName,
               original_ingredient: ingredient,
               product_id: `fallback_${index}`,
-              price: Math.floor(Math.random() * 10) + 2 // Random price 2-12
+              price: Math.floor(Math.random() * 10) + 2
             };
           }),
           walmart_url: `https://walmart.com/search?q=${encodeURIComponent(recipe.ingredients.join(' '))}`,
-          total_price: recipe.ingredients.length * 5, // Estimate
+          total_price: recipe.ingredients.length * 5,
           fallback: true
         };
         
         setGroceryCart(fallbackCart);
         
-        // Save fallback URL too
         if (recipe && recipe.id) {
-          window.currentRecipe = { ...recipe, walmart_url: fallbackCart.walmart_url, cart_generated: true, cart_id: fallbackCart.id, last_updated: new Date().toISOString() };
+          window.currentRecipe = { 
+            ...recipe, 
+            walmart_url: fallbackCart.walmart_url, 
+            cart_generated: true, 
+            cart_id: fallbackCart.id, 
+            last_updated: new Date().toISOString() 
+          };
         }
-        
-        // Open fallback URL immediately too - SAFE METHOD
-        if (fallbackCart.walmart_url) {
-          try {
-            const link = document.createElement('a');
-            link.href = fallbackCart.walmart_url;
-            link.target = '_blank';
-            link.rel = 'noopener noreferrer';
-            link.style.display = 'none';
-            
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            
-            alert('✅ Opened Walmart search for your recipe!');
-          } catch (e) {
-            try {
-              navigator.clipboard.writeText(fallbackCart.walmart_url);
-              alert(`🛒 WALMART SEARCH URL COPIED:\n\n${fallbackCart.walmart_url}`);
-            } catch (e2) {
-              alert(`🛒 WALMART SEARCH:\n\n${fallbackCart.walmart_url}`);
-            }
-          }
-        }
-        
-        // Skip confirmation dialog
-        // setShowWalmartConfirm(true);
       } finally {
         setGenerating(false);
       }
