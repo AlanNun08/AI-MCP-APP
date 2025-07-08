@@ -645,15 +645,61 @@ function App() {
   const RecipeDetailScreen = ({ recipe, showBackButton = false }) => {
     const [showIngredients, setShowIngredients] = useState(true);
     const [groceryCart, setGroceryCart] = useState(null);
+    const [autoGenerating, setAutoGenerating] = useState(false);
+
+    // Auto-generate Walmart URL when component mounts if flag is set
+    useEffect(() => {
+      if (window.autoGenerateGroceries && recipe && user) {
+        window.autoGenerateGroceries = false; // Reset flag
+        handleAutoGenerateGroceries();
+      }
+    }, [recipe, user]);
+
+    const handleAutoGenerateGroceries = async () => {
+      setAutoGenerating(true);
+      try {
+        // Create a simplified grocery cart with just ingredient names (no portions)
+        const response = await axios.post(`${API}/grocery/simple-cart`, {
+          recipe_id: recipe.id,
+          user_id: user.id
+        });
+        setGroceryCart(response.data);
+      } catch (error) {
+        console.error('Auto grocery generation error:', error);
+        
+        // Create demo cart for offline mode
+        if (error.code === 'ERR_NETWORK') {
+          const demoCart = {
+            id: 'demo-cart-' + Date.now(),
+            user_id: user.id,
+            recipe_id: recipe.id,
+            simple_items: recipe.ingredients.map((ingredient, index) => {
+              // Extract just the main ingredient name without portions
+              const cleanName = ingredient.replace(/^\d+[\s\w\/]*\s+/, '').replace(/,.*$/, '').trim();
+              return {
+                name: cleanName,
+                original_ingredient: ingredient,
+                product_id: `demo_${index}`,
+                price: Math.floor(Math.random() * 10) + 2 // Random price 2-12
+              };
+            }),
+            walmart_url: `https://affil.walmart.com/cart/addToCart?items=${recipe.ingredients.map((_, i) => `demo_${i}`).join(',')}`,
+            total_price: recipe.ingredients.length * 5, // Estimate
+            demo: true
+          };
+          setGroceryCart(demoCart);
+        }
+      } finally {
+        setAutoGenerating(false);
+      }
+    };
 
     const handleOrderGroceries = async () => {
       setLoading(true);
       try {
-        const response = await axios.post(`${API}/grocery/cart`, null, {
-          params: {
-            recipe_id: recipe.id,
-            user_id: user.id
-          }
+        const response = await axios.post(`${API}/grocery/simple-cart`, {
+          recipe_id: recipe.id,
+          user_id: user.id
         });
         setGroceryCart(response.data);
       } catch (error) {
@@ -666,38 +712,17 @@ function App() {
             id: 'demo-cart-' + Date.now(),
             user_id: user.id,
             recipe_id: recipe.id,
-            items: [
-              {
-                product_id: "123456789",
-                name: "Main Ingredient",
-                quantity: 2,
-                price: 4.99,
-                original_ingredient: recipe.ingredients[0] || "Main ingredient"
-              },
-              {
-                product_id: "987654321", 
-                name: "Fresh Onion",
-                quantity: 1,
-                price: 1.99,
-                original_ingredient: "1 onion, diced"
-              },
-              {
-                product_id: "456789123",
-                name: "Fresh Garlic",
-                quantity: 1,
-                price: 2.49,
-                original_ingredient: "2 cloves garlic, minced"
-              },
-              {
-                product_id: "789123456",
-                name: "Olive Oil",
-                quantity: 1,
-                price: 5.99,
-                original_ingredient: "2 tbsp olive oil"
-              }
-            ],
-            total_price: 15.46,
-            walmart_url: "https://affil.walmart.com/cart/addToCart?items=123456789_2,987654321,456789123,789123456",
+            simple_items: recipe.ingredients.map((ingredient, index) => {
+              const cleanName = ingredient.replace(/^\d+[\s\w\/]*\s+/, '').replace(/,.*$/, '').trim();
+              return {
+                name: cleanName,
+                original_ingredient: ingredient,
+                product_id: `demo_${index}`,
+                price: Math.floor(Math.random() * 10) + 2
+              };
+            }),
+            walmart_url: `https://affil.walmart.com/cart/addToCart?items=${recipe.ingredients.map((_, i) => `demo_${i}`).join(',')}`,
+            total_price: recipe.ingredients.length * 5,
             demo: true
           };
           setGroceryCart(demoCart);
@@ -710,7 +735,7 @@ function App() {
     };
 
     if (groceryCart) {
-      return <GroceryCartScreen cart={groceryCart} />;
+      return <SimpleGroceryCartScreen cart={groceryCart} recipe={recipe} />;
     }
 
     return (
