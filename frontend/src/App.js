@@ -1161,59 +1161,58 @@ function App() {
     const handleOrderNow = () => {
       const walmartUrl = cart?.walmart_url || `https://walmart.com/search?q=${encodeURIComponent(recipe.title + ' ingredients')}`;
       
-      console.log('🚀 FORCING Walmart redirect:', walmartUrl);
+      console.log('🚀 Opening Walmart:', walmartUrl);
       
-      // AGGRESSIVE METHOD 1: Ask user and redirect directly (same tab)
-      if (confirm(`🛒 GO TO WALMART NOW?\n\nThis will take you to Walmart with your cart items.\n\nClick OK to go to Walmart or Cancel to copy the URL instead.`)) {
-        window.location.href = walmartUrl;
+      // Validate URL to avoid blank redirects
+      if (!walmartUrl || walmartUrl === '') {
+        alert('❌ No valid Walmart URL found. Please try again.');
         return;
       }
       
-      // AGGRESSIVE METHOD 2: Force new window with location change
+      // METHOD 1: Clean window.open approach
       try {
-        const newWindow = window.open('', '_blank');
-        if (newWindow) {
-          newWindow.location.href = walmartUrl;
-          newWindow.focus();
-          alert('✅ Opened Walmart in new tab! Check your browser tabs.');
+        const opened = window.open(walmartUrl, '_blank', 'noopener,noreferrer');
+        
+        if (opened && !opened.closed) {
+          alert('✅ Successfully opened Walmart! Check your new tab.');
           setTimeout(() => setCurrentScreen('all-recipes'), 1000);
           return;
         }
       } catch (e) {
-        console.log('New window method failed:', e);
+        console.log('Window.open failed:', e);
       }
       
-      // AGGRESSIVE METHOD 3: Create and click temporary link
+      // METHOD 2: Link click method (no blank windows)
       try {
         const link = document.createElement('a');
         link.href = walmartUrl;
         link.target = '_blank';
         link.rel = 'noopener noreferrer';
+        link.style.display = 'none';
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        alert('✅ Opened Walmart link! Check your new tab.');
+        
+        alert('✅ Opened Walmart! Check your new tab.');
         setTimeout(() => setCurrentScreen('all-recipes'), 1000);
         return;
       } catch (e) {
-        console.log('Link click method failed:', e);
+        console.log('Link click failed:', e);
       }
       
-      // AGGRESSIVE METHOD 4: Copy to clipboard with clear instructions
+      // METHOD 3: Copy to clipboard (no redirects)
       try {
         navigator.clipboard.writeText(walmartUrl);
-        alert(`🛒 WALMART URL COPIED!\n\nSteps to get to your cart:\n1. Open a new browser tab\n2. Press Ctrl+V (or Cmd+V on Mac) to paste\n3. Press Enter\n\nURL: ${walmartUrl}`);
+        alert(`🛒 WALMART URL COPIED!\n\nSteps:\n1. Open new browser tab\n2. Paste (Ctrl+V) and press Enter\n\nURL: ${walmartUrl}`);
+        setTimeout(() => setCurrentScreen('all-recipes'), 1000);
+        return;
       } catch (e) {
-        alert(`🛒 COPY THIS WALMART URL:\n\n${walmartUrl}\n\n1. Highlight and copy the URL above\n2. Open a new browser tab\n3. Paste and press Enter`);
+        console.log('Clipboard failed:', e);
       }
       
-      // Ask if they want to go in current tab
-      const useCurrentTab = confirm('Would you like to go to Walmart in this tab instead? (You will leave this app)');
-      if (useCurrentTab) {
-        window.location.href = walmartUrl;
-      } else {
-        setTimeout(() => setCurrentScreen('all-recipes'), 1000);
-      }
+      // METHOD 4: Show URL for manual copy
+      alert(`🛒 COPY THIS WALMART URL:\n\n${walmartUrl}\n\n1. Copy this URL\n2. Open new browser tab\n3. Paste and press Enter`);
+      setTimeout(() => setCurrentScreen('all-recipes'), 1000);
     };
 
     // Generate cart for saved recipes that don't have one
