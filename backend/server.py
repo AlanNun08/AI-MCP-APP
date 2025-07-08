@@ -519,6 +519,127 @@ async def cleanup_test_data():
         logging.error(f"Cleanup error: {str(e)}")
         raise HTTPException(status_code=500, detail="Cleanup failed")
 
+@api_router.post("/auth/forgot-password")
+async def forgot_password(request: PasswordResetRequest):
+    """Send password reset code to user's email"""
+    try:
+        # Normalize email
+        email_lower = request.email.lower().strip()
+        
+        # Find user
+        user = await db.users.find_one({"email": {"$regex": f"^{email_lower}$", "$options": "i"}})
+        if not user:
+            # Don't reveal if email exists for security - always return success
+            return {
+                "message": "If an account with this email exists, a password reset code has been sent.",
+                "email": email_lower
+            }
+        
+        # Generate reset code (6-digit)
+        reset_code = email_service.generate_verification_code()
+        expires_at = datetime.utcnow() + timedelta(minutes=10)  # 10 minutes for password reset
+        
+        # Mark any existing reset codes as used
+        await db.password_reset_codes.update_many(
+            {"email": email_lower, "is_used": False},
+            {"$set": {"is_used": True}}
+        )
+        
+        # Save new reset code
+        reset_doc = {
+            "id": str(uuid.uuid4()),
+            "user_id": user["id"],
+            "email": email_lower,
+            "code": reset_code,
+            "created_at": datetime.utcnow(),
+            "expires_at": expires_at,
+            "is_used": False
+        }
+        await db.password_reset_codes.insert_one(reset_doc)
+        
+        # Send reset email
+        email_sent = await email_service.send_password_reset_email(
+            to_email=email_lower,
+            first_name=user["first_name"],
+            reset_code=reset_code
+        )
+        
+        if not email_sent:
+            logging.warning(f"Failed to send password reset email to {email_lower}")
+        
+        return {
+            "message": "If an account with this email exists, a password reset code has been sent.",
+            "email": email_lower
+        }
+        
+    except Exception as e:
+        logging.error(f"Password reset error for {request.email}: {str(e)}")
+        raise HTTPException(status_code=500, detail="Password reset request failed")
+
+@api_router.post("/auth/reset-password")
+async def reset_password(request: PasswordResetVerify):
+    """Reset password with verification code"""
+    try:
+        # Normalize email
+        email_lower = request.email.lower().strip()
+        
+        # Validate new password
+        if len(request.new_password) < 6:
+            raise HTTPException(status_code=400, detail="Password must be at least 6 characters long")
+        
+        # Find the reset code
+        reset_doc = await db.password_reset_codes.find_one({
+            "email": email_lower,
+            "code": request.reset_code,
+            "is_used": False
+        }, sort=[("created_at", -1)])
+        
+        if not reset_doc:
+            raise HTTPException(status_code=400, detail="Invalid or expired reset code")
+        
+        # Check if code is expired
+        expires_at = reset_doc["expires_at"]
+        if isinstance(expires_at, str):
+            expires_at = parser.parse(expires_at)
+        
+        if datetime.utcnow() > expires_at:
+            # Mark expired code as used
+            await db.password_reset_codes.update_one(
+                {"_id": reset_doc["_id"]},
+                {"$set": {"is_used": True}}
+            )
+            raise HTTPException(status_code=400, detail="Reset code has expired")
+        
+        # Mark code as used
+        await db.password_reset_codes.update_one(
+            {"_id": reset_doc["_id"]},
+            {"$set": {"is_used": True}}
+        )
+        
+        # Hash new password
+        new_password_hash = hash_password(request.new_password)
+        
+        # Update user password
+        result = await db.users.update_one(
+            {"email": email_lower},
+            {"$set": {"password_hash": new_password_hash}}
+        )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        logging.info(f"Password reset successful for {email_lower}")
+        return {
+            "message": "Password reset successful. You can now login with your new password.",
+            "email": email_lower
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Password reset verification error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Password reset failed")
+
 # Keep all existing routes for backward compatibility
 @api_router.get("/")
 async def root():
