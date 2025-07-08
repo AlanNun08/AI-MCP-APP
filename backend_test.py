@@ -361,38 +361,37 @@ class AIRecipeAppTester:
             return True
         return False
     
-    def test_password_validation(self):
-        """Test password validation during registration"""
-        # Try to register with a weak password
+    def test_duplicate_email_registration(self):
+        """Test registration with duplicate email"""
+        if not self.test_email:
+            print("❌ No test email available")
+            return False
+            
+        # Try to register with the same email
         user_data = {
-            "first_name": "Weak",
-            "last_name": "Password",
-            "email": f"weak_{uuid.uuid4()}@example.com",
-            "password": "123",  # Too short/simple
+            "first_name": "Duplicate",
+            "last_name": "User",
+            "email": self.test_email,
+            "password": "AnotherP@ssw0rd",
             "dietary_preferences": [],
             "allergies": [],
             "favorite_cuisines": []
         }
         
         # We expect this to fail with 400 status code
-        # Note: The current implementation might not have password validation
-        # This test is to verify if it exists
         success, response = self.run_test(
-            "Weak Password Registration",
+            "Duplicate Email Registration",
             "POST",
             "auth/register",
             400,
             data=user_data
         )
         
-        # If the API doesn't validate passwords, this test might fail
-        # That's okay, we're just checking if validation exists
-        if not success:
-            print("⚠️ Password validation might not be implemented")
-            # Don't count this as a failure if validation isn't implemented
-            self.tests_passed += 1
-        else:
-            print("✅ Password validation is implemented")
+        # Check if the error message mentions duplicate email
+        if success and 'detail' in response:
+            if 'already registered' in response['detail'].lower():
+                print("✅ Duplicate email correctly rejected")
+                return True
         
         return success
     
