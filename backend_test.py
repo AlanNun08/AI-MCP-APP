@@ -3,7 +3,15 @@ import json
 import time
 import sys
 import uuid
+import logging
 from datetime import datetime
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 class AIRecipeAppTester:
     def __init__(self, base_url="https://1040bfc7-a818-485b-ae04-e045a52b4b67.preview.emergentagent.com"):
@@ -17,22 +25,31 @@ class AIRecipeAppTester:
         self.combined_recipe_id = None
         self.cart_id = None
         self.cart_options_id = None
+        self.timeout_issues = False
+        self.mongodb_objectid_issues = False
 
-    def run_test(self, name, method, endpoint, expected_status, data=None, params=None):
-        """Run a single API test"""
+    def run_test(self, name, method, endpoint, expected_status, data=None, params=None, timeout=30):
+        """Run a single API test with configurable timeout"""
         url = f"{self.base_url}/{endpoint}"
         headers = {'Content-Type': 'application/json'}
         
         self.tests_run += 1
         print(f"\n🔍 Testing {name}...")
+        logger.info(f"Testing {name} - {method} {url}")
+        
+        start_time = time.time()
         
         try:
             if method == 'GET':
-                response = requests.get(url, headers=headers, params=params)
+                response = requests.get(url, headers=headers, params=params, timeout=timeout)
             elif method == 'POST':
-                response = requests.post(url, json=data, headers=headers, params=params)
+                response = requests.post(url, json=data, headers=headers, params=params, timeout=timeout)
             elif method == 'PUT':
-                response = requests.put(url, json=data, headers=headers)
+                response = requests.put(url, json=data, headers=headers, timeout=timeout)
+            
+            elapsed_time = time.time() - start_time
+            print(f"⏱️ Request completed in {elapsed_time:.2f} seconds")
+            logger.info(f"Request completed in {elapsed_time:.2f} seconds")
             
             success = response.status_code == expected_status
             
@@ -46,13 +63,27 @@ class AIRecipeAppTester:
             else:
                 print(f"❌ Failed - Expected {expected_status}, got {response.status_code}")
                 try:
-                    print(f"Response: {response.json()}")
+                    error_data = response.json()
+                    print(f"Response: {error_data}")
+                    # Check for MongoDB ObjectId serialization issues
+                    if "ObjectId" in str(error_data):
+                        print("⚠️ Detected MongoDB ObjectId serialization issue")
+                        logger.warning("Detected MongoDB ObjectId serialization issue")
+                        self.mongodb_objectid_issues = True
+                    return False, error_data
                 except:
                     print(f"Response: {response.text}")
-                return False, {}
+                    return False, {}
 
+        except requests.exceptions.Timeout:
+            elapsed_time = time.time() - start_time
+            print(f"❌ Failed - Request timed out after {elapsed_time:.2f} seconds (timeout set to {timeout}s)")
+            logger.error(f"Request timed out after {elapsed_time:.2f} seconds (timeout set to {timeout}s)")
+            self.timeout_issues = True
+            return False, {"error": "Request timed out"}
         except Exception as e:
             print(f"❌ Failed - Error: {str(e)}")
+            logger.error(f"Test failed with error: {str(e)}")
             return False, {}
 
     def test_api_root(self):
