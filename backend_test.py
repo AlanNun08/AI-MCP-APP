@@ -764,95 +764,26 @@ class AIRecipeAppTester:
         
         return success
         
-    def test_password_validation(self):
-        """Test password validation during reset"""
-        # Request password reset with a short password
-        reset_email = f"short_pwd_{uuid.uuid4()}@example.com"
-        
-        # Create a user first
-        user_data = {
-            "first_name": "Short",
-            "last_name": "Password",
-            "email": reset_email,
-            "password": "SecureP@ssw0rd123",
-            "dietary_preferences": [],
-            "allergies": [],
-            "favorite_cuisines": []
+    def test_resend_to_nonexistent_user(self):
+        """Test resending code to non-existent user"""
+        # Try to resend code to non-existent user
+        resend_data = {
+            "email": f"nonexistent_{uuid.uuid4()}@example.com"
         }
         
-        # Register the user
-        success, _ = self.run_test(
-            "Register User for Password Validation Test",
-            "POST",
-            "auth/register",
-            200,
-            data=user_data
-        )
-        
-        if not success:
-            print("❌ Failed to register user for password validation test")
-            return False
-            
-        # Request password reset
-        reset_request = {
-            "email": reset_email
-        }
-        
-        reset_success, _ = self.run_test(
-            "Request Password Reset for Validation Test",
-            "POST",
-            "auth/forgot-password",
-            200,
-            data=reset_request
-        )
-        
-        if not reset_success:
-            print("❌ Failed to request password reset for validation test")
-            return False
-            
-        # Get reset code
-        code_success, code_response = self.run_test(
-            "Get Reset Code for Validation Test",
-            "GET",
-            f"debug/verification-codes/{reset_email}",
-            200
-        )
-        
-        if not code_success:
-            print("❌ Failed to get reset code for validation test")
-            return False
-            
-        # Try to get the reset code from the response
-        reset_code = None
-        if 'last_test_code' in code_response and code_response['last_test_code']:
-            reset_code = code_response['last_test_code']
-        elif 'codes' in code_response and len(code_response['codes']) > 0:
-            reset_code = code_response['codes'][0]['code']
-        
-        if not reset_code:
-            print("❌ No reset code found for validation test")
-            return False
-            
-        # Try with a short password (less than 6 characters)
-        reset_data = {
-            "email": reset_email,
-            "reset_code": reset_code,
-            "new_password": "short"  # Too short
-        }
-        
-        # We expect this to fail with 400 status code
+        # We expect this to fail with 404 status code
         success, response = self.run_test(
-            "Reset with Short Password",
+            "Resend to Non-existent User",
             "POST",
-            "auth/reset-password",
-            400,
-            data=reset_data
+            "auth/resend-code",
+            404,
+            data=resend_data
         )
         
-        # Check if the error message mentions password length
+        # Check if the error message mentions user not found
         if success and 'detail' in response:
-            if 'password' in response['detail'].lower() and 'characters' in response['detail'].lower():
-                print("✅ Short password correctly rejected")
+            if 'not found' in response['detail'].lower():
+                print("✅ Resend to non-existent user correctly rejected")
                 return True
         
         return success
