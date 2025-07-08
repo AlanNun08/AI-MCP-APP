@@ -775,34 +775,63 @@ function App() {
     };
 
     const handleSendToWalmart = () => {
-      console.log('🚀 Opening Walmart (user-triggered)...');
+      console.log('🚀 Opening Walmart (Safari-optimized)...');
       
       if (groceryCart && groceryCart.walmart_url) {
         const walmartUrl = groceryCart.walmart_url;
         console.log('🛒 Walmart URL:', walmartUrl);
         
-        // DIRECT USER INTERACTION: This should bypass popup blockers
+        // SAFARI-SPECIFIC METHOD: Immediate link creation and click
         try {
-          const opened = window.open(walmartUrl, '_blank');
-          if (opened) {
-            console.log('✅ Successfully opened Walmart URL');
-            alert('✅ Successfully opened Walmart! Check your new tab.');
-          } else {
-            // Fallback: Use invisible link click
-            const link = document.createElement('a');
-            link.href = walmartUrl;
-            link.target = '_blank';
-            link.rel = 'noopener noreferrer';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            
-            console.log('✅ Opened Walmart via link click');
-            alert('✅ Successfully opened Walmart! Check your new tab.');
-          }
+          // Create link immediately without any delay
+          const link = document.createElement('a');
+          link.href = walmartUrl;
+          link.target = '_blank';
+          link.rel = 'noopener noreferrer';
+          link.style.display = 'none';
+          
+          // Add to DOM and click immediately
+          document.body.appendChild(link);
+          
+          // For Safari: Simulate user click more directly
+          const clickEvent = new MouseEvent('click', {
+            view: window,
+            bubbles: true,
+            cancelable: true
+          });
+          
+          link.dispatchEvent(clickEvent);
+          
+          // Clean up
+          document.body.removeChild(link);
+          
+          console.log('✅ Opened via Safari-optimized link click');
+          alert('✅ Successfully opened Walmart! Check your new tab.');
+          
         } catch (e) {
-          console.log('❌ Failed to open URL:', e);
-          alert(`🛒 WALMART CART:\n\nCopy this URL:\n\n${walmartUrl}`);
+          console.log('❌ Safari method failed, trying alternatives:', e);
+          
+          // FALLBACK 1: Try standard window.open
+          try {
+            const opened = window.open(walmartUrl, '_blank');
+            if (opened && !opened.closed) {
+              console.log('✅ Successfully opened via window.open');
+              alert('✅ Successfully opened Walmart! Check your new tab.');
+            } else {
+              throw new Error('Popup blocked');
+            }
+          } catch (e2) {
+            // FALLBACK 2: Ask user to manually open
+            console.log('❌ All methods blocked, showing manual instructions');
+            
+            // Copy to clipboard automatically for Safari
+            try {
+              navigator.clipboard.writeText(walmartUrl);
+              alert(`🍎 SAFARI POPUP BLOCKED!\n\nURL automatically copied to clipboard!\n\nSteps:\n1. Open a new tab (⌘+T)\n2. Paste (⌘+V) and press Enter\n\nURL: ${walmartUrl}`);
+            } catch (e3) {
+              alert(`🍎 SAFARI POPUP BLOCKED!\n\nCopy this URL manually:\n\n${walmartUrl}\n\nSteps:\n1. Select and copy the URL above\n2. Open new tab (⌘+T)\n3. Paste (⌘+V) and press Enter`);
+            }
+          }
         }
         
         setShowWalmartConfirm(false);
