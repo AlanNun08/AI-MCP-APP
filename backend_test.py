@@ -1063,40 +1063,37 @@ class AIRecipeAppTester:
         
     def test_create_custom_cart(self):
         """Test creating custom cart from selected options"""
-        if not self.cart_options_id or not self.user_id:
-            print("❌ No cart options ID or user ID available for testing")
+        if not self.recipe_id or not self.user_id:
+            print("❌ No recipe ID or user ID available for testing")
             return False
             
-        # First, get the cart options to select from
-        _, cart_options = self.run_test(
-            "Get Cart Options for Selection",
-            "GET",
-            f"grocery/cart-options/{self.cart_options_id}",
-            200
-        )
-        
-        if not cart_options or 'ingredient_options' not in cart_options:
-            print("❌ Failed to get ingredient options")
-            return False
-            
-        # Create selections from available options
-        selections = []
-        for ingredient_option in cart_options['ingredient_options']:
-            if 'options' in ingredient_option and len(ingredient_option['options']) > 0:
-                # Select the first option for each ingredient
-                selections.append({
-                    "ingredient_name": ingredient_option['ingredient_name'],
-                    "selected_product_id": ingredient_option['options'][0]['product_id'],
-                    "quantity": ingredient_option.get('quantity', 1)
-                })
-        
-        if not selections:
-            print("❌ No product options available to select")
-            return False
-            
-        custom_cart_request = {
-            "cart_id": self.cart_options_id,
-            "selections": selections
+        # Create a custom cart directly
+        custom_cart_data = {
+            "user_id": self.user_id,
+            "recipe_id": self.recipe_id,
+            "products": [
+                {
+                    "ingredient_name": "pasta",
+                    "product_id": "12345",
+                    "name": "Barilla Pasta",
+                    "price": 2.99,
+                    "quantity": 1
+                },
+                {
+                    "ingredient_name": "tomatoes",
+                    "product_id": "67890",
+                    "name": "Roma Tomatoes",
+                    "price": 1.99,
+                    "quantity": 2
+                },
+                {
+                    "ingredient_name": "garlic",
+                    "product_id": "54321",
+                    "name": "Fresh Garlic",
+                    "price": 0.99,
+                    "quantity": 1
+                }
+            ]
         }
         
         success, response = self.run_test(
@@ -1104,13 +1101,30 @@ class AIRecipeAppTester:
             "POST",
             "grocery/custom-cart",
             200,
-            data=custom_cart_request
+            data=custom_cart_data
         )
         
         if success and 'id' in response:
             print(f"Created custom cart with ID: {response['id']}")
             print(f"Total price: ${response.get('total_price', 0):.2f}")
             print(f"Walmart URL: {response.get('walmart_url', 'N/A')}")
+            
+            # Verify Walmart URL format
+            if 'walmart_url' in response:
+                walmart_url = response['walmart_url']
+                if 'affil.walmart.com' in walmart_url and 'items=' in walmart_url:
+                    print("✅ Walmart URL correctly formatted")
+                    
+                    # Check if all product IDs are in the URL
+                    product_ids = [p['product_id'] for p in custom_cart_data['products']]
+                    all_ids_in_url = all(pid in walmart_url for pid in product_ids)
+                    if all_ids_in_url:
+                        print("✅ All product IDs included in Walmart URL")
+                    else:
+                        print("⚠️ Not all product IDs found in Walmart URL")
+                else:
+                    print("⚠️ Walmart URL format may be incorrect")
+            
             return True
         return False
 
