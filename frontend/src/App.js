@@ -716,18 +716,38 @@ function App() {
         if (simpleCart.walmart_url && simpleCart.walmart_url.includes('walmart.com')) {
           console.log('🚀 Opening Walmart URL immediately...');
           
+          // METHOD 1: Create invisible link and trigger click (bypasses popup blockers)
           try {
-            const opened = window.open(simpleCart.walmart_url, '_blank');
-            if (opened) {
-              console.log('✅ Successfully opened Walmart URL');
-              alert('✅ Successfully opened Walmart! Check your new tab.');
-            } else {
-              console.log('⚠️ Popup blocked, showing URL for manual copy');
-              alert(`🛒 WALMART CART READY!\n\nPopup blocked. Copy this URL and paste in a new tab:\n\n${simpleCart.walmart_url}`);
-            }
+            const link = document.createElement('a');
+            link.href = simpleCart.walmart_url;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+            link.style.position = 'absolute';
+            link.style.left = '-9999px';
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            console.log('✅ Successfully opened Walmart URL via link click');
+            alert('✅ Successfully opened Walmart! Check your new tab.');
           } catch (e) {
-            console.log('❌ Failed to open URL:', e);
-            alert(`🛒 WALMART CART READY!\n\nCopy this URL and paste in a new tab:\n\n${simpleCart.walmart_url}`);
+            console.log('❌ Link click failed:', e);
+            
+            // METHOD 2: Try direct window.open as fallback
+            try {
+              const opened = window.open(simpleCart.walmart_url, '_blank');
+              if (opened) {
+                console.log('✅ Successfully opened Walmart URL via window.open');
+                alert('✅ Successfully opened Walmart! Check your new tab.');
+              } else {
+                console.log('⚠️ Popup blocked, showing URL for manual copy');
+                alert(`🛒 WALMART CART READY!\n\nPopup blocked. Copy this URL and paste in a new tab:\n\n${simpleCart.walmart_url}`);
+              }
+            } catch (e2) {
+              console.log('❌ Window.open failed:', e2);
+              alert(`🛒 WALMART CART READY!\n\nCopy this URL and paste in a new tab:\n\n${simpleCart.walmart_url}`);
+            }
           }
         }
         
