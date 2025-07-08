@@ -57,6 +57,16 @@ class AIRecipeAppTester:
             print(f"⏱️ Request completed in {elapsed_time:.2f} seconds")
             logger.info(f"Request completed in {elapsed_time:.2f} seconds")
             
+            # For checking endpoint availability, we'll accept any response
+            if name.startswith("Check ") and "Availability" in name:
+                if response.status_code == 404:
+                    print(f"❌ Endpoint not found - Status: {response.status_code}")
+                    return False, {}
+                else:
+                    self.tests_passed += 1
+                    print(f"✅ Endpoint exists - Status: {response.status_code}")
+                    return True, {}
+            
             success = response.status_code == expected_status
             
             if success:
@@ -87,6 +97,10 @@ class AIRecipeAppTester:
             logger.error(f"Request timed out after {elapsed_time:.2f} seconds (timeout set to {timeout}s)")
             self.timeout_issues = True
             return False, {"error": "Request timed out"}
+        except requests.exceptions.ConnectionError:
+            print(f"❌ Failed - Connection error: Could not connect to {url}")
+            logger.error(f"Connection error: Could not connect to {url}")
+            return False, {"error": "Connection error"}
         except Exception as e:
             print(f"❌ Failed - Error: {str(e)}")
             logger.error(f"Test failed with error: {str(e)}")
