@@ -636,7 +636,31 @@ function App() {
     const [generating, setGenerating] = useState(false);
     const [showWalmartConfirm, setShowWalmartConfirm] = useState(false);
 
+    // Debug: Check if user and recipe data are available
+    React.useEffect(() => {
+      console.log('🔍 RecipeDetailScreen loaded with:');
+      console.log('Recipe:', recipe?.title || 'No recipe');
+      console.log('User:', user?.name || 'No user');
+      
+      if (!user) {
+        alert('⚠️ User data missing! Cart generation will not work.');
+      }
+      if (!recipe) {
+        alert('⚠️ Recipe data missing!');
+      }
+    }, [recipe, user]);
+
     const handleGenerateCart = async () => {
+      if (!user) {
+        alert('❌ Error: User not logged in! Please go back to dashboard and try again.');
+        return;
+      }
+      
+      if (!recipe) {
+        alert('❌ Error: Recipe data missing! Please go back and select the recipe again.');
+        return;
+      }
+      
       setGenerating(true);
       try {
         console.log('🔄 Starting cart generation...');
