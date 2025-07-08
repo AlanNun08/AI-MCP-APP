@@ -1288,33 +1288,6 @@ function App() {
                 >
                   🛒 Order at Walmart Now
                 </button>
-                
-                <button
-                  onClick={handleGenerateCartForSavedRecipe}
-                  className="w-full bg-orange-500 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200"
-                >
-                  🚀 Generate New Cart (Fresh Products)
-                </button>
-                
-                <button
-                  onClick={() => {
-                    const searchUrl = `https://walmart.com/search?q=${encodeURIComponent(recipe.title + ' recipe ingredients')}`;
-                    try {
-                      window.open(searchUrl, '_blank');
-                      alert('✅ Opened Walmart search for your recipe!');
-                    } catch (e) {
-                      try {
-                        navigator.clipboard.writeText(searchUrl);
-                        alert(`🛒 URL COPIED!\n${searchUrl}`);
-                      } catch (e2) {
-                        alert(`🛒 SEARCH URL:\n${searchUrl}`);
-                      }
-                    }
-                  }}
-                  className="w-full bg-purple-500 text-white font-medium py-3 px-6 rounded-xl shadow-lg hover:bg-purple-600 transition-all duration-200"
-                >
-                  🔍 Search Walmart Manually
-                </button>
               </div>
             </div>
           </div>
