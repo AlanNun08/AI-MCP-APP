@@ -249,11 +249,11 @@ frontend:
   
   - task: "Grocery Cart Integration"
     implemented: true
-    working: false
+    working: true
     file: "App.js"
     stuck_count: 2
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "testing"
@@ -267,6 +267,9 @@ frontend:
       - working: true
         agent: "main"
         comment: "Backend testing confirmed cart-options and custom-cart endpoints are working correctly. Issue is likely in frontend integration. Ready for frontend testing to verify UI and API integration."
+      - working: true
+        agent: "testing"
+        comment: "Grocery cart integration is now working correctly. The 'Generate Walmart Cart' button is visible on the recipe detail page. Clicking it successfully generates a cart and displays the 'Your Walmart Cart is Ready!' message with a 'SHOP NOW AT WALMART' button. The cart-options API endpoint is being called correctly and returns a valid Walmart URL with product IDs. The URL is correctly formatted with 'affil.walmart.com' domain and includes multiple product IDs."
 
 metadata:
   created_by: "main_agent"
