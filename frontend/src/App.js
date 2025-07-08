@@ -991,7 +991,85 @@ function App() {
       </div>
     );
   };
-  const GroceryCartScreen = ({ cart }) => {
+  // Simple Grocery Cart Component (no portions, just ingredient names)
+  const SimpleGroceryCartScreen = ({ cart, recipe }) => {
+    const handleOrderNow = () => {
+      // Open Walmart URL
+      window.open(cart.walmart_url, '_blank');
+      
+      // Show success message
+      alert('Opening Walmart with your ingredients! Complete your purchase there.');
+      
+      // Go back to all recipes to see the saved recipe
+      setTimeout(() => {
+        setCurrentScreen('all-recipes');
+      }, 1000);
+    };
+
+    return (
+      <div className="min-h-screen bg-gray-50 p-4">
+        <div className="max-w-md mx-auto bg-white rounded-3xl shadow-lg p-6">
+          <div className="flex items-center justify-between mb-6">
+            <button
+              onClick={() => setCurrentScreen('all-recipes')}
+              className="p-2 text-gray-600 hover:text-gray-800"
+            >
+              ← Back to Recipes
+            </button>
+            <h2 className="text-xl font-bold text-gray-800">Grocery List</h2>
+            <div></div>
+          </div>
+
+          {/* Recipe Reference */}
+          <div className="bg-blue-50 rounded-xl p-4 mb-6">
+            <h3 className="font-semibold text-blue-800 mb-1">{recipe.title}</h3>
+            <p className="text-blue-600 text-sm">Ingredients for {recipe.servings} servings</p>
+          </div>
+
+          <div className="space-y-4">
+            {/* Ingredient List */}
+            <div className="space-y-3">
+              <h4 className="font-semibold text-gray-800">Walmart Products Found:</h4>
+              {cart.simple_items?.map((item, index) => (
+                <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+                  <div className="flex-1">
+                    <h4 className="font-medium text-gray-800">{item.name}</h4>
+                    <p className="text-sm text-gray-600">{item.original_ingredient}</p>
+                  </div>
+                  <div className="text-right">
+                    <span className="font-semibold text-green-600">
+                      ${item.price?.toFixed(2) || '0.00'}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Total */}
+            <div className="border-t pt-4">
+              <div className="flex justify-between items-center mb-4">
+                <span className="text-lg font-semibold text-gray-800">Estimated Total:</span>
+                <span className="text-2xl font-bold text-green-600">${cart.total_price?.toFixed(2) || '0.00'}</span>
+              </div>
+
+              <div className="bg-green-50 p-4 rounded-xl mb-4">
+                <p className="text-sm text-green-800">
+                  <strong>🛒 Ready to Order:</strong> We've found the basic ingredients you need. Click below to add them to your Walmart cart and complete your purchase!
+                </p>
+              </div>
+
+              <button
+                onClick={handleOrderNow}
+                className="w-full bg-gradient-to-r from-green-500 to-blue-500 text-white font-semibold py-4 px-6 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200"
+              >
+                🛒 Order at Walmart Now
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
     const handleOrderNow = () => {
       // Open Walmart URL
       window.open(cart.walmart_url, '_blank');
