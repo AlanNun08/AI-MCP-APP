@@ -186,9 +186,13 @@ async def register_user(user_data: UserRegistration):
         if len(user_data.password) < 6:
             raise HTTPException(status_code=400, detail="Password must be at least 6 characters long")
         
-        # Check if user already exists
-        existing_user = await db.users.find_one({"email": user_data.email})
+        # Normalize email
+        email_lower = user_data.email.lower().strip()
+        
+        # Check if user already exists (case-insensitive)
+        existing_user = await db.users.find_one({"email": {"$regex": f"^{email_lower}$", "$options": "i"}})
         if existing_user:
+            logging.warning(f"Registration attempt with existing email: {email_lower}")
             raise HTTPException(status_code=400, detail="Email already registered")
         
         # Hash password
@@ -196,9 +200,9 @@ async def register_user(user_data: UserRegistration):
         
         # Create user document
         user = User(
-            first_name=user_data.first_name,
-            last_name=user_data.last_name,
-            email=user_data.email,
+            first_name=user_data.first_name.strip(),
+            last_name=user_data.last_name.strip(),
+            email=email_lower,
             password_hash=password_hash,
             dietary_preferences=user_data.dietary_preferences,
             allergies=user_data.allergies,
@@ -208,7 +212,10 @@ async def register_user(user_data: UserRegistration):
         
         # Save user to database
         user_dict = user.dict()
-        await db.users.insert_one(user_dict)
+        result = await db.users.insert_one(user_dict)
+        
+        if not result.inserted_id:
+            raise HTTPException(status_code=500, detail="Failed to create user account")
         
         # Generate verification code
         verification_code = email_service.generate_verification_code()
@@ -217,7 +224,7 @@ async def register_user(user_data: UserRegistration):
         # Save verification code
         code_doc = VerificationCode(
             user_id=user.id,
-            email=user.email,
+            email=email_lower,
             code=verification_code,
             expires_at=expires_at
         )
@@ -225,25 +232,26 @@ async def register_user(user_data: UserRegistration):
         
         # Send verification email
         email_sent = await email_service.send_verification_email(
-            to_email=user.email,
+            to_email=email_lower,
             first_name=user.first_name,
             verification_code=verification_code
         )
         
         if not email_sent:
-            logging.warning(f"Failed to send verification email to {user.email}")
+            logging.warning(f"Failed to send verification email to {email_lower}")
             # Don't fail registration if email fails - user can resend later
         
+        logging.info(f"User registered successfully: {email_lower}")
         return {
             "message": "Registration successful. Please check your email for verification code.",
-            "email": user.email,
+            "email": email_lower,
             "user_id": user.id
         }
         
     except HTTPException:
         raise
     except Exception as e:
-        logging.error(f"Registration error: {str(e)}")
+        logging.error(f"Registration error for {user_data.email}: {str(e)}")
         raise HTTPException(status_code=500, detail="Registration failed")
 
 @api_router.post("/auth/verify")
