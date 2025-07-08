@@ -1198,7 +1198,7 @@ function App() {
     const handleOrderNow = () => {
       const walmartUrl = cart?.walmart_url || `https://walmart.com/search?q=${encodeURIComponent(recipe.title + ' ingredients')}`;
       
-      console.log('🚀 Opening Walmart DIRECTLY:', walmartUrl);
+      console.log('🚀 Opening Walmart automatically:', walmartUrl);
       
       // Validate URL
       if (!walmartUrl || walmartUrl === '') {
@@ -1211,16 +1211,48 @@ function App() {
         window.currentRecipe = { ...recipe, walmart_url: walmartUrl, cart_generated: true };
       }
       
-      // DIRECT REDIRECT: Use location.href (no blank tabs)
-      if (confirm(`🛒 GO TO WALMART?\n\nThis will take you to Walmart with your cart items.\n\nClick OK to go to Walmart.`)) {
-        window.location.href = walmartUrl;
+      // AUTOMATIC REDIRECT: Create proper link and click it (NO blank URLs)
+      try {
+        const link = document.createElement('a');
+        link.href = walmartUrl;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        
+        // Add to DOM temporarily
+        document.body.appendChild(link);
+        
+        // Click the link to open
+        link.click();
+        
+        // Remove from DOM
+        document.body.removeChild(link);
+        
+        console.log('✅ Successfully opened Walmart URL');
+        alert('✅ Successfully opened Walmart! Check your new tab.');
+        setTimeout(() => setCurrentScreen('all-recipes'), 1000);
         return;
+        
+      } catch (e) {
+        console.log('Link click failed:', e);
       }
       
-      // If user cancels, copy URL
+      // FALLBACK: Try window.open with full URL
+      try {
+        const opened = window.open(walmartUrl, '_blank', 'noopener,noreferrer');
+        if (opened) {
+          console.log('✅ Opened via window.open');
+          alert('✅ Successfully opened Walmart! Check your new tab.');
+          setTimeout(() => setCurrentScreen('all-recipes'), 1000);
+          return;
+        }
+      } catch (e) {
+        console.log('Window.open failed:', e);
+      }
+      
+      // FINAL FALLBACK: Copy URL
       try {
         navigator.clipboard.writeText(walmartUrl);
-        alert(`🛒 WALMART URL COPIED!\n\nPaste in new tab:\n${walmartUrl}`);
+        alert(`🛒 WALMART URL COPIED!\n\nURL: ${walmartUrl}\n\nPaste in new tab.`);
       } catch (e) {
         alert(`🛒 COPY THIS URL:\n\n${walmartUrl}`);
       }
