@@ -90,13 +90,15 @@ function App() {
     const allergyOptions = ['nuts', 'dairy', 'eggs', 'soy', 'shellfish', 'fish'];
     const cuisineOptions = ['italian', 'mexican', 'asian', 'american', 'mediterranean', 'indian'];
 
-    const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
       e.preventDefault();
       setLoading(true);
       
       try {
+        console.log('Creating user with data:', formData);
         const response = await axios.post(`${API}/users`, formData);
         const newUser = response.data;
+        console.log('User created successfully:', newUser);
         
         setUser(newUser);
         localStorage.setItem('user', JSON.stringify(newUser));
