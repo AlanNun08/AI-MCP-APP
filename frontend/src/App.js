@@ -752,13 +752,9 @@ function App() {
     };
 
     const handleSendToWalmart = () => {
-      console.log('🚀 Opening Walmart (fixed method)...');
-      
       if (groceryCart && groceryCart.walmart_url) {
         const walmartUrl = groceryCart.walmart_url;
-        console.log('🛒 Walmart URL:', walmartUrl);
         
-        // ONLY METHOD: Create proper link and click - NO window navigation
         try {
           const link = document.createElement('a');
           link.href = walmartUrl;
@@ -770,25 +766,11 @@ function App() {
           link.click();
           document.body.removeChild(link);
           
-          console.log('✅ Successfully opened Walmart via link click');
-          alert('✅ Successfully opened Walmart! Check your new tab.');
-          
         } catch (e) {
-          console.log('❌ Link click failed:', e);
-          
-          // FALLBACK: Copy URL only - NO window operations
-          try {
-            navigator.clipboard.writeText(walmartUrl);
-            alert(`🛒 WALMART CART READY!\n\nURL copied to clipboard:\n\n${walmartUrl}\n\nPaste in a new browser tab to open your cart.`);
-          } catch (e2) {
-            alert(`🛒 WALMART CART READY!\n\nCopy this URL and open in a new tab:\n\n${walmartUrl}`);
-          }
+          navigator.clipboard.writeText(walmartUrl);
+          alert(`🛒 URL copied to clipboard!\n\nPaste in a new tab: ${walmartUrl}`);
         }
         
-        setShowWalmartConfirm(false);
-        
-      } else {
-        alert('❌ No cart URL found!');
         setShowWalmartConfirm(false);
       }
     };
