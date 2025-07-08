@@ -626,6 +626,23 @@ function App() {
           <div className="bg-white rounded-2xl shadow-sm p-6">
             <p className="text-gray-600 mb-4">{recipe.description}</p>
             
+            {/* Healthy Recipe Badge */}
+            {recipe.is_healthy && (
+              <div className="bg-green-100 border border-green-300 rounded-lg p-3 mb-4">
+                <div className="flex items-center space-x-2">
+                  <span className="text-green-600 text-lg">🍃</span>
+                  <div>
+                    <h4 className="text-green-800 font-semibold text-sm">Healthy Recipe</h4>
+                    {recipe.calories_per_serving && (
+                      <p className="text-green-700 text-xs">
+                        {recipe.calories_per_serving} calories per serving
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+            
             <div className="grid grid-cols-3 gap-4 text-center">
               <div className="bg-blue-50 p-3 rounded-xl">
                 <div className="text-2xl">⏱️</div>
@@ -643,6 +660,15 @@ function App() {
                 <div className="font-semibold">{recipe.servings}</div>
               </div>
             </div>
+            
+            {/* Calorie info for healthy recipes */}
+            {recipe.calories_per_serving && (
+              <div className="mt-4 bg-green-50 p-3 rounded-xl text-center">
+                <div className="text-2xl">🍃</div>
+                <div className="text-sm text-green-600">Calories</div>
+                <div className="font-semibold text-green-800">{recipe.calories_per_serving} cal</div>
+              </div>
+            )}
           </div>
 
           {/* Tabs */}
