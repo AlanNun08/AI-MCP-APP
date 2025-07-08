@@ -59,7 +59,14 @@ function App() {
     const handleSubmit = async (e) => {
       e.preventDefault();
       if (!formData.name || !formData.email) {
-        alert('Please fill in name and email');
+        alert('❌ Please fill in name and email');
+        return;
+      }
+
+      // Basic email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(formData.email)) {
+        alert('❌ Please enter a valid email address');
         return;
       }
 
@@ -70,7 +77,7 @@ function App() {
         setCurrentScreen('dashboard');
       } catch (error) {
         console.error('Registration failed:', error);
-        alert('Registration failed. Please try again.');
+        alert('❌ Registration failed. Please try again.');
       } finally {
         setIsCreating(false);
       }
