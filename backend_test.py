@@ -157,6 +157,73 @@ class AIRecipeAppTester:
             data=update_data
         )
         
+    def test_openai_api_key(self):
+        """Test if the OpenAI API key is working correctly"""
+        print("\n🔍 Testing OpenAI API Key...")
+        
+        # We'll use the recipe generation endpoint to test the OpenAI API key
+        if not self.user_id:
+            # Create a temporary user for testing
+            test_user = {
+                "name": f"Test User {uuid.uuid4()}",
+                "email": f"test_{uuid.uuid4()}@example.com",
+                "dietary_preferences": [],
+                "allergies": [],
+                "favorite_cuisines": []
+            }
+            
+            success, response = self.run_test(
+                "Create Temporary User for OpenAI Test",
+                "POST",
+                "users",
+                200,
+                data=test_user
+            )
+            
+            if success and 'id' in response:
+                temp_user_id = response['id']
+            else:
+                print("❌ Failed to create temporary user for OpenAI test")
+                return False
+        else:
+            temp_user_id = self.user_id
+            
+        # Create a very simple recipe request to minimize processing time
+        recipe_request = {
+            "user_id": temp_user_id,
+            "cuisine_type": "simple",
+            "dietary_preferences": [],
+            "ingredients_on_hand": ["bread", "cheese"],
+            "prep_time_max": 10,
+            "servings": 1,
+            "difficulty": "easy"
+        }
+        
+        success, response = self.run_test(
+            "OpenAI API Key Verification",
+            "POST",
+            "recipes/generate",
+            200,
+            data=recipe_request,
+            timeout=30  # Shorter timeout for this test
+        )
+        
+        if success:
+            print("✅ OpenAI API key is working correctly")
+            return True
+        else:
+            error_msg = response.get("detail", "Unknown error")
+            if "API key" in str(error_msg).lower():
+                print(f"❌ OpenAI API key issue detected: {error_msg}")
+                logger.error(f"OpenAI API key issue detected: {error_msg}")
+            elif self.timeout_issues:
+                print("⚠️ OpenAI API request timed out - possible rate limiting or slow response")
+                logger.warning("OpenAI API request timed out - possible rate limiting or slow response")
+            else:
+                print(f"❌ OpenAI API test failed: {error_msg}")
+                logger.error(f"OpenAI API test failed: {error_msg}")
+            return False
+
         return success
 
     def test_generate_recipe(self):
