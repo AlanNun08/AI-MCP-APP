@@ -34,8 +34,11 @@ class EmailService:
     
     async def send_verification_email(self, to_email: str, first_name: str, verification_code: str) -> bool:
         """Send verification email with 6-digit code"""
+        self.last_verification_code = verification_code  # Store for testing
+        
         if self.test_mode:
             logger.info(f"TEST MODE: Would send verification code {verification_code} to {to_email}")
+            print(f"🧪 TEST EMAIL: Verification code {verification_code} for {to_email}")
             return True
             
         try:
