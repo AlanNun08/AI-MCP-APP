@@ -1039,14 +1039,14 @@ function App() {
                   </div>
                 </div>
 
-                <p className="text-gray-600 text-sm mb-6">Ready to send your cart to Walmart?</p>
+                <p className="text-gray-600 text-sm mb-6">Your cart is ready! Click below to open Walmart with your items.</p>
                 
                 <div className="space-y-3">
                   <button
                     onClick={handleSendToWalmart}
                     className="w-full bg-gradient-to-r from-green-500 to-blue-500 text-white font-semibold py-4 px-6 rounded-xl hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200"
                   >
-                    🚀 Open Walmart (Smart Method)
+                    🚀 Open Walmart Now
                   </button>
                   
                   <button
