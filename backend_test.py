@@ -1402,8 +1402,17 @@ def main():
     # Test login with invalid credentials
     tester.test_login_with_invalid_credentials()
     
-    # Test login with unverified user
+    # Test unverified user login flow
     tester.test_login_with_unverified_user()
+    
+    # Test password reset flow
+    tester.test_password_reset_flow()
+    
+    # Test invalid reset code
+    tester.test_invalid_reset_code()
+    
+    # Test password validation
+    tester.test_password_validation()
     
     # Test OpenAI Integration
     print("\n" + "=" * 50)
