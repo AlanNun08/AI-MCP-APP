@@ -676,20 +676,23 @@ class AIRecipeAppTester:
             "password": unverified_password
         }
         
-        # We expect this to fail with 401 status code
+        # We expect a 200 status code with a special response indicating unverified status
         success, response = self.run_test(
             "Login with Unverified User",
             "POST",
             "auth/login",
-            401,
+            200,
             data=login_data
         )
         
-        # Check if the error message mentions verification
-        if success and 'detail' in response:
-            if 'verify' in response['detail'].lower():
-                print("✅ Unverified user login correctly rejected")
+        # Check if the response indicates unverified status
+        if success and 'status' in response:
+            if response['status'] == 'unverified' and response.get('needs_verification', False):
+                print("✅ Unverified user login correctly handled with unverified status")
                 return True
+            else:
+                print(f"❌ Unexpected response for unverified user: {response}")
+                return False
         
         return success
     def test_openai_api_key(self):
