@@ -993,45 +993,14 @@ function App() {
                   </div>
                 </div>
 
-                <p className="text-gray-600 text-sm mb-6">Ready to send your cart to Walmart? Choose your preferred method:</p>
+                <p className="text-gray-600 text-sm mb-6">Ready to send your cart to Walmart?</p>
                 
                 <div className="space-y-3">
                   <button
                     onClick={handleSendToWalmart}
-                    className="w-full bg-gradient-to-r from-green-500 to-blue-500 text-white font-semibold py-3 px-4 rounded-xl hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200"
+                    className="w-full bg-gradient-to-r from-green-500 to-blue-500 text-white font-semibold py-4 px-6 rounded-xl hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200"
                   >
                     🚀 Open Walmart (Smart Method)
-                  </button>
-                  
-                  <button
-                    onClick={() => {
-                      if (groceryCart?.walmart_url) {
-                        window.location.href = groceryCart.walmart_url;
-                      }
-                    }}
-                    className="w-full bg-red-500 text-white font-semibold py-3 px-4 rounded-xl hover:bg-red-600 transition-all duration-200"
-                  >
-                    🚨 FORCE OPEN WALMART (Same Tab)
-                  </button>
-                  
-                  <button
-                    onClick={() => {
-                      navigator.clipboard.writeText(groceryCart.walmart_url);
-                      alert(`🛒 WALMART URL COPIED!\n\nPaste in new tab:\n${groceryCart.walmart_url}`);
-                      setShowWalmartConfirm(false);
-                    }}
-                    className="w-full bg-blue-500 text-white font-medium py-3 px-4 rounded-xl hover:bg-blue-600 transition-colors"
-                  >
-                    📋 Copy URL to Clipboard
-                  </button>
-                  
-                  <button
-                    onClick={() => {
-                      alert(`🛒 WALMART CART URL:\n\n${groceryCart.walmart_url}\n\nCopy this URL and paste in a new browser tab to access your pre-filled cart.`);
-                    }}
-                    className="w-full bg-gray-500 text-white font-medium py-3 px-4 rounded-xl hover:bg-gray-600 transition-colors"
-                  >
-                    👁️ Show URL
                   </button>
                   
                   <button
