@@ -81,6 +81,7 @@ function App() {
       try {
         const response = await axios.post(`${API}/api/users`, formData);
         setUser(response.data);
+        showNotification('✅ Account created successfully! Welcome to AI Chef!', 'success');
         setCurrentScreen('dashboard');
       } catch (error) {
         console.error('Registration failed:', error);
