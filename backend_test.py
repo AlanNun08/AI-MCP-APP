@@ -330,39 +330,36 @@ class AIRecipeAppTester:
         
         return False
     
-    def test_duplicate_email_registration(self):
-        """Test registration with duplicate email"""
-        if not self.test_email:
-            print("❌ No test email available")
-            return False
-            
-        # Try to register with the same email
+    def test_user_registration(self):
+        """Test user registration with email verification"""
+        print("\n" + "=" * 50)
+        print("Testing User Registration with Email Verification")
+        print("=" * 50)
+        
+        # Test valid registration
         user_data = {
-            "first_name": "Duplicate",
+            "first_name": "Test",
             "last_name": "User",
             "email": self.test_email,
-            "password": "AnotherP@ssw0rd",
-            "dietary_preferences": [],
-            "allergies": [],
-            "favorite_cuisines": []
+            "password": self.test_password,
+            "dietary_preferences": ["vegetarian"],
+            "allergies": ["nuts"],
+            "favorite_cuisines": ["italian", "mexican"]
         }
         
-        # We expect this to fail with 400 status code
         success, response = self.run_test(
-            "Duplicate Email Registration",
+            "User Registration",
             "POST",
             "auth/register",
-            400,
+            200,
             data=user_data
         )
         
-        # Check if the error message mentions duplicate email
-        if success and 'detail' in response:
-            if 'already registered' in response['detail'].lower():
-                print("✅ Duplicate email correctly rejected")
-                return True
-        
-        return success
+        if success and 'user_id' in response:
+            self.verified_user_id = response['user_id']
+            print(f"✅ User registered with ID: {self.verified_user_id}")
+            return True
+        return False
     
     def test_password_validation(self):
         """Test password validation during registration"""
