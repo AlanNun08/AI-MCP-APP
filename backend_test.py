@@ -534,34 +534,29 @@ class AIRecipeAppTester:
         
         return success
     
-    def test_login_with_verified_user(self):
-        """Test login with verified user"""
-        if not self.test_email:
-            print("❌ No verified test email available")
-            return False
-            
-        login_data = {
-            "email": self.test_email,
-            "password": self.test_password
+    def test_resend_to_nonexistent_user(self):
+        """Test resending code to non-existent user"""
+        # Try to resend code to non-existent user
+        resend_data = {
+            "email": f"nonexistent_{uuid.uuid4()}@example.com"
         }
         
+        # We expect this to fail with 404 status code
         success, response = self.run_test(
-            "Login with Verified User",
+            "Resend to Non-existent User",
             "POST",
-            "auth/login",
-            200,
-            data=login_data
+            "auth/resend-code",
+            404,
+            data=resend_data
         )
         
-        if success and 'status' in response and response['status'] == 'success':
-            print("✅ Login successful")
-            return True
-        elif success and 'message' in response and 'successful' in response['message'].lower():
-            print("✅ Login successful")
-            return True
-        else:
-            print(f"❌ Login failed with response: {response}")
-            return False
+        # Check if the error message mentions user not found
+        if success and 'detail' in response:
+            if 'not found' in response['detail'].lower():
+                print("✅ Resend to non-existent user correctly rejected")
+                return True
+        
+        return success
     
     def test_password_reset_flow(self):
         """Test the complete password reset flow"""
