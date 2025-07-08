@@ -723,13 +723,32 @@ function App() {
     };
 
     const handleSendToWalmart = () => {
+      console.log('🚀 Attempting to open Walmart URL...');
+      alert('🚀 Opening Walmart with your cart...');
+      
       if (groceryCart && groceryCart.walmart_url) {
+        console.log('🛒 Walmart URL:', groceryCart.walmart_url);
+        alert('URL: ' + groceryCart.walmart_url);
+        
         // Open Walmart URL in new tab
-        window.open(groceryCart.walmart_url, '_blank');
+        const opened = window.open(groceryCart.walmart_url, '_blank');
+        
+        if (opened) {
+          console.log('✅ Successfully opened Walmart URL');
+          alert('✅ Successfully opened Walmart! Check your new tab.');
+        } else {
+          console.log('❌ Popup blocked - copying URL to clipboard');
+          alert('❌ Popup blocked! Copying URL to clipboard. Paste in new tab: ' + groceryCart.walmart_url);
+          navigator.clipboard.writeText(groceryCart.walmart_url);
+        }
+        
         setShowWalmartConfirm(false);
         
         // Show success message
         alert('🛒 Redirected to Walmart! Your cart has been pre-filled with the recipe ingredients.');
+      } else {
+        console.log('❌ No grocery cart or URL found');
+        alert('❌ No cart or URL found!');
       }
     };
 
