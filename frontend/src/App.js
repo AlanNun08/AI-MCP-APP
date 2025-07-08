@@ -771,7 +771,18 @@ function App() {
           window.currentRecipe = { ...recipe, walmart_url: fallbackCart.walmart_url, cart_generated: true, cart_id: fallbackCart.id, last_updated: new Date().toISOString() };
         }
         
-        setShowWalmartConfirm(true);
+        // Open fallback URL immediately too
+        if (fallbackCart.walmart_url) {
+          try {
+            window.open(fallbackCart.walmart_url, '_blank');
+            alert('✅ Opened Walmart search for your recipe!');
+          } catch (e) {
+            alert(`🛒 SEARCH WALMART FOR:\n\n${fallbackCart.walmart_url}`);
+          }
+        }
+        
+        // Skip confirmation dialog
+        // setShowWalmartConfirm(true);
       } finally {
         setGenerating(false);
       }
