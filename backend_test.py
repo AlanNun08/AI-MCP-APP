@@ -1127,9 +1127,18 @@ def main():
     # First, clean up any existing test data
     tester.test_cleanup_test_data()
     
-    # Test Email Verification System with Live Mode
+    # Test User Management
     print("\n" + "=" * 50)
-    print("Testing Email Verification System with Live Mode")
+    print("Testing User Management")
+    print("=" * 50)
+    
+    tester.test_create_user()
+    tester.test_get_user()
+    tester.test_update_user()
+    
+    # Test Email Verification System
+    print("\n" + "=" * 50)
+    print("Testing Email Verification System")
     print("=" * 50)
     
     # Test if email service is in live mode
@@ -1147,6 +1156,41 @@ def main():
     
     # Test case-insensitive email handling
     tester.test_case_insensitive_email()
+    
+    # Test duplicate email registration
+    tester.test_duplicate_email_registration()
+    
+    # Test invalid verification code
+    tester.test_invalid_verification_code()
+    
+    # Test resend verification code
+    tester.test_resend_verification_code()
+    
+    # Test login with invalid credentials
+    tester.test_login_with_invalid_credentials()
+    
+    # Test login with unverified user
+    tester.test_login_with_unverified_user()
+    
+    # Test OpenAI Integration
+    print("\n" + "=" * 50)
+    print("Testing OpenAI Integration")
+    print("=" * 50)
+    
+    tester.test_openai_api_key()
+    tester.test_generate_recipe()
+    tester.test_get_recipe()
+    tester.test_generate_healthy_recipe()
+    tester.test_generate_budget_recipe()
+    tester.test_generate_combined_recipe()
+    
+    # Test Walmart Integration
+    print("\n" + "=" * 50)
+    print("Testing Walmart Integration")
+    print("=" * 50)
+    
+    tester.test_create_grocery_cart_with_options()
+    tester.test_create_custom_cart()
     
     # Print results
     print("\n" + "=" * 50)
