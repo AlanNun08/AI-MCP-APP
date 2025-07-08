@@ -260,6 +260,37 @@ class AIRecipeAppTester:
                 return True
         
         return False
+        
+    def test_user_registration(self):
+        """Test user registration with email verification"""
+        print("\n" + "=" * 50)
+        print("Testing User Registration with Email Verification")
+        print("=" * 50)
+        
+        # Test valid registration
+        user_data = {
+            "first_name": "Test",
+            "last_name": "User",
+            "email": self.test_email,
+            "password": self.test_password,
+            "dietary_preferences": ["vegetarian"],
+            "allergies": ["nuts"],
+            "favorite_cuisines": ["italian", "mexican"]
+        }
+        
+        success, response = self.run_test(
+            "User Registration",
+            "POST",
+            "auth/register",
+            200,
+            data=user_data
+        )
+        
+        if success and 'user_id' in response:
+            self.verified_user_id = response['user_id']
+            print(f"✅ User registered with ID: {self.verified_user_id}")
+            return True
+        return False
     
     def test_duplicate_email_registration(self):
         """Test registration with duplicate email"""
