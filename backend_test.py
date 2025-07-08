@@ -1330,6 +1330,9 @@ def main():
     # Test resend verification code
     tester.test_resend_verification_code()
     
+    # Test resend to nonexistent user
+    tester.test_resend_to_nonexistent_user()
+    
     # Test login with invalid credentials
     tester.test_login_with_invalid_credentials()
     
