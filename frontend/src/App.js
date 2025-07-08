@@ -708,6 +708,12 @@ function App() {
         console.log('🛒 Walmart URL generated:', simpleCart.walmart_url);
         
         setGroceryCart(simpleCart);
+        
+        // Save the Walmart URL to the recipe for future use
+        if (recipe && recipe.id && simpleCart.walmart_url) {
+          window.currentRecipe = { ...recipe, walmart_url: simpleCart.walmart_url, cart_generated: true };
+        }
+        
         setShowWalmartConfirm(true); // Show confirmation dialog
         
       } catch (error) {
