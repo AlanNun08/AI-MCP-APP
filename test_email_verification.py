@@ -31,8 +31,9 @@ def test_email_verification():
     print("Registering a new user with a real email")
     print("=" * 50)
     
-    # Use a real email for testing
-    test_email = "alan.nunez0310@icloud.com"
+    # Use a real email for testing with a unique identifier
+    random_id = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
+    test_email = f"alan.nunez0310+{random_id}@icloud.com"
     test_password = "SecureP@ssw0rd123"
     
     user_data = {
