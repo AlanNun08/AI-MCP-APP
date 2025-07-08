@@ -968,21 +968,33 @@ function App() {
                 <button
                   onClick={() => {
                     const walmartUrl = recipe.walmart_url;
-                    console.log('🚀 Opening saved Walmart URL immediately:', walmartUrl);
+                    console.log('🚀 Opening saved Walmart URL:', walmartUrl);
                     
-                    // ONLY use window.open - NO navigation of current tab
+                    // SAFE METHOD: Only link clicks, never navigate current window
                     try {
-                      const opened = window.open(walmartUrl, '_blank');
-                      if (opened) {
-                        console.log('✅ Successfully opened saved Walmart URL');
-                        alert('✅ Successfully opened Walmart! Check your new tab.');
-                      } else {
-                        console.log('⚠️ Popup blocked');
-                        alert(`🛒 WALMART CART:\n\nPopup blocked. Copy this URL and paste in a new tab:\n\n${walmartUrl}`);
-                      }
+                      const link = document.createElement('a');
+                      link.href = walmartUrl;
+                      link.target = '_blank';
+                      link.rel = 'noopener noreferrer';
+                      link.style.display = 'none';
+                      
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
+                      
+                      console.log('✅ Successfully opened saved Walmart URL');
+                      alert('✅ Successfully opened Walmart! Check your new tab.');
+                      
                     } catch (e) {
                       console.log('❌ Failed to open saved URL:', e);
-                      alert(`🛒 WALMART CART:\n\nCopy this URL and paste in a new tab:\n\n${walmartUrl}`);
+                      
+                      // SAFE FALLBACK: Copy URL only
+                      try {
+                        navigator.clipboard.writeText(walmartUrl);
+                        alert(`🛒 WALMART URL COPIED!\n\nPaste in new tab:\n\n${walmartUrl}`);
+                      } catch (e2) {
+                        alert(`🛒 COPY THIS URL:\n\n${walmartUrl}`);
+                      }
                     }
                   }}
                   className="w-full bg-gradient-to-r from-green-500 to-blue-500 text-white font-semibold py-4 px-6 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 mb-2"
