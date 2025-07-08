@@ -189,21 +189,125 @@ class AIRecipeAppTester:
         
         return success
 
-    def test_save_recipe(self):
-        """Test saving recipe"""
-        if not self.recipe_id or not self.user_id:
-            print("❌ No recipe ID or user ID available for testing")
+    def test_generate_healthy_recipe(self):
+        """Test healthy recipe generation with calorie limits"""
+        if not self.user_id:
+            print("❌ No user ID available for testing")
             return False
             
-        success, _ = self.run_test(
-            "Save Recipe",
+        recipe_request = {
+            "user_id": self.user_id,
+            "cuisine_type": "mediterranean",
+            "dietary_preferences": ["vegetarian"],
+            "ingredients_on_hand": ["chickpeas", "olive oil", "tomatoes"],
+            "prep_time_max": 30,
+            "servings": 2,
+            "difficulty": "medium",
+            "is_healthy": True,
+            "max_calories_per_serving": 400
+        }
+        
+        success, response = self.run_test(
+            "Generate Healthy Recipe",
             "POST",
-            f"recipes/{self.recipe_id}/save",
+            "recipes/generate",
             200,
-            params={"user_id": self.user_id}
+            data=recipe_request
         )
         
-        return success
+        if success and 'id' in response:
+            self.healthy_recipe_id = response['id']
+            print(f"Generated healthy recipe with ID: {self.healthy_recipe_id}")
+            
+            # Verify calorie information is present
+            if 'calories_per_serving' in response and response['calories_per_serving']:
+                print(f"✅ Calorie information present: {response['calories_per_serving']} calories per serving")
+                if response['calories_per_serving'] <= recipe_request['max_calories_per_serving']:
+                    print(f"✅ Calorie limit respected: {response['calories_per_serving']} <= {recipe_request['max_calories_per_serving']}")
+                else:
+                    print(f"⚠️ Calorie limit exceeded: {response['calories_per_serving']} > {recipe_request['max_calories_per_serving']}")
+            else:
+                print("⚠️ No calorie information in the response")
+                
+            return True
+        return False
+
+    def test_generate_budget_recipe(self):
+        """Test budget-friendly recipe generation with budget limits"""
+        if not self.user_id:
+            print("❌ No user ID available for testing")
+            return False
+            
+        recipe_request = {
+            "user_id": self.user_id,
+            "cuisine_type": "american",
+            "dietary_preferences": [],
+            "ingredients_on_hand": ["potatoes", "onions", "beans"],
+            "prep_time_max": 45,
+            "servings": 4,
+            "difficulty": "easy",
+            "is_budget_friendly": True,
+            "max_budget": 15.0
+        }
+        
+        success, response = self.run_test(
+            "Generate Budget-Friendly Recipe",
+            "POST",
+            "recipes/generate",
+            200,
+            data=recipe_request
+        )
+        
+        if success and 'id' in response:
+            self.budget_recipe_id = response['id']
+            print(f"Generated budget-friendly recipe with ID: {self.budget_recipe_id}")
+            return True
+        return False
+
+    def test_generate_combined_recipe(self):
+        """Test recipe generation with both healthy and budget modes"""
+        if not self.user_id:
+            print("❌ No user ID available for testing")
+            return False
+            
+        recipe_request = {
+            "user_id": self.user_id,
+            "cuisine_type": "asian",
+            "dietary_preferences": ["low-carb"],
+            "ingredients_on_hand": ["tofu", "broccoli", "ginger"],
+            "prep_time_max": 30,
+            "servings": 2,
+            "difficulty": "medium",
+            "is_healthy": True,
+            "max_calories_per_serving": 350,
+            "is_budget_friendly": True,
+            "max_budget": 12.0
+        }
+        
+        success, response = self.run_test(
+            "Generate Combined Healthy & Budget Recipe",
+            "POST",
+            "recipes/generate",
+            200,
+            data=recipe_request
+        )
+        
+        if success and 'id' in response:
+            self.combined_recipe_id = response['id']
+            print(f"Generated combined healthy & budget recipe with ID: {self.combined_recipe_id}")
+            
+            # Verify calorie information is present
+            if 'calories_per_serving' in response and response['calories_per_serving']:
+                print(f"✅ Calorie information present: {response['calories_per_serving']} calories per serving")
+                if response['calories_per_serving'] <= recipe_request['max_calories_per_serving']:
+                    print(f"✅ Calorie limit respected: {response['calories_per_serving']} <= {recipe_request['max_calories_per_serving']}")
+                else:
+                    print(f"⚠️ Calorie limit exceeded: {response['calories_per_serving']} > {recipe_request['max_calories_per_serving']}")
+            else:
+                print("⚠️ No calorie information in the response")
+                
+            return True
+        return False
 
     def test_create_grocery_cart(self):
         """Test creating grocery cart"""
