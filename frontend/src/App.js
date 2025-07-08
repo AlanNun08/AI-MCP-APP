@@ -720,11 +720,44 @@ function App() {
     const handleOrderGroceries = async () => {
       setLoading(true);
       try {
-        const response = await axios.post(`${API}/grocery/simple-cart`, {
-          recipe_id: recipe.id,
-          user_id: user.id
-        });
-        setGroceryCart(response.data);
+        const response = await axios.post(`${API}/grocery/cart-options?recipe_id=${recipe.id}&user_id=${user.id}`);
+        
+        // Convert cart options to simple cart format for display
+        const cartOptions = response.data;
+        const simpleCart = {
+          id: cartOptions.id,
+          user_id: cartOptions.user_id,
+          recipe_id: cartOptions.recipe_id,
+          simple_items: cartOptions.ingredient_options.map(option => {
+            // Use first available product option or create placeholder
+            if (option.options && option.options.length > 0) {
+              const firstOption = option.options[0];
+              return {
+                name: firstOption.name,
+                original_ingredient: option.original_ingredient,
+                product_id: firstOption.product_id,
+                price: firstOption.price,
+                thumbnail: firstOption.thumbnail_image
+              };
+            } else {
+              return {
+                name: option.ingredient_name,
+                original_ingredient: option.original_ingredient,
+                product_id: null,
+                price: 0.0,
+                status: "not_found"
+              };
+            }
+          }),
+          total_price: cartOptions.ingredient_options.reduce((sum, option) => {
+            return sum + (option.options && option.options.length > 0 ? option.options[0].price : 0);
+          }, 0),
+          walmart_url: cartOptions.ingredient_options.length > 0 ? 
+            `https://affil.walmart.com/cart/addToCart?items=${cartOptions.ingredient_options.map(opt => opt.options && opt.options.length > 0 ? opt.options[0].product_id : '').filter(id => id).join(',')}` : 
+            "https://walmart.com"
+        };
+        
+        setGroceryCart(simpleCart);
       } catch (error) {
         console.error('Grocery cart error:', error);
         
