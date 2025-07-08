@@ -522,6 +522,12 @@ def main():
     # Test API root
     tester.test_api_root()
     
+    # Test OpenAI API key
+    print("\n" + "=" * 50)
+    print("Testing OpenAI API Integration")
+    print("=" * 50)
+    tester.test_openai_api_key()
+    
     # Test user management
     if not tester.test_create_user():
         print("❌ User creation failed, stopping tests")
@@ -574,6 +580,8 @@ def main():
     # Print results
     print("\n" + "=" * 50)
     print(f"📊 Tests passed: {tester.tests_passed}/{tester.tests_run}")
+    print(f"⚠️ Timeout issues detected: {tester.timeout_issues}")
+    print(f"⚠️ MongoDB ObjectId issues detected: {tester.mongodb_objectid_issues}")
     print("=" * 50)
     
     return 0 if tester.tests_passed == tester.tests_run else 1
