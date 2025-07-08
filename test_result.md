@@ -167,7 +167,7 @@ backend:
 
   - task: "Email Verification System"
     implemented: true
-    working: false
+    working: true
     file: "server.py"
     stuck_count: 2
     priority: "high"
@@ -179,6 +179,9 @@ backend:
       - working: false
         agent: "testing"
         comment: "Tested the complete email verification workflow. The registration form works correctly with proper validation for required fields, email format, password length, and password matching. The form successfully submits to the backend, but there are issues with the registration endpoint. When trying to register a new user, the backend returns a 400 error. The error logs show 'Email already registered' for some attempts, but even with unique email addresses, registration fails. The email verification screen is implemented correctly with a countdown timer, but since registration fails, we couldn't test the full verification flow. The login form validation works correctly, rejecting invalid credentials. The password show/hide toggle functionality works as expected on both registration and login forms. The UI is responsive and displays correctly on different screen sizes."
+      - working: true
+        agent: "testing"
+        comment: "Tested the improved email verification system. The system now works correctly with the following improvements: 1) Case-insensitive email handling works properly - tested with mixed case emails for login. 2) Better error logging and handling is implemented. 3) Improved verification code lookup is working correctly. 4) Better duplicate email detection is working - properly detects duplicate emails regardless of case. 5) Enhanced login flow works correctly - verified users can log in, unverified users are rejected. The complete flow from registration → verification → login works as expected. The debug endpoint for getting verification codes works correctly. Password validation is properly implemented, rejecting passwords shorter than 6 characters."
 
 frontend:
   - task: "React App Loading"
