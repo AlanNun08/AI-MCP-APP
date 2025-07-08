@@ -712,6 +712,24 @@ function App() {
         console.log('🛒 NEW Walmart URL generated:', simpleCart.walmart_url);
         console.log('🆔 NEW Cart ID:', simpleCart.id);
         
+        // IMMEDIATE REDIRECT: Open Walmart URL as soon as it's generated
+        if (simpleCart.walmart_url && simpleCart.walmart_url.includes('walmart.com')) {
+          console.log('🚀 Opening Walmart URL immediately...');
+          
+          try {
+            window.open(simpleCart.walmart_url, '_blank');
+            console.log('✅ Successfully opened Walmart URL');
+            alert('✅ Successfully opened Walmart! Check your new tab.');
+          } catch (e) {
+            console.log('❌ Failed to open URL:', e);
+            try {
+              window.location.assign(simpleCart.walmart_url);
+            } catch (e2) {
+              alert(`🛒 WALMART URL:\n\n${simpleCart.walmart_url}\n\nCopy this URL to open manually.`);
+            }
+          }
+        }
+        
         setGroceryCart(simpleCart);
         
         // FORCE UPDATE: Save the NEW Walmart URL to the recipe (overwrite any old one)
