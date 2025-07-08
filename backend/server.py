@@ -394,6 +394,34 @@ async def login_user(login_data: UserLogin):
         logging.error(f"Login error: {str(e)}")
         raise HTTPException(status_code=500, detail="Login failed")
 
+@api_router.get("/debug/verification-codes/{email}")
+async def get_verification_codes_debug(email: str):
+    """Debug endpoint to get verification codes for testing"""
+    try:
+        # Only allow in development/test mode
+        if os.getenv('NODE_ENV') == 'production':
+            raise HTTPException(status_code=404, detail="Not found")
+        
+        codes = []
+        async for code in db.verification_codes.find({"email": email, "is_used": False}).sort("created_at", -1).limit(5):
+            codes.append({
+                "code": code["code"],
+                "expires_at": code["expires_at"],
+                "is_expired": datetime.utcnow() > code["expires_at"]
+            })
+        
+        return {
+            "email": email,
+            "codes": codes,
+            "last_test_code": email_service.last_verification_code
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Debug endpoint error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Debug endpoint failed")
+
 # Keep all existing routes for backward compatibility
 @api_router.get("/")
 async def root():
