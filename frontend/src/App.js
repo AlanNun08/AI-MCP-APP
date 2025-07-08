@@ -1023,7 +1023,8 @@ function App() {
                 </button>
               </div>
             </div>
-          ) : (
+          )}
+
           {/* Generate Cart Button - show when no cart exists and not generating */}
           {!generating && !groceryCart && (
             <button
