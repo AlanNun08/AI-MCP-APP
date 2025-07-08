@@ -712,45 +712,6 @@ function App() {
         console.log('🛒 NEW Walmart URL generated:', simpleCart.walmart_url);
         console.log('🆔 NEW Cart ID:', simpleCart.id);
         
-        // IMMEDIATE REDIRECT: Open Walmart URL as soon as it's generated
-        if (simpleCart.walmart_url && simpleCart.walmart_url.includes('walmart.com')) {
-          console.log('🚀 Opening Walmart URL immediately...');
-          
-          // METHOD 1: Create invisible link and trigger click (bypasses popup blockers)
-          try {
-            const link = document.createElement('a');
-            link.href = simpleCart.walmart_url;
-            link.target = '_blank';
-            link.rel = 'noopener noreferrer';
-            link.style.position = 'absolute';
-            link.style.left = '-9999px';
-            
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            
-            console.log('✅ Successfully opened Walmart URL via link click');
-            alert('✅ Successfully opened Walmart! Check your new tab.');
-          } catch (e) {
-            console.log('❌ Link click failed:', e);
-            
-            // METHOD 2: Try direct window.open as fallback
-            try {
-              const opened = window.open(simpleCart.walmart_url, '_blank');
-              if (opened) {
-                console.log('✅ Successfully opened Walmart URL via window.open');
-                alert('✅ Successfully opened Walmart! Check your new tab.');
-              } else {
-                console.log('⚠️ Popup blocked, showing URL for manual copy');
-                alert(`🛒 WALMART CART READY!\n\nPopup blocked. Copy this URL and paste in a new tab:\n\n${simpleCart.walmart_url}`);
-              }
-            } catch (e2) {
-              console.log('❌ Window.open failed:', e2);
-              alert(`🛒 WALMART CART READY!\n\nCopy this URL and paste in a new tab:\n\n${simpleCart.walmart_url}`);
-            }
-          }
-        }
-        
         setGroceryCart(simpleCart);
         
         // FORCE UPDATE: Save the NEW Walmart URL to the recipe (overwrite any old one)
@@ -759,8 +720,8 @@ function App() {
           console.log('💾 Updated recipe with NEW cart URL');
         }
         
-        // Skip confirmation dialog since we opened immediately
-        // setShowWalmartConfirm(true);
+        // Show confirmation dialog for immediate opening (bypasses popup blockers)
+        setShowWalmartConfirm(true);
         
       } catch (error) {
         console.error('❌ Grocery cart generation error:', error);
