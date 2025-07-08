@@ -816,7 +816,107 @@ function App() {
     );
   };
 
-  // Grocery Cart Component
+  // All Recipes Screen Component
+  const AllRecipesScreen = () => {
+    const [userRecipes, setUserRecipes] = useState([]);
+    const [loadingRecipes, setLoadingRecipes] = useState(true);
+
+    useEffect(() => {
+      const loadUserRecipes = async () => {
+        setLoadingRecipes(true);
+        try {
+          const response = await axios.get(`${API}/recipes?user_id=${user.id}`);
+          setUserRecipes(response.data);
+        } catch (error) {
+          console.error('Error loading user recipes:', error);
+        } finally {
+          setLoadingRecipes(false);
+        }
+      };
+
+      if (user?.id) {
+        loadUserRecipes();
+      }
+    }, [user?.id]);
+
+    return (
+      <div className="min-h-screen bg-gray-50">
+        {/* Header */}
+        <div className="bg-white shadow-sm p-4">
+          <div className="max-w-md mx-auto flex items-center justify-between">
+            <button
+              onClick={() => setCurrentScreen('dashboard')}
+              className="p-2 text-gray-600 hover:text-gray-800"
+            >
+              ← Back
+            </button>
+            <h2 className="text-xl font-bold text-gray-800">My Recipes</h2>
+            <div></div>
+          </div>
+        </div>
+
+        {/* Recipes List */}
+        <div className="p-4 max-w-md mx-auto">
+          {loadingRecipes ? (
+            <div className="text-center py-8">
+              <div className="loading text-gray-500">Loading your recipes...</div>
+            </div>
+          ) : userRecipes.length > 0 ? (
+            <div className="space-y-4">
+              {userRecipes.map((recipe) => (
+                <div
+                  key={recipe.id}
+                  onClick={() => {
+                    setCurrentScreen('recipe-detail');
+                    window.currentRecipe = recipe;
+                  }}
+                  className="bg-white rounded-2xl shadow-sm p-6 hover:shadow-lg cursor-pointer transition-all"
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-gray-800 mb-1">{recipe.title}</h3>
+                      <p className="text-sm text-gray-600 line-clamp-2">{recipe.description}</p>
+                    </div>
+                    {recipe.is_healthy && (
+                      <span className="bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded-full ml-2">
+                        🍃 Healthy
+                      </span>
+                    )}
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-4 text-sm text-gray-500">
+                      <span>⏱️ {recipe.prep_time + recipe.cook_time}m</span>
+                      <span>👥 {recipe.servings}</span>
+                      <span>📊 {recipe.difficulty}</span>
+                      {recipe.calories_per_serving && (
+                        <span className="text-green-600">🍃 {recipe.calories_per_serving}cal</span>
+                      )}
+                    </div>
+                    <span className="text-xs text-gray-400">
+                      {new Date(recipe.created_at).toLocaleDateString()}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <div className="text-6xl mb-4">📝</div>
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">No recipes yet</h3>
+              <p className="text-gray-500 mb-6">Start by generating your first AI recipe!</p>
+              <button
+                onClick={() => setCurrentScreen('generate')}
+                className="bg-gradient-to-r from-green-500 to-blue-500 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200"
+              >
+                🤖 Generate Recipe
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
   const GroceryCartScreen = ({ cart }) => {
     const handleOrderNow = () => {
       // Open Walmart URL
