@@ -6,13 +6,17 @@ import uuid
 from datetime import datetime
 
 class AIRecipeAppTester:
-    def __init__(self, base_url="http://localhost:8001"):
+    def __init__(self, base_url="https://ae98d8a0-e0fa-4434-aadf-fe1df1f1101d.preview.emergentagent.com"):
         self.base_url = f"{base_url}/api"
         self.tests_run = 0
         self.tests_passed = 0
         self.user_id = None
         self.recipe_id = None
+        self.healthy_recipe_id = None
+        self.budget_recipe_id = None
+        self.combined_recipe_id = None
         self.cart_id = None
+        self.cart_options_id = None
 
     def run_test(self, name, method, endpoint, expected_status, data=None, params=None):
         """Run a single API test"""
