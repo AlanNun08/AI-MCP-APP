@@ -267,7 +267,7 @@ function App() {
     <div className="min-h-screen bg-gray-50 p-4">
       <div className="max-w-md mx-auto">
         <div className="bg-white rounded-2xl shadow-sm p-6 mb-4">
-          <div className="flex items-center space-x-3 mb-4">
+          <div className="flex items-center space-x-3 mb-6">
             <div className="text-3xl">👨‍🍳</div>
             <div>
               <h2 className="text-xl font-bold text-gray-800">Hi, {user?.name}!</h2>
@@ -278,19 +278,40 @@ function App() {
           <div className="space-y-3">
             <button
               onClick={() => setCurrentScreen('generate-recipe')}
-              className="w-full bg-gradient-to-r from-green-500 to-blue-500 text-white font-semibold py-4 px-6 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200"
+              className="w-full bg-gradient-to-r from-green-500 to-blue-500 text-white font-semibold py-4 px-6 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 active:scale-95"
             >
               🎯 Generate AI Recipe
             </button>
             
             <button
               onClick={() => setCurrentScreen('all-recipes')}
-              className="w-full bg-purple-500 text-white font-semibold py-4 px-6 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200"
+              className="w-full bg-purple-500 text-white font-semibold py-4 px-6 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 active:scale-95"
             >
-              ❤️ Recipe History
+              📚 Recipe History
             </button>
           </div>
         </div>
+        
+        {/* Quick Stats */}
+        <div className="bg-gradient-to-r from-green-100 to-blue-100 rounded-2xl p-4 mb-4">
+          <h3 className="font-semibold text-gray-800 mb-2">🌟 Welcome to AI Chef!</h3>
+          <div className="text-sm text-gray-600 space-y-1">
+            <p>• Generate personalized recipes with AI</p>
+            <p>• Instant Walmart grocery delivery</p>
+            <p>• Healthy & budget-friendly options</p>
+          </div>
+        </div>
+        
+        {/* Logout Button */}
+        <button
+          onClick={() => {
+            setUser(null);
+            setCurrentScreen('landing');
+          }}
+          className="w-full text-gray-500 hover:text-gray-700 transition-colors py-2"
+        >
+          🚪 Sign Out
+        </button>
       </div>
     </div>
   );
