@@ -729,81 +729,8 @@ function App() {
     const handleCancelWalmart = () => {
       setShowWalmartConfirm(false);
     };
-      setLoading(true);
-      try {
-        const response = await axios.post(`${API}/grocery/cart-options?recipe_id=${recipe.id}&user_id=${user.id}`);
-        
-        // Convert cart options to simple cart format for display
-        const cartOptions = response.data;
-        const simpleCart = {
-          id: cartOptions.id,
-          user_id: cartOptions.user_id,
-          recipe_id: cartOptions.recipe_id,
-          simple_items: cartOptions.ingredient_options.map(option => {
-            // Use first available product option or create placeholder
-            if (option.options && option.options.length > 0) {
-              const firstOption = option.options[0];
-              return {
-                name: firstOption.name,
-                original_ingredient: option.original_ingredient,
-                product_id: firstOption.product_id,
-                price: firstOption.price,
-                thumbnail: firstOption.thumbnail_image
-              };
-            } else {
-              return {
-                name: option.ingredient_name,
-                original_ingredient: option.original_ingredient,
-                product_id: null,
-                price: 0.0,
-                status: "not_found"
-              };
-            }
-          }),
-          total_price: cartOptions.ingredient_options.reduce((sum, option) => {
-            return sum + (option.options && option.options.length > 0 ? option.options[0].price : 0);
-          }, 0),
-          walmart_url: cartOptions.ingredient_options.length > 0 ? 
-            `https://affil.walmart.com/cart/addToCart?items=${cartOptions.ingredient_options.map(opt => opt.options && opt.options.length > 0 ? opt.options[0].product_id : '').filter(id => id).join(',')}` : 
-            "https://walmart.com"
-        };
-        
-        setGroceryCart(simpleCart);
-      } catch (error) {
-        console.error('Grocery cart error:', error);
-        
-        // If backend is not accessible, show demo cart
-        if (error.code === 'ERR_NETWORK') {
-          alert('Demo Mode: Showing sample grocery cart with Walmart URL.');
-          const demoCart = {
-            id: 'demo-cart-' + Date.now(),
-            user_id: user.id,
-            recipe_id: recipe.id,
-            simple_items: recipe.ingredients.map((ingredient, index) => {
-              const cleanName = ingredient.replace(/^\d+[\s\w\/]*\s+/, '').replace(/,.*$/, '').trim();
-              return {
-                name: cleanName,
-                original_ingredient: ingredient,
-                product_id: `demo_${index}`,
-                price: Math.floor(Math.random() * 10) + 2
-              };
-            }),
-            walmart_url: `https://affil.walmart.com/cart/addToCart?items=${recipe.ingredients.map((_, i) => `demo_${i}`).join(',')}`,
-            total_price: recipe.ingredients.length * 5,
-            demo: true
-          };
-          setGroceryCart(demoCart);
-        } else {
-          alert('Failed to create grocery cart. Please try again.');
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
 
-    if (groceryCart) {
-      return <SimpleGroceryCartScreen cart={groceryCart} recipe={recipe} />;
-    }
+    // Show grocery cart if generated
 
     return (
       <div className="min-h-screen bg-gray-50">
