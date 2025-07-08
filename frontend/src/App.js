@@ -970,8 +970,50 @@ function App() {
                 <p className="text-green-600 text-sm mb-4">Your Walmart cart was previously generated for this recipe.</p>
                 <button
                   onClick={() => {
-                    if (confirm(`🛒 GO TO WALMART?\n\nTake you to your saved Walmart cart for this recipe?\n\nClick OK to go to Walmart.`)) {
-                      window.location.href = recipe.walmart_url;
+                    const walmartUrl = recipe.walmart_url;
+                    console.log('🚀 Opening saved Walmart URL:', walmartUrl);
+                    
+                    // AUTOMATIC REDIRECT: Create proper link and click it
+                    try {
+                      const link = document.createElement('a');
+                      link.href = walmartUrl;
+                      link.target = '_blank';
+                      link.rel = 'noopener noreferrer';
+                      
+                      // Add to DOM temporarily
+                      document.body.appendChild(link);
+                      
+                      // Click the link to open
+                      link.click();
+                      
+                      // Remove from DOM
+                      document.body.removeChild(link);
+                      
+                      console.log('✅ Successfully opened saved Walmart URL');
+                      alert('✅ Successfully opened Walmart! Check your new tab.');
+                      return;
+                      
+                    } catch (e) {
+                      console.log('Link click failed:', e);
+                    }
+                    
+                    // FALLBACK: Try window.open
+                    try {
+                      const opened = window.open(walmartUrl, '_blank', 'noopener,noreferrer');
+                      if (opened) {
+                        alert('✅ Successfully opened Walmart! Check your new tab.');
+                        return;
+                      }
+                    } catch (e) {
+                      console.log('Window.open failed:', e);
+                    }
+                    
+                    // FINAL FALLBACK: Copy URL
+                    try {
+                      navigator.clipboard.writeText(walmartUrl);
+                      alert(`🛒 WALMART URL COPIED!\n\nURL: ${walmartUrl}`);
+                    } catch (e) {
+                      alert(`🛒 COPY THIS URL:\n\n${walmartUrl}`);
                     }
                   }}
                   className="w-full bg-gradient-to-r from-green-500 to-blue-500 text-white font-semibold py-4 px-6 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 mb-2"
