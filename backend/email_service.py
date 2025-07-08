@@ -15,6 +15,7 @@ class EmailService:
         self.secret_key = os.getenv('MAILJET_SECRET_KEY')
         self.sender_email = os.getenv('SENDER_EMAIL')
         self.test_mode = True  # Always use test mode for now
+        self.last_verification_code = None  # Store for testing
         
         if not all([self.api_key, self.secret_key, self.sender_email]) and not self.test_mode:
             raise ValueError("Missing Mailjet configuration. Please check your environment variables.")
