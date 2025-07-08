@@ -14,47 +14,15 @@ logger = logging.getLogger(__name__)
 
 class EmailService:
     def __init__(self):
-        self.api_key = None
-        self.secret_key = None
-        self.sender_email = None
-        self.test_mode = False  # Default to live mode
+        # Hardcode credentials for testing
+        self.api_key = "5c7ca7fe01cf13886b5ce84fd3a1aff9"
+        self.secret_key = "da58d6dc87b3f527734077d6131d664f"
+        self.sender_email = "Alan.nunez0310@icloud.com"
+        self.test_mode = False  # Always use live mode
         self.last_verification_code = None  # Store for testing
-        self.initialized = False
-        
-        # Initialize immediately to check credentials
-        self._initialize()
-        
-    def _initialize(self):
-        """Initialize the service with environment variables"""
-        if self.initialized:
-            return
-            
-        # Get credentials from environment
-        self.api_key = os.getenv('MAILJET_API_KEY')
-        self.secret_key = os.getenv('MAILJET_SECRET_KEY')
-        self.sender_email = os.getenv('SENDER_EMAIL')
-        
-        # Log the actual values for debugging
-        logger.info(f"MAILJET_API_KEY: {self.api_key}")
-        logger.info(f"MAILJET_SECRET_KEY: {self.secret_key}")
-        logger.info(f"SENDER_EMAIL: {self.sender_email}")
-        
-        # Check if all credentials are present
-        if not all([self.api_key, self.secret_key, self.sender_email]):
-            logger.error(f"Missing Mailjet configuration:")
-            logger.error(f"  MAILJET_API_KEY: {'✅' if self.api_key else '❌'}")
-            logger.error(f"  MAILJET_SECRET_KEY: {'✅' if self.secret_key else '❌'}")
-            logger.error(f"  SENDER_EMAIL: {'✅' if self.sender_email else '❌'}")
-            
-            # Force live mode for testing
-            logger.warning("Missing some Mailjet config, but continuing in LIVE mode")
-            self.test_mode = False
-        else:
-            logger.info("All Mailjet credentials found, using LIVE mode")
-            self.test_mode = False
-        
         self.initialized = True
-        logger.info(f"EmailService initialized - Live mode: {not self.test_mode}, Sender: {self.sender_email}")
+        
+        logger.info(f"EmailService initialized with hardcoded credentials - Live mode: True, Sender: {self.sender_email}")
     
     def generate_verification_code(self) -> str:
         """Generate a 6-digit verification code"""
