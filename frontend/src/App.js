@@ -378,17 +378,33 @@ function App() {
         // Demo mode fallback
         const demoRecipe = {
           id: 'demo-' + Date.now(),
-          title: `${formData.cuisine_type.charAt(0).toUpperCase() + formData.cuisine_type.slice(1)} Demo Recipe`,
-          description: "AI-generated recipe (demo mode)",
-          ingredients: ["2 cups flour", "1 cup water", "1 tsp salt", "2 tbsp oil"],
-          instructions: ["Mix ingredients", "Cook as desired", "Enjoy your meal"],
+          title: `${formData.cuisine_type.charAt(0).toUpperCase() + formData.cuisine_type.slice(1)} Fusion Delight`,
+          description: `A delicious ${formData.cuisine_type} recipe crafted by our AI chef. Perfect for ${formData.servings} ${formData.servings === 1 ? 'person' : 'people'}!`,
+          ingredients: [
+            "2 cups premium flour", 
+            "1 cup filtered water", 
+            "1 tsp sea salt", 
+            "2 tbsp olive oil",
+            "1 tsp fresh herbs",
+            "½ cup seasonal vegetables"
+          ],
+          instructions: [
+            "Prepare all ingredients and set up your workspace",
+            "Mix dry ingredients in a large bowl",
+            "Gradually add liquids while stirring",
+            "Knead until smooth and elastic",
+            "Let rest for 15 minutes",
+            "Cook according to traditional method",
+            "Serve hot and enjoy!"
+          ],
           prep_time: 15,
           cook_time: 30,
           servings: formData.servings,
           difficulty: formData.difficulty,
-          calories_per_serving: formData.is_healthy ? parseInt(formData.max_calories_per_serving) || 350 : null,
+          calories_per_serving: formData.is_healthy ? parseInt(formData.max_calories_per_serving) || 350 : 425,
           is_healthy: formData.is_healthy,
           user_id: user.id,
+          created_at: new Date().toISOString(),
           demo: true
         };
         
