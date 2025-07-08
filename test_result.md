@@ -327,7 +327,8 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Recipe Generation"
+    - "Unverified User Login Flow"
+    - "Password Reset Flow"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
