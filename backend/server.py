@@ -104,6 +104,14 @@ class VerifyCodeRequest(BaseModel):
 class ResendCodeRequest(BaseModel):
     email: EmailStr
 
+class PasswordResetRequest(BaseModel):
+    email: EmailStr
+
+class PasswordResetVerify(BaseModel):
+    email: EmailStr
+    reset_code: str
+    new_password: str
+
 class UserLogin(BaseModel):
     email: EmailStr
     password: str
