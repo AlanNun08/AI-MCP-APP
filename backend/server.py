@@ -12,6 +12,13 @@ from datetime import datetime
 import openai
 from openai import OpenAI
 import json
+import httpx
+import asyncio
+import time
+import base64
+import re
+from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.hazmat.primitives.asymmetric import padding
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -23,6 +30,11 @@ db = client[os.environ['DB_NAME']]
 
 # OpenAI setup
 openai_client = OpenAI(api_key=os.environ['OPENAI_API_KEY'])
+
+# Walmart API setup
+WALMART_CONSUMER_ID = os.environ['WALMART_CONSUMER_ID']
+WALMART_KEY_VERSION = os.environ['WALMART_KEY_VERSION']
+WALMART_PRIVATE_KEY = os.environ['WALMART_PRIVATE_KEY']
 
 # Create the main app without a prefix
 app = FastAPI(title="AI Recipe & Grocery App", version="1.0.0")
@@ -75,36 +87,132 @@ class WalmartProduct(BaseModel):
     product_id: str
     name: str
     price: float
-    category: str
-    common_ingredient_names: List[str]
+    thumbnail_image: Optional[str] = None
+    availability: str = "Available"
 
 class GroceryCart(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     user_id: str
     recipe_id: str
-    items: List[Dict[str, Any]]  # {product_id, name, quantity, price}
+    items: List[Dict[str, Any]]  # {product_id, name, quantity, price, original_ingredient}
     total_price: float
     walmart_url: str
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
-# Walmart product mapping (mock data for now)
-WALMART_PRODUCTS = {
-    "chicken breast": {"product_id": "945193065", "name": "Chicken Breast", "price": 8.99, "category": "meat"},
-    "ground beef": {"product_id": "660768274", "name": "Ground Beef", "price": 6.99, "category": "meat"},
-    "rice": {"product_id": "123456789", "name": "White Rice", "price": 2.99, "category": "grains"},
-    "pasta": {"product_id": "987654321", "name": "Pasta", "price": 1.99, "category": "grains"},
-    "tomatoes": {"product_id": "456789123", "name": "Fresh Tomatoes", "price": 3.49, "category": "produce"},
-    "onions": {"product_id": "789123456", "name": "Yellow Onions", "price": 2.29, "category": "produce"},
-    "garlic": {"product_id": "321654987", "name": "Fresh Garlic", "price": 1.99, "category": "produce"},
-    "olive oil": {"product_id": "654987321", "name": "Olive Oil", "price": 5.99, "category": "condiments"},
-    "salt": {"product_id": "147258369", "name": "Table Salt", "price": 1.49, "category": "spices"},
-    "pepper": {"product_id": "369258147", "name": "Black Pepper", "price": 2.99, "category": "spices"},
-    "cheese": {"product_id": "258147369", "name": "Cheddar Cheese", "price": 4.99, "category": "dairy"},
-    "milk": {"product_id": "741852963", "name": "Whole Milk", "price": 3.99, "category": "dairy"},
-    "eggs": {"product_id": "852963741", "name": "Large Eggs", "price": 2.99, "category": "dairy"},
-    "bread": {"product_id": "963741852", "name": "White Bread", "price": 2.49, "category": "bakery"},
-    "butter": {"product_id": "159753486", "name": "Butter", "price": 4.49, "category": "dairy"}
-}
+# Walmart API functions
+def get_walmart_auth_headers():
+    """Generate Walmart API authentication headers"""
+    try:
+        # Load private key
+        private_key = serialization.load_pem_private_key(
+            WALMART_PRIVATE_KEY.encode(),
+            password=None
+        )
+        
+        # Generate timestamp
+        timestamp = str(int(time.time() * 1000))
+        
+        # Create message to sign
+        message = f"{WALMART_CONSUMER_ID}\n{timestamp}\n{WALMART_KEY_VERSION}\n".encode("utf-8")
+        
+        # Sign the message
+        signature = private_key.sign(message, padding.PKCS1v15(), hashes.SHA256())
+        signature_b64 = base64.b64encode(signature).decode("utf-8")
+        
+        # Return headers
+        return {
+            "WM_CONSUMER.ID": WALMART_CONSUMER_ID,
+            "WM_CONSUMER.INTIMESTAMP": timestamp,
+            "WM_SEC.KEY_VERSION": WALMART_KEY_VERSION,
+            "WM_SEC.AUTH_SIGNATURE": signature_b64,
+            "Content-Type": "application/json"
+        }
+    except Exception as e:
+        logging.error(f"Error generating Walmart auth headers: {str(e)}")
+        return None
+
+async def search_walmart_product(ingredient_name: str) -> Optional[WalmartProduct]:
+    """Search for a product on Walmart using their API"""
+    try:
+        headers = get_walmart_auth_headers()
+        if not headers:
+            return None
+        
+        # Clean ingredient name for search
+        clean_ingredient = clean_ingredient_name(ingredient_name)
+        
+        # Walmart API endpoint
+        url = "https://developer.api.walmart.com/api-proxy/service/affil/product/v2/search"
+        params = {
+            "query": clean_ingredient,
+            "numItems": 5  # Get top 5 results
+        }
+        
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            response = await client.get(url, headers=headers, params=params)
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Parse response and find best match
+                if "items" in data and len(data["items"]) > 0:
+                    # Get the first/best match
+                    item = data["items"][0]
+                    
+                    return WalmartProduct(
+                        product_id=str(item.get("itemId", "")),
+                        name=item.get("name", clean_ingredient),
+                        price=float(item.get("salePrice", 0.0)),
+                        thumbnail_image=item.get("thumbnailImage", ""),
+                        availability="Available"
+                    )
+                else:
+                    logging.warning(f"No Walmart products found for: {clean_ingredient}")
+                    return None
+            else:
+                logging.error(f"Walmart API error: {response.status_code} - {response.text}")
+                return None
+                
+    except Exception as e:
+        logging.error(f"Error searching Walmart for {ingredient_name}: {str(e)}")
+        return None
+
+def clean_ingredient_name(ingredient: str) -> str:
+    """Clean ingredient name for better search results"""
+    # Remove quantities and measurements
+    ingredient = re.sub(r'\d+[\s]*(?:cups?|tbsp|tsp|tablespoons?|teaspoons?|oz|ounces?|lbs?|pounds?|grams?|kg|ml|liters?)', '', ingredient, flags=re.IGNORECASE)
+    
+    # Remove common cooking terms
+    cooking_terms = ['chopped', 'diced', 'sliced', 'minced', 'fresh', 'dried', 'ground', 'crushed', 'finely', 'roughly', 'large', 'small', 'medium']
+    for term in cooking_terms:
+        ingredient = re.sub(rf'\b{term}\b', '', ingredient, flags=re.IGNORECASE)
+    
+    # Remove extra whitespace and clean up
+    ingredient = re.sub(r'\s+', ' ', ingredient).strip()
+    
+    # Remove leading/trailing punctuation
+    ingredient = ingredient.strip('.,;:-')
+    
+    return ingredient
+
+def extract_quantity_from_ingredient(ingredient: str) -> int:
+    """Extract quantity from ingredient string"""
+    # Look for numbers at the beginning
+    match = re.search(r'^(\d+)', ingredient.strip())
+    if match:
+        return int(match.group(1))
+    
+    # Look for fractions or decimals
+    fraction_match = re.search(r'(\d+/\d+|\d*\.\d+)', ingredient)
+    if fraction_match:
+        fraction_str = fraction_match.group(1)
+        if '/' in fraction_str:
+            num, den = fraction_str.split('/')
+            return max(1, int(float(num) / float(den)))
+        else:
+            return max(1, int(float(fraction_str)))
+    
+    return 1  # Default quantity
 
 # API Routes
 @api_router.get("/")
@@ -265,7 +373,7 @@ async def save_recipe(recipe_id: str, user_id: str):
     
     return {"message": "Recipe saved successfully"}
 
-# Walmart integration
+# Walmart integration with real API
 @api_router.post("/grocery/cart", response_model=GroceryCart)
 async def create_grocery_cart(recipe_id: str, user_id: str):
     # Get recipe
@@ -273,57 +381,70 @@ async def create_grocery_cart(recipe_id: str, user_id: str):
     if not recipe:
         raise HTTPException(status_code=404, detail="Recipe not found")
     
-    # Map ingredients to Walmart products
+    # Map ingredients to Walmart products using real API
     cart_items = []
     total_price = 0
     walmart_product_ids = []
     
+    logging.info(f"Processing {len(recipe['ingredients'])} ingredients for Walmart search")
+    
+    # Process ingredients in parallel for better performance
+    search_tasks = []
     for ingredient in recipe["ingredients"]:
-        # Simple ingredient matching (can be improved with NLP)
-        ingredient_lower = ingredient.lower()
-        matched = False
+        search_tasks.append(search_walmart_product(ingredient))
+    
+    # Execute all searches concurrently
+    walmart_products = await asyncio.gather(*search_tasks, return_exceptions=True)
+    
+    for i, ingredient in enumerate(recipe["ingredients"]):
+        walmart_product = walmart_products[i]
         
-        for key, product in WALMART_PRODUCTS.items():
-            if key in ingredient_lower:
-                quantity = 1  # Default quantity
-                # Try to extract quantity from ingredient string
-                import re
-                qty_match = re.search(r'(\d+)', ingredient)
-                if qty_match:
-                    quantity = int(qty_match.group(1))
-                
-                cart_items.append({
-                    "product_id": product["product_id"],
-                    "name": product["name"],
-                    "quantity": quantity,
-                    "price": product["price"],
-                    "original_ingredient": ingredient
-                })
-                
-                total_price += product["price"] * quantity
-                
-                # Add to Walmart URL
-                if quantity > 1:
-                    walmart_product_ids.append(f"{product['product_id']}_{quantity}")
-                else:
-                    walmart_product_ids.append(product["product_id"])
-                
-                matched = True
-                break
+        # Extract quantity from ingredient
+        quantity = extract_quantity_from_ingredient(ingredient)
         
-        if not matched:
-            # Add as unmatched item
+        if isinstance(walmart_product, WalmartProduct) and walmart_product.product_id:
+            # Successfully found Walmart product
+            item_total = walmart_product.price * quantity
+            
+            cart_items.append({
+                "product_id": walmart_product.product_id,
+                "name": walmart_product.name,
+                "quantity": quantity,
+                "price": walmart_product.price,
+                "total": item_total,
+                "original_ingredient": ingredient,
+                "status": "found",
+                "thumbnail": walmart_product.thumbnail_image
+            })
+            
+            total_price += item_total
+            
+            # Add to Walmart URL
+            if quantity > 1:
+                walmart_product_ids.append(f"{walmart_product.product_id}_{quantity}")
+            else:
+                walmart_product_ids.append(walmart_product.product_id)
+                
+        else:
+            # Product not found or error occurred
             cart_items.append({
                 "product_id": None,
-                "name": ingredient,
-                "quantity": 1,
-                "price": 0,
+                "name": clean_ingredient_name(ingredient),
+                "quantity": quantity,
+                "price": 0.0,
+                "total": 0.0,
                 "original_ingredient": ingredient,
-                "status": "not_found"
+                "status": "not_found",
+                "thumbnail": None
             })
+            
+            logging.warning(f"Could not find Walmart product for: {ingredient}")
     
-    # Generate Walmart URL
-    walmart_url = f"https://affil.walmart.com/cart/addToCart?items={','.join(walmart_product_ids)}"
+    # Generate Walmart affiliate URL
+    if walmart_product_ids:
+        walmart_url = f"https://affil.walmart.com/cart/addToCart?items={','.join(walmart_product_ids)}"
+    else:
+        walmart_url = "https://walmart.com"  # Fallback URL
     
     # Create cart
     cart = GroceryCart(
@@ -336,6 +457,8 @@ async def create_grocery_cart(recipe_id: str, user_id: str):
     
     # Save to database
     await db.grocery_carts.insert_one(cart.dict())
+    
+    logging.info(f"Created grocery cart with {len([item for item in cart_items if item['status'] == 'found'])} found items out of {len(cart_items)} total")
     
     return cart
 
