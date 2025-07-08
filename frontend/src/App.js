@@ -1152,16 +1152,91 @@ function App() {
   // Simple Grocery Cart Component (no portions, just ingredient names)
   const SimpleGroceryCartScreen = ({ cart, recipe }) => {
     const handleOrderNow = () => {
-      // Open Walmart URL
-      window.open(cart.walmart_url, '_blank');
+      const walmartUrl = cart?.walmart_url || `https://walmart.com/search?q=${encodeURIComponent(recipe.title + ' ingredients')}`;
       
-      // Show success message
-      alert('Opening Walmart with your ingredients! Complete your purchase there.');
+      console.log('🚀 Attempting to open Walmart URL:', walmartUrl);
       
-      // Go back to all recipes to see the saved recipe
-      setTimeout(() => {
-        setCurrentScreen('all-recipes');
-      }, 1000);
+      // METHOD 1: Try to open in new tab
+      try {
+        const opened = window.open(walmartUrl, '_blank');
+        
+        if (!opened || opened.closed || typeof opened.closed == 'undefined') {
+          throw new Error('Popup blocked');
+        }
+        
+        alert('✅ Successfully opened Walmart! Check your new tab.');
+        setTimeout(() => setCurrentScreen('all-recipes'), 1000);
+        return;
+      } catch (e) {
+        console.log('⚠️ Popup blocked, trying alternative methods...');
+      }
+      
+      // METHOD 2: Copy to clipboard and show instructions
+      try {
+        navigator.clipboard.writeText(walmartUrl);
+        alert(`🛒 WALMART URL COPIED TO CLIPBOARD!\n\nPaste this in a new browser tab:\n${walmartUrl}\n\nClick OK to continue.`);
+      } catch (e) {
+        // METHOD 3: Show URL in alert for manual copy
+        alert(`🛒 COPY THIS WALMART URL:\n\n${walmartUrl}\n\nCopy and paste this URL in a new browser tab to find your ingredients.`);
+      }
+      
+      // METHOD 4: Ask if user wants to go to Walmart in current tab
+      const useCurrentTab = confirm('Would you like to go to Walmart in this tab? (Click Cancel to stay here)');
+      if (useCurrentTab) {
+        window.location.href = walmartUrl;
+      } else {
+        setTimeout(() => setCurrentScreen('all-recipes'), 1000);
+      }
+    };
+
+    // Generate cart for saved recipes that don't have one
+    const handleGenerateCartForSavedRecipe = async () => {
+      if (!user || !recipe) {
+        alert('❌ Error: Missing user or recipe data');
+        return;
+      }
+      
+      try {
+        console.log('🔄 Generating cart for saved recipe...');
+        alert('🔄 Generating Walmart cart for: ' + recipe.title);
+        
+        const response = await axios.post(`${API}/grocery/cart-options?recipe_id=${recipe.id}&user_id=${user.id}`);
+        console.log('✅ Cart generated successfully:', response.data);
+        
+        // Create the cart and redirect
+        const cartOptions = response.data;
+        const walmartUrl = cartOptions.ingredient_options.length > 0 ? 
+          `https://affil.walmart.com/cart/addToCart?items=${cartOptions.ingredient_options.map(opt => opt.options && opt.options.length > 0 ? opt.options[0].product_id : '').filter(id => id).join(',')}` : 
+          `https://walmart.com/search?q=${encodeURIComponent(recipe.title)}`;
+        
+        console.log('🛒 Walmart URL:', walmartUrl);
+        
+        // Use the same bulletproof redirect method
+        try {
+          const opened = window.open(walmartUrl, '_blank');
+          if (!opened) throw new Error('Popup blocked');
+          alert('✅ Cart generated! Opened Walmart with your ingredients.');
+        } catch (e) {
+          try {
+            navigator.clipboard.writeText(walmartUrl);
+            alert(`🛒 CART GENERATED!\nURL copied to clipboard:\n${walmartUrl}`);
+          } catch (e2) {
+            alert(`🛒 CART READY!\nCopy this URL:\n${walmartUrl}`);
+          }
+        }
+        
+      } catch (error) {
+        console.error('❌ Cart generation failed:', error);
+        alert('❌ Cart generation failed. Using basic search instead.');
+        
+        // Fallback to basic search
+        const searchUrl = `https://walmart.com/search?q=${encodeURIComponent(recipe.title + ' ingredients')}`;
+        try {
+          window.open(searchUrl, '_blank');
+        } catch (e) {
+          alert(`🛒 SEARCH WALMART FOR:\n${recipe.title} ingredients\n\nURL: ${searchUrl}`);
+        }
+      }
     };
 
     return (
