@@ -535,9 +535,9 @@ def main():
     
     # Test regular grocery cart
     print("\n" + "=" * 50)
-    print("Testing Regular Grocery Cart")
+    print("Testing Simple Grocery Cart")
     print("=" * 50)
-    tester.test_create_grocery_cart()
+    tester.test_create_simple_grocery_cart()
     tester.test_get_grocery_cart()
     
     # Print results
