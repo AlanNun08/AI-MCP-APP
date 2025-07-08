@@ -243,6 +243,9 @@ frontend:
       - working: true
         agent: "testing"
         comment: "Confirmed recipe generation is working correctly. Successfully generated a Mediterranean Grilled Chicken with Quinoa Salad recipe with healthy mode (380 calories per serving). The recipe details page displays correctly with all expected information."
+      - working: true
+        agent: "main"
+        comment: "Backend testing confirmed recipe generation is working perfectly. OpenAI integration responds in 2-5 seconds with no timeout issues. Ready for frontend testing."
   
   - task: "Grocery Cart Integration"
     implemented: true
