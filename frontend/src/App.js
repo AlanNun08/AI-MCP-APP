@@ -1110,7 +1110,6 @@ function App() {
               </div>
             </div>
           )}
-          )}
 
           {/* Walmart Confirmation Dialog */}
           {showWalmartConfirm && groceryCart && (
