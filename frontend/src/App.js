@@ -16,23 +16,26 @@ function App() {
   // Landing Screen Component
   const LandingScreen = () => (
     <div className="min-h-screen bg-gradient-to-br from-green-400 to-blue-500 flex items-center justify-center p-4">
-      <div className="text-center">
-        <div className="text-6xl mb-4">👨‍🍳</div>
-        <h1 className="text-4xl font-bold text-white mb-2">AI Chef</h1>
-        <p className="text-xl text-white mb-8 opacity-90">Personalized recipes with instant grocery delivery</p>
+      <div className="text-center max-w-md">
+        <div className="text-6xl mb-4 animate-bounce">👨‍🍳</div>
+        <h1 className="text-4xl font-bold text-white mb-2 drop-shadow-lg">AI Chef</h1>
+        <p className="text-xl text-white mb-8 opacity-90 leading-relaxed">Personalized recipes with instant grocery delivery</p>
         <div className="space-y-4">
           <button
             onClick={() => setCurrentScreen('register')}
-            className="w-full bg-white text-green-600 font-semibold py-4 px-8 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200"
+            className="w-full bg-white text-green-600 font-semibold py-4 px-8 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 hover:bg-gray-50 active:scale-95"
           >
-            Get Started
+            ✨ Get Started
           </button>
           <button
             onClick={() => setCurrentScreen('login')}
-            className="w-full bg-transparent border-2 border-white text-white font-semibold py-4 px-8 rounded-2xl hover:bg-white hover:text-green-600 transition-all duration-200"
+            className="w-full bg-transparent border-2 border-white text-white font-semibold py-4 px-8 rounded-2xl hover:bg-white hover:text-green-600 transition-all duration-200 active:scale-95"
           >
-            I Have an Account
+            🔑 I Have an Account
           </button>
+        </div>
+        <div className="mt-8 text-white/70 text-sm">
+          <p>🤖 AI-powered • 🛒 Walmart delivery • 🍃 Healthy options</p>
         </div>
       </div>
     </div>
