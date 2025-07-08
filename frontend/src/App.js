@@ -930,14 +930,40 @@ function App() {
             </div>
           )}
 
-          {/* Generate Cart Button - show when no cart exists and not generating */}
-          {!generating && !groceryCart && (
-            <button
-              onClick={handleGenerateCart}
-              className="w-full bg-gradient-to-r from-green-500 to-blue-500 text-white font-semibold py-4 px-6 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 disabled:opacity-50 mb-4"
-            >
-              🛒 Generate Walmart Cart
-            </button>
+          {/* Check if recipe already has saved Walmart URL */}
+          {recipe.walmart_url && !generating && !groceryCart ? (
+            <div className="bg-green-50 border border-green-300 rounded-2xl shadow-sm p-6 mb-4">
+              <div className="text-center">
+                <h4 className="text-green-800 font-semibold mb-2">🛒 Cart Already Ready!</h4>
+                <p className="text-green-600 text-sm mb-4">Your Walmart cart was previously generated for this recipe.</p>
+                <button
+                  onClick={() => {
+                    if (confirm(`🛒 GO TO WALMART?\n\nTake you to your saved Walmart cart for this recipe?\n\nClick OK to go to Walmart.`)) {
+                      window.location.href = recipe.walmart_url;
+                    }
+                  }}
+                  className="w-full bg-gradient-to-r from-green-500 to-blue-500 text-white font-semibold py-4 px-6 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 mb-2"
+                >
+                  🚀 Go to Saved Walmart Cart
+                </button>
+                <button
+                  onClick={handleGenerateCart}
+                  className="w-full bg-gray-500 text-white font-medium py-2 px-4 rounded-xl hover:bg-gray-600 transition-colors"
+                >
+                  🔄 Generate New Cart
+                </button>
+              </div>
+            </div>
+          ) : (
+            /* Generate Cart Button - show when no cart exists and not generating */
+            !generating && !groceryCart && (
+              <button
+                onClick={handleGenerateCart}
+                className="w-full bg-gradient-to-r from-green-500 to-blue-500 text-white font-semibold py-4 px-6 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 disabled:opacity-50 mb-4"
+              >
+                🛒 Generate Walmart Cart
+              </button>
+            )
           )}
 
           {/* Walmart Confirmation Dialog */}
