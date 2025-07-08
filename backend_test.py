@@ -1059,12 +1059,15 @@ def main():
     # Test API root
     tester.test_api_root()
     
-    # Check if email verification endpoints are available
+    # Test Email Verification System
     print("\n" + "=" * 50)
     print("Testing Email Verification System")
     print("=" * 50)
     
-    # Try to access the registration endpoint to see if it's available
+    # First, clean up any existing test data
+    tester.test_cleanup_test_data()
+    
+    # Check if email verification endpoints are available
     success, _ = tester.run_test(
         "Check Email Verification API Availability",
         "POST",
@@ -1089,6 +1092,9 @@ def main():
         
         # Test password validation
         tester.test_password_validation()
+        
+        # Get verification code from debug endpoint
+        tester.test_get_verification_code(tester.test_email)
         
         # Test email verification
         if not tester.test_email_verification():
@@ -1117,6 +1123,9 @@ def main():
         
         # Test login with unverified user
         tester.test_login_with_unverified_user()
+        
+        # Test case-insensitive email handling
+        tester.test_case_insensitive_email()
     
     # Test OpenAI API key
     print("\n" + "=" * 50)
