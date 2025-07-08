@@ -82,6 +82,12 @@ class RecipeGenRequest(BaseModel):
     prep_time_max: Optional[int] = None
     servings: int = 4
     difficulty: str = "medium"
+    # New healthy options
+    is_healthy: bool = False
+    max_calories_per_serving: Optional[int] = None
+    # New budget options
+    is_budget_friendly: bool = False
+    max_budget: Optional[float] = None
 
 class WalmartProduct(BaseModel):
     product_id: str
