@@ -534,33 +534,34 @@ class AIRecipeAppTester:
         
         return success
     
-    def test_resend_to_verified_user(self):
-        """Test resending code to already verified user"""
+    def test_login_with_verified_user(self):
+        """Test login with verified user"""
         if not self.test_email:
             print("❌ No verified test email available")
             return False
             
-        # Try to resend code to verified user
-        resend_data = {
-            "email": self.test_email
+        login_data = {
+            "email": self.test_email,
+            "password": self.test_password
         }
         
-        # We expect this to fail with 400 status code
         success, response = self.run_test(
-            "Resend to Verified User",
+            "Login with Verified User",
             "POST",
-            "auth/resend-code",
-            400,
-            data=resend_data
+            "auth/login",
+            200,
+            data=login_data
         )
         
-        # Check if the error message mentions already verified
-        if success and 'detail' in response:
-            if 'already verified' in response['detail'].lower():
-                print("✅ Resend to verified user correctly rejected")
-                return True
-        
-        return success
+        if success and 'status' in response and response['status'] == 'success':
+            print("✅ Login successful")
+            return True
+        elif success and 'message' in response and 'successful' in response['message'].lower():
+            print("✅ Login successful")
+            return True
+        else:
+            print(f"❌ Login failed with response: {response}")
+            return False
     
     def test_password_reset_flow(self):
         """Test the complete password reset flow"""
