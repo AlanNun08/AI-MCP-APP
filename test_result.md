@@ -182,6 +182,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "Tested the improved email verification system. The system now works correctly with the following improvements: 1) Case-insensitive email handling works properly - tested with mixed case emails for login. 2) Better error logging and handling is implemented. 3) Improved verification code lookup is working correctly. 4) Better duplicate email detection is working - properly detects duplicate emails regardless of case. 5) Enhanced login flow works correctly - verified users can log in, unverified users are rejected. The complete flow from registration → verification → login works as expected. The debug endpoint for getting verification codes works correctly. Password validation is properly implemented, rejecting passwords shorter than 6 characters."
+      - working: true
+        agent: "testing"
+        comment: "Verified that the email service is now sending REAL emails through Mailjet API instead of using test mode. Successfully tested the complete email verification flow with a real email address. The system correctly generates a verification code, sends it via Mailjet API, and allows verification with the code. The Mailjet API responded with a success status, confirming that real emails are being sent. The email service is properly configured with the Mailjet API key, secret key, and sender email. The system is now fully functional for production use."
 
 frontend:
   - task: "React App Loading"
