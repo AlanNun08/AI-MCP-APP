@@ -404,9 +404,8 @@ function App() {
         });
         const newRecipe = response.data;
         console.log('Recipe generated successfully:', newRecipe);
-        setGeneratedRecipe(newRecipe);
         
-        // Refresh user recipes in localStorage for immediate UI update
+        // Refresh user recipes for immediate UI update
         try {
           const recipesResponse = await axios.get(`${API}/recipes?user_id=${user.id}`);
           window.userRecipes = recipesResponse.data;
@@ -414,6 +413,11 @@ function App() {
         } catch (error) {
           console.log('Could not refresh recipes list:', error);
         }
+        
+        // Automatically redirect to recipe detail with auto-grocery generation
+        window.currentRecipe = newRecipe;
+        window.autoGenerateGroceries = true; // Flag to auto-generate groceries
+        setCurrentScreen('recipe-detail');
         
       } catch (error) {
         console.error('Recipe generation error:', error);
@@ -454,7 +458,11 @@ function App() {
             is_healthy: genRequest.is_healthy,
             demo: true
           };
-          setGeneratedRecipe(demoRecipe);
+          
+          // Redirect to recipe detail for demo too
+          window.currentRecipe = demoRecipe;
+          window.autoGenerateGroceries = true;
+          setCurrentScreen('recipe-detail');
         } else {
           const errorMessage = error.response?.data?.detail || 'Failed to generate recipe. Please try again.';
           alert(`Error: ${errorMessage}`);
