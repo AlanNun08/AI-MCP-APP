@@ -459,16 +459,21 @@ async def create_simple_grocery_cart(recipe_id: str, user_id: str):
     for ingredient in recipe["ingredients"]:
         # Extract just the main ingredient name without quantities
         clean_name = clean_ingredient_name(ingredient)
-        search_tasks.append(search_walmart_products(clean_name))
+        search_tasks.append(search_walmart_products(clean_name, num_results=1))
     
     # Execute all searches concurrently
     walmart_products = await asyncio.gather(*search_tasks, return_exceptions=True)
     
     for i, ingredient in enumerate(recipe["ingredients"]):
-        walmart_product = walmart_products[i]
+        walmart_product_list = walmart_products[i]
         clean_name = clean_ingredient_name(ingredient)
         
-        if isinstance(walmart_product, WalmartProduct) and walmart_product.product_id:
+        # Get the first product from the list if available
+        if (isinstance(walmart_product_list, list) and 
+            len(walmart_product_list) > 0 and 
+            walmart_product_list[0].product_id):
+            
+            walmart_product = walmart_product_list[0]
             # Successfully found Walmart product - use quantity 1 for all items
             simple_items.append({
                 "name": walmart_product.name,
