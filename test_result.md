@@ -234,6 +234,18 @@ frontend:
       - working: false
         agent: "testing"
         comment: "Recipe generation form UI works correctly with healthy mode and budget mode toggles, but actual recipe generation fails with API error: 'Failed to generate recipe'. Console shows API Error and Recipe generation error."
+  
+  - task: "Grocery Cart Integration"
+    implemented: true
+    working: "NA"
+    file: "App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "Could not fully test grocery cart integration because recipe generation failed. The Order Groceries button was not visible since no recipe was generated."
 
 metadata:
   created_by: "main_agent"
