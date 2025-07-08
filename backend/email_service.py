@@ -1,9 +1,12 @@
 import os
 import random
 import string
+import requests
+import json
 from datetime import datetime, timedelta
 from typing import Optional
 import logging
+import base64
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -14,36 +17,27 @@ class EmailService:
         self.api_key = os.getenv('MAILJET_API_KEY')
         self.secret_key = os.getenv('MAILJET_SECRET_KEY')
         self.sender_email = os.getenv('SENDER_EMAIL')
-        self.test_mode = True  # Always use test mode for now
+        self.test_mode = False  # Switch to live mode
         self.last_verification_code = None  # Store for testing
         
-        if not all([self.api_key, self.secret_key, self.sender_email]) and not self.test_mode:
+        if not all([self.api_key, self.secret_key, self.sender_email]):
+            logger.error("Missing Mailjet configuration. Check MAILJET_API_KEY, MAILJET_SECRET_KEY, and SENDER_EMAIL")
             raise ValueError("Missing Mailjet configuration. Please check your environment variables.")
         
-        if not self.test_mode:
-            try:
-                from mailjet_rest import Client
-                self.mailjet = Client(auth=(self.api_key, self.secret_key), version='v3.1')
-            except ImportError:
-                logger.warning("mailjet_rest not installed, running in test mode")
-                self.test_mode = True
+        logger.info(f"EmailService initialized with sender: {self.sender_email}")
     
     def generate_verification_code(self) -> str:
         """Generate a 6-digit verification code"""
         return ''.join(random.choices(string.digits, k=6))
     
     async def send_verification_email(self, to_email: str, first_name: str, verification_code: str) -> bool:
-        """Send verification email with 6-digit code"""
+        """Send verification email with 6-digit code using Mailjet API"""
         self.last_verification_code = verification_code  # Store for testing
         
-        if self.test_mode:
-            logger.info(f"TEST MODE: Would send verification code {verification_code} to {to_email}")
-            print(f"🧪 TEST EMAIL: Verification code {verification_code} for {to_email}")
-            return True
-            
         try:
+            # Prepare the email data in Mailjet v3.1 format
             data = {
-                'Messages': [
+                "Messages": [
                     {
                         "From": {
                             "Email": self.sender_email,
@@ -55,7 +49,7 @@ class EmailService:
                                 "Name": first_name
                             }
                         ],
-                        "Subject": "Verify Your AI Chef Account",
+                        "Subject": "Verify Your AI Chef Account - Code Inside",
                         "TextPart": f"""
 Hi {first_name},
 
@@ -72,28 +66,38 @@ AI Chef Team
                         """,
                         "HTMLPart": f"""
 <html>
-<body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+<body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9fafb;">
     <div style="text-align: center; margin-bottom: 30px;">
         <h1 style="color: #10b981; margin-bottom: 10px;">👨‍🍳 AI Chef</h1>
         <h2 style="color: #374151; margin-top: 0;">Verify Your Account</h2>
     </div>
     
-    <div style="background-color: #f9fafb; border-radius: 12px; padding: 25px; margin: 20px 0;">
+    <div style="background-color: white; border-radius: 12px; padding: 25px; margin: 20px 0; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
         <p style="color: #374151; font-size: 16px; margin-bottom: 20px;">Hi {first_name},</p>
         
         <p style="color: #374151; font-size: 16px; margin-bottom: 20px;">
-            Welcome to AI Chef! Please verify your email address to complete your registration.
+            Welcome to AI Chef! Please verify your email address to complete your registration and start generating amazing recipes.
         </p>
         
         <div style="text-align: center; margin: 30px 0;">
-            <div style="background-color: #10b981; color: white; font-size: 32px; font-weight: bold; padding: 20px; border-radius: 8px; letter-spacing: 8px; font-family: monospace;">
+            <div style="background: linear-gradient(135deg, #10b981, #3b82f6); color: white; font-size: 32px; font-weight: bold; padding: 20px; border-radius: 8px; letter-spacing: 8px; font-family: monospace; display: inline-block;">
                 {verification_code}
             </div>
         </div>
         
         <p style="color: #6b7280; font-size: 14px; text-align: center; margin-top: 20px;">
-            This code will expire in 5 minutes.
+            ⏰ This code will expire in 5 minutes.
         </p>
+        
+        <div style="text-align: center; margin-top: 30px; padding: 20px; background-color: #f3f4f6; border-radius: 8px;">
+            <h3 style="color: #374151; margin-bottom: 10px;">🎯 What's Next?</h3>
+            <p style="color: #6b7280; font-size: 14px; margin: 0;">
+                After verification, you'll be able to:<br/>
+                🤖 Generate AI-powered recipes<br/>
+                🛒 Get instant Walmart grocery delivery<br/>
+                🍃 Access healthy & budget-friendly options
+            </p>
+        </div>
     </div>
     
     <div style="border-top: 1px solid #e5e7eb; padding-top: 20px; margin-top: 30px;">
@@ -101,7 +105,8 @@ AI Chef Team
             If you didn't create this account, please ignore this email.
         </p>
         <p style="color: #6b7280; font-size: 12px; text-align: center;">
-            Best regards,<br>AI Chef Team
+            Best regards,<br/>
+            <strong>AI Chef Team</strong>
         </p>
     </div>
 </body>
@@ -111,18 +116,35 @@ AI Chef Team
                 ]
             }
             
-            # Send email using Mailjet
-            result = self.mailjet.send.create(data=data)
+            # Make the API call using requests (matching the curl format you provided)
+            auth = (self.api_key, self.secret_key)
+            headers = {
+                'Content-Type': 'application/json'
+            }
             
-            if result.status_code == 200:
-                logger.info(f"Verification email sent successfully to {to_email}")
+            logger.info(f"Sending verification email to {to_email} with code {verification_code}")
+            
+            response = requests.post(
+                'https://api.mailjet.com/v3.1/send',
+                auth=auth,
+                headers=headers,
+                json=data,
+                timeout=30
+            )
+            
+            if response.status_code == 200:
+                result = response.json()
+                logger.info(f"✅ Email sent successfully to {to_email}. Mailjet response: {result}")
+                print(f"📧 LIVE EMAIL SENT: Verification code {verification_code} sent to {to_email}")
                 return True
             else:
-                logger.error(f"Failed to send email. Status: {result.status_code}, Error: {result.json()}")
+                logger.error(f"❌ Failed to send email. Status: {response.status_code}, Response: {response.text}")
+                print(f"❌ Email failed: Status {response.status_code} - {response.text}")
                 return False
                 
         except Exception as e:
-            logger.error(f"Error sending verification email: {str(e)}")
+            logger.error(f"❌ Error sending verification email: {str(e)}")
+            print(f"❌ Email error: {str(e)}")
             return False
 
 # Create global email service instance
