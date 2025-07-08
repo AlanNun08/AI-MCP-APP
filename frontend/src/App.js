@@ -390,7 +390,17 @@ function App() {
           user_id: user.id,
           ...genRequest
         });
-        setGeneratedRecipe(response.data);
+        const newRecipe = response.data;
+        setGeneratedRecipe(newRecipe);
+        
+        // Refresh user recipes in localStorage for immediate UI update
+        try {
+          const recipesResponse = await axios.get(`${API}/recipes?user_id=${user.id}`);
+          window.userRecipes = recipesResponse.data;
+        } catch (error) {
+          console.log('Could not refresh recipes list');
+        }
+        
       } catch (error) {
         console.error('Recipe generation error:', error);
         
