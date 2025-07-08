@@ -1287,16 +1287,45 @@ function App() {
 
               <div className="bg-green-50 p-4 rounded-xl mb-4">
                 <p className="text-sm text-green-800">
-                  <strong>🛒 Ready to Order:</strong> We've found the basic ingredients you need. Click below to add them to your Walmart cart and complete your purchase!
+                  <strong>🛒 Ready to Order:</strong> Choose your preferred method to get your ingredients from Walmart!
                 </p>
               </div>
 
-              <button
-                onClick={handleOrderNow}
-                className="w-full bg-gradient-to-r from-green-500 to-blue-500 text-white font-semibold py-4 px-6 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200"
-              >
-                🛒 Order at Walmart Now
-              </button>
+              <div className="space-y-3">
+                <button
+                  onClick={handleOrderNow}
+                  className="w-full bg-gradient-to-r from-green-500 to-blue-500 text-white font-semibold py-4 px-6 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200"
+                >
+                  🛒 Order at Walmart Now
+                </button>
+                
+                <button
+                  onClick={handleGenerateCartForSavedRecipe}
+                  className="w-full bg-orange-500 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200"
+                >
+                  🚀 Generate New Cart (Fresh Products)
+                </button>
+                
+                <button
+                  onClick={() => {
+                    const searchUrl = `https://walmart.com/search?q=${encodeURIComponent(recipe.title + ' recipe ingredients')}`;
+                    try {
+                      window.open(searchUrl, '_blank');
+                      alert('✅ Opened Walmart search for your recipe!');
+                    } catch (e) {
+                      try {
+                        navigator.clipboard.writeText(searchUrl);
+                        alert(`🛒 URL COPIED!\n${searchUrl}`);
+                      } catch (e2) {
+                        alert(`🛒 SEARCH URL:\n${searchUrl}`);
+                      }
+                    }
+                  }}
+                  className="w-full bg-purple-500 text-white font-medium py-3 px-6 rounded-xl shadow-lg hover:bg-purple-600 transition-all duration-200"
+                >
+                  🔍 Search Walmart Manually
+                </button>
+              </div>
             </div>
           </div>
         </div>
