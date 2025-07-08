@@ -856,28 +856,76 @@ function App() {
             )}
           </div>
 
-          {/* Auto-generating groceries indicator */}
-          {autoGenerating && (
+          {/* Generating groceries indicator */}
+          {generating && (
             <div className="bg-blue-50 border border-blue-300 rounded-2xl shadow-sm p-6 mb-4">
               <div className="flex items-center space-x-3">
                 <div className="loading w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
                 <div>
                   <h4 className="text-blue-800 font-semibold">Finding Walmart Products...</h4>
-                  <p className="text-blue-600 text-sm">Automatically generating grocery list for your recipe</p>
+                  <p className="text-blue-600 text-sm">Generating grocery list for your recipe</p>
                 </div>
               </div>
             </div>
           )}
 
-          {/* Order Groceries Button - only show if not auto-generating and no cart yet */}
-          {!autoGenerating && !groceryCart && (
+          {/* Generate Cart Button - show when no cart exists and not generating */}
+          {!generating && !groceryCart && (
             <button
-              onClick={handleOrderGroceries}
-              disabled={loading}
+              onClick={handleGenerateCart}
               className="w-full bg-gradient-to-r from-green-500 to-blue-500 text-white font-semibold py-4 px-6 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 disabled:opacity-50 mb-4"
             >
-              {loading ? 'Creating Cart...' : '🛒 Order Groceries from Walmart'}
+              🛒 Generate Walmart Cart
             </button>
+          )}
+
+          {/* Walmart Confirmation Dialog */}
+          {showWalmartConfirm && groceryCart && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+              <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
+                <h3 className="text-xl font-bold text-gray-800 mb-4">🛒 Cart Ready for Walmart!</h3>
+                
+                <div className="mb-4">
+                  <p className="text-gray-600 mb-3">Your grocery cart has been generated with {groceryCart.simple_items?.filter(item => item.status !== 'not_found').length || 0} items:</p>
+                  
+                  <div className="bg-gray-50 rounded-lg p-3 max-h-32 overflow-y-auto">
+                    {groceryCart.simple_items?.slice(0, 5).map((item, index) => (
+                      <div key={index} className="flex justify-between text-sm mb-1">
+                        <span className="text-gray-700">{item.name}</span>
+                        <span className="text-green-600 font-medium">${item.price?.toFixed(2) || '0.00'}</span>
+                      </div>
+                    ))}
+                    {groceryCart.simple_items?.length > 5 && (
+                      <p className="text-gray-500 text-xs">...and {groceryCart.simple_items.length - 5} more items</p>
+                    )}
+                  </div>
+                  
+                  <div className="mt-3 pt-2 border-t border-gray-200">
+                    <div className="flex justify-between font-semibold">
+                      <span>Estimated Total:</span>
+                      <span className="text-green-600">${groceryCart.total_price?.toFixed(2) || '0.00'}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <p className="text-gray-600 text-sm mb-6">Ready to send your cart to Walmart? This will open a new tab with your items pre-added to your Walmart cart.</p>
+                
+                <div className="flex space-x-3">
+                  <button
+                    onClick={handleCancelWalmart}
+                    className="flex-1 bg-gray-200 text-gray-700 font-medium py-3 px-4 rounded-xl hover:bg-gray-300 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleSendToWalmart}
+                    className="flex-1 bg-gradient-to-r from-green-500 to-blue-500 text-white font-semibold py-3 px-4 rounded-xl hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200"
+                  >
+                    🚀 Go to Walmart
+                  </button>
+                </div>
+              </div>
+            </div>
           )}
         </div>
       </div>
