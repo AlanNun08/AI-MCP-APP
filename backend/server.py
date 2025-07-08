@@ -380,19 +380,23 @@ async def resend_verification_code(resend_request: ResendCodeRequest):
 async def login_user(login_data: UserLogin):
     """Login user with email and password"""
     try:
-        # Find user
-        user = await db.users.find_one({"email": login_data.email})
+        # Normalize email
+        email_lower = login_data.email.lower().strip()
+        
+        # Find user (case-insensitive)
+        user = await db.users.find_one({"email": {"$regex": f"^{email_lower}$", "$options": "i"}})
         if not user:
             raise HTTPException(status_code=401, detail="Invalid email or password")
         
         # Check if user is verified
-        if not user["is_verified"]:
+        if not user.get("is_verified", False):
             raise HTTPException(status_code=401, detail="Email not verified. Please verify your email first.")
         
         # Verify password
         if not verify_password(login_data.password, user["password_hash"]):
             raise HTTPException(status_code=401, detail="Invalid email or password")
         
+        logging.info(f"User logged in successfully: {email_lower}")
         return {
             "message": "Login successful",
             "user": {
@@ -400,17 +404,17 @@ async def login_user(login_data: UserLogin):
                 "first_name": user["first_name"],
                 "last_name": user["last_name"],
                 "email": user["email"],
-                "dietary_preferences": user["dietary_preferences"],
-                "allergies": user["allergies"],
-                "favorite_cuisines": user["favorite_cuisines"],
-                "is_verified": user["is_verified"]
+                "dietary_preferences": user.get("dietary_preferences", []),
+                "allergies": user.get("allergies", []),
+                "favorite_cuisines": user.get("favorite_cuisines", []),
+                "is_verified": user.get("is_verified", False)
             }
         }
         
     except HTTPException:
         raise
     except Exception as e:
-        logging.error(f"Login error: {str(e)}")
+        logging.error(f"Login error for {login_data.email}: {str(e)}")
         raise HTTPException(status_code=500, detail="Login failed")
 
 @api_router.get("/debug/verification-codes/{email}")
