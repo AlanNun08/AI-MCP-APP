@@ -222,8 +222,26 @@ frontend:
       - working: true
         agent: "testing"
         comment: "User registration flow works correctly. Form accepts name, email, dietary preferences, allergies, and favorite cuisines. Successfully creates user account and redirects to dashboard."
+      - working: true
+        agent: "testing"
+        comment: "Confirmed user registration is working correctly. Successfully created multiple test users with different preferences and all were properly saved and redirected to dashboard."
   
   - task: "Recipe Generation"
+    implemented: true
+    working: true
+    file: "App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "Recipe generation form UI works correctly with healthy mode and budget mode toggles, but actual recipe generation fails with API error: 'Failed to generate recipe'. Console shows API Error and Recipe generation error."
+      - working: true
+        agent: "testing"
+        comment: "Recipe generation is now working correctly. Successfully generated an Italian recipe with proper ingredients and instructions. The recipe details page displays correctly with all expected information including prep time, cook time, servings, and calorie information."
+  
+  - task: "Grocery Cart Integration"
     implemented: true
     working: false
     file: "App.js"
@@ -231,21 +249,12 @@ frontend:
     priority: "high"
     needs_retesting: false
     status_history:
-      - working: false
-        agent: "testing"
-        comment: "Recipe generation form UI works correctly with healthy mode and budget mode toggles, but actual recipe generation fails with API error: 'Failed to generate recipe'. Console shows API Error and Recipe generation error."
-  
-  - task: "Grocery Cart Integration"
-    implemented: true
-    working: "NA"
-    file: "App.js"
-    stuck_count: 0
-    priority: "high"
-    needs_retesting: true
-    status_history:
       - working: "NA"
         agent: "testing"
         comment: "Could not fully test grocery cart integration because recipe generation failed. The Order Groceries button was not visible since no recipe was generated."
+      - working: false
+        agent: "testing"
+        comment: "Grocery cart integration is partially working. The Order Groceries button appears correctly on the recipe detail page, but clicking it results in a 500 error from the /api/grocery/simple-cart endpoint. Console shows 'Auto grocery generation error: AxiosError'. This is consistent with the known issue in the backend where the simple-cart endpoint has a MongoDB ObjectId serialization error."
 
 metadata:
   created_by: "main_agent"
