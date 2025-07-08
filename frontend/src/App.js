@@ -294,7 +294,13 @@ function App() {
       ingredients_on_hand: [],
       prep_time_max: '',
       servings: 4,
-      difficulty: 'medium'
+      difficulty: 'medium',
+      // New healthy options
+      is_healthy: false,
+      max_calories_per_serving: 500,
+      // New budget options  
+      is_budget_friendly: false,
+      max_budget: 25.0
     });
     const [generatedRecipe, setGeneratedRecipe] = useState(null);
 
@@ -314,8 +320,8 @@ function App() {
           alert('Demo Mode: Backend not accessible. Showing sample recipe.');
           const demoRecipe = {
             id: 'demo-recipe-' + Date.now(),
-            title: genRequest.cuisine_type ? `${genRequest.cuisine_type.charAt(0).toUpperCase() + genRequest.cuisine_type.slice(1)} Demo Recipe` : 'Demo Recipe',
-            description: `A delicious ${genRequest.cuisine_type || 'international'} dish perfect for ${genRequest.servings} people.`,
+            title: genRequest.cuisine_type ? `${genRequest.cuisine_type.charAt(0).toUpperCase() + genRequest.cuisine_type.slice(1)} ${genRequest.is_healthy ? 'Healthy ' : ''}Demo Recipe` : 'Demo Recipe',
+            description: `A delicious ${genRequest.cuisine_type || 'international'} dish perfect for ${genRequest.servings} people.${genRequest.is_healthy ? ' This healthy version contains approximately ' + genRequest.max_calories_per_serving + ' calories per serving.' : ''}`,
             ingredients: [
               '2 cups main ingredient',
               '1 onion, diced',
@@ -340,6 +346,8 @@ function App() {
             cuisine_type: genRequest.cuisine_type || 'international',
             dietary_tags: genRequest.dietary_preferences,
             difficulty: genRequest.difficulty,
+            calories_per_serving: genRequest.is_healthy ? genRequest.max_calories_per_serving : null,
+            is_healthy: genRequest.is_healthy,
             demo: true
           };
           setGeneratedRecipe(demoRecipe);
