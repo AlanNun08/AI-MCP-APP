@@ -742,31 +742,56 @@ function App() {
 
     const handleSendToWalmart = () => {
       console.log('🚀 Attempting to open Walmart URL...');
-      alert('🚀 Opening Walmart with your cart...');
       
       if (groceryCart && groceryCart.walmart_url) {
         console.log('🛒 Walmart URL:', groceryCart.walmart_url);
-        alert('URL: ' + groceryCart.walmart_url);
         
-        // Open Walmart URL in new tab
-        const opened = window.open(groceryCart.walmart_url, '_blank');
+        // METHOD 1: Try to open in new tab
+        try {
+          const opened = window.open(groceryCart.walmart_url, '_blank');
+          
+          if (!opened || opened.closed || typeof opened.closed == 'undefined') {
+            // Popup was blocked - use alternative methods
+            throw new Error('Popup blocked');
+          }
+          
+          console.log('✅ Successfully opened Walmart URL in new tab');
+          setShowWalmartConfirm(false);
+          return;
+        } catch (e) {
+          console.log('⚠️ Popup blocked, trying alternative methods...');
+        }
         
-        if (opened) {
-          console.log('✅ Successfully opened Walmart URL');
-          alert('✅ Successfully opened Walmart! Check your new tab.');
-        } else {
-          console.log('❌ Popup blocked - copying URL to clipboard');
-          alert('❌ Popup blocked! Copying URL to clipboard. Paste in new tab: ' + groceryCart.walmart_url);
+        // METHOD 2: Copy to clipboard and show instructions
+        try {
           navigator.clipboard.writeText(groceryCart.walmart_url);
+          alert(`🛒 WALMART CART READY!\n\nURL copied to clipboard! \n\nPaste this in a new browser tab:\n${groceryCart.walmart_url}\n\nClick OK to continue.`);
+        } catch (e) {
+          // METHOD 3: Show URL in alert for manual copy
+          alert(`🛒 WALMART CART READY!\n\nCopy this URL and paste in a new browser tab:\n\n${groceryCart.walmart_url}\n\nClick OK to continue.`);
+        }
+        
+        // METHOD 4: Try location.href as last resort (same tab)
+        const useCurrentTab = confirm('Would you like to go to Walmart in this tab? (Click Cancel to stay here)');
+        if (useCurrentTab) {
+          window.location.href = groceryCart.walmart_url;
         }
         
         setShowWalmartConfirm(false);
         
-        // Show success message
-        alert('🛒 Redirected to Walmart! Your cart has been pre-filled with the recipe ingredients.');
       } else {
         console.log('❌ No grocery cart or URL found');
-        alert('❌ No cart or URL found!');
+        alert('❌ No cart or URL found! Trying to generate basic Walmart search...');
+        
+        // Emergency fallback - basic Walmart search
+        const searchUrl = `https://walmart.com/search?q=${encodeURIComponent(recipe.title + ' ingredients')}`;
+        alert(`🛒 EMERGENCY WALMART SEARCH:\n\n${searchUrl}\n\nCopy this URL to find your ingredients manually.`);
+        
+        try {
+          window.open(searchUrl, '_blank');
+        } catch (e) {
+          window.location.href = searchUrl;
+        }
       }
     };
 
