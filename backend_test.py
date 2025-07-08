@@ -330,12 +330,14 @@ class AIRecipeAppTester:
             "max_budget": 12.0
         }
         
+        print("Testing combined healthy & budget recipe generation with 60 second timeout...")
         success, response = self.run_test(
             "Generate Combined Healthy & Budget Recipe",
             "POST",
             "recipes/generate",
             200,
-            data=recipe_request
+            data=recipe_request,
+            timeout=60  # Set timeout to 60 seconds to check for timeout issues
         )
         
         if success and 'id' in response:
@@ -353,6 +355,9 @@ class AIRecipeAppTester:
                 print("⚠️ No calorie information in the response")
                 
             return True
+        elif self.timeout_issues:
+            print("⚠️ Combined recipe generation timed out after 60 seconds")
+            logger.warning("Combined recipe generation timed out after 60 seconds")
         return False
 
     def test_create_simple_grocery_cart(self):
