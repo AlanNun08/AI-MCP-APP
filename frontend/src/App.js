@@ -1134,57 +1134,33 @@ function App() {
     const handleOrderNow = () => {
       const walmartUrl = cart?.walmart_url || `https://walmart.com/search?q=${encodeURIComponent(recipe.title + ' ingredients')}`;
       
-      console.log('🚀 Opening Walmart:', walmartUrl);
+      console.log('🚀 Opening Walmart DIRECTLY:', walmartUrl);
       
-      // Validate URL to avoid blank redirects
+      // Validate URL
       if (!walmartUrl || walmartUrl === '') {
         alert('❌ No valid Walmart URL found. Please try again.');
         return;
       }
       
-      // METHOD 1: Clean window.open approach
-      try {
-        const opened = window.open(walmartUrl, '_blank', 'noopener,noreferrer');
-        
-        if (opened && !opened.closed) {
-          alert('✅ Successfully opened Walmart! Check your new tab.');
-          setTimeout(() => setCurrentScreen('all-recipes'), 1000);
-          return;
-        }
-      } catch (e) {
-        console.log('Window.open failed:', e);
+      // Save URL to recipe for persistence
+      if (recipe && recipe.id) {
+        window.currentRecipe = { ...recipe, walmart_url: walmartUrl, cart_generated: true };
       }
       
-      // METHOD 2: Link click method (no blank windows)
-      try {
-        const link = document.createElement('a');
-        link.href = walmartUrl;
-        link.target = '_blank';
-        link.rel = 'noopener noreferrer';
-        link.style.display = 'none';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        
-        alert('✅ Opened Walmart! Check your new tab.');
-        setTimeout(() => setCurrentScreen('all-recipes'), 1000);
+      // DIRECT REDIRECT: Use location.href (no blank tabs)
+      if (confirm(`🛒 GO TO WALMART?\n\nThis will take you to Walmart with your cart items.\n\nClick OK to go to Walmart.`)) {
+        window.location.href = walmartUrl;
         return;
-      } catch (e) {
-        console.log('Link click failed:', e);
       }
       
-      // METHOD 3: Copy to clipboard (no redirects)
+      // If user cancels, copy URL
       try {
         navigator.clipboard.writeText(walmartUrl);
-        alert(`🛒 WALMART URL COPIED!\n\nSteps:\n1. Open new browser tab\n2. Paste (Ctrl+V) and press Enter\n\nURL: ${walmartUrl}`);
-        setTimeout(() => setCurrentScreen('all-recipes'), 1000);
-        return;
+        alert(`🛒 WALMART URL COPIED!\n\nPaste in new tab:\n${walmartUrl}`);
       } catch (e) {
-        console.log('Clipboard failed:', e);
+        alert(`🛒 COPY THIS URL:\n\n${walmartUrl}`);
       }
       
-      // METHOD 4: Show URL for manual copy
-      alert(`🛒 COPY THIS WALMART URL:\n\n${walmartUrl}\n\n1. Copy this URL\n2. Open new browser tab\n3. Paste and press Enter`);
       setTimeout(() => setCurrentScreen('all-recipes'), 1000);
     };
 
