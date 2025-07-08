@@ -747,7 +747,7 @@ function App() {
     };
 
     const handleSendToWalmart = () => {
-      console.log('🚀 Opening Walmart with DIRECT method...');
+      console.log('🚀 Opening Walmart automatically...');
       
       if (groceryCart && groceryCart.walmart_url) {
         const walmartUrl = groceryCart.walmart_url;
@@ -765,18 +765,50 @@ function App() {
           window.currentRecipe = { ...recipe, walmart_url: walmartUrl, cart_generated: true };
         }
         
-        // DIRECT METHOD: Use location.href for guaranteed redirect (no blank tabs)
-        if (confirm(`🛒 WALMART CART READY!\n\nGo to Walmart now with your cart items?\n\nClick OK to go to Walmart or Cancel to stay here.`)) {
-          window.location.href = walmartUrl;
+        // DIRECT METHOD: Create proper link and click it (NO blank URLs)
+        try {
+          const link = document.createElement('a');
+          link.href = walmartUrl;
+          link.target = '_blank';
+          link.rel = 'noopener noreferrer';
+          
+          // Add to DOM temporarily
+          document.body.appendChild(link);
+          
+          // Click the link to open
+          link.click();
+          
+          // Remove from DOM
+          document.body.removeChild(link);
+          
+          console.log('✅ Successfully opened Walmart URL');
+          alert('✅ Successfully opened Walmart! Check your new tab.');
+          setShowWalmartConfirm(false);
           return;
+          
+        } catch (e) {
+          console.log('Link click failed:', e);
         }
         
-        // Alternative: Copy URL if user cancels
+        // FALLBACK: Try window.open with full URL (not blank)
+        try {
+          const opened = window.open(walmartUrl, '_blank', 'noopener,noreferrer');
+          if (opened) {
+            console.log('✅ Opened via window.open');
+            alert('✅ Successfully opened Walmart! Check your new tab.');
+            setShowWalmartConfirm(false);
+            return;
+          }
+        } catch (e) {
+          console.log('Window.open failed:', e);
+        }
+        
+        // FINAL FALLBACK: Copy URL
         try {
           navigator.clipboard.writeText(walmartUrl);
-          alert(`🛒 WALMART URL COPIED!\n\nPaste in new tab:\n${walmartUrl}`);
+          alert(`🛒 WALMART URL COPIED!\n\nURL: ${walmartUrl}\n\nPaste in new tab to access your cart.`);
         } catch (e) {
-          alert(`🛒 COPY THIS URL:\n\n${walmartUrl}`);
+          alert(`🛒 COPY THIS URL:\n\n${walmartUrl}\n\nPaste in new tab to access your cart.`);
         }
         
         setShowWalmartConfirm(false);
