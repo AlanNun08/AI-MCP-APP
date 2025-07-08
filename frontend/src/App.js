@@ -978,6 +978,10 @@ function App() {
         return <EmailVerificationScreen />;
       case 'login':
         return <LoginScreen />;
+      case 'forgot-password':
+        return <ForgotPasswordScreen />;
+      case 'reset-password':
+        return <ResetPasswordScreen />;
       case 'dashboard':
         return <DashboardScreen />;
       case 'generate-recipe':
