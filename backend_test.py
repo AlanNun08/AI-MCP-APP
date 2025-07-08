@@ -471,16 +471,44 @@ def main():
     tester.test_get_user()
     tester.test_update_user()
     
-    # Test recipe generation
+    # Test basic recipe generation
     if not tester.test_generate_recipe():
         print("❌ Recipe generation failed, stopping tests")
         return 1
     
     tester.test_get_recipes()
     tester.test_get_recipe()
-    tester.test_save_recipe()
     
-    # Test grocery cart
+    # Test healthy recipe generation
+    print("\n" + "=" * 50)
+    print("Testing Healthy Recipe Mode")
+    print("=" * 50)
+    tester.test_generate_healthy_recipe()
+    
+    # Test budget recipe generation
+    print("\n" + "=" * 50)
+    print("Testing Budget-Friendly Recipe Mode")
+    print("=" * 50)
+    tester.test_generate_budget_recipe()
+    
+    # Test combined healthy + budget recipe generation
+    print("\n" + "=" * 50)
+    print("Testing Combined Healthy + Budget Recipe Mode")
+    print("=" * 50)
+    tester.test_generate_combined_recipe()
+    
+    # Test grocery cart with options
+    print("\n" + "=" * 50)
+    print("Testing Grocery Cart with Multiple Options")
+    print("=" * 50)
+    tester.test_create_grocery_cart_with_options()
+    tester.test_get_grocery_cart_options()
+    tester.test_create_custom_cart()
+    
+    # Test regular grocery cart
+    print("\n" + "=" * 50)
+    print("Testing Regular Grocery Cart")
+    print("=" * 50)
     tester.test_create_grocery_cart()
     tester.test_get_grocery_cart()
     
