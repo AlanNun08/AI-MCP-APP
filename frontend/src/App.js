@@ -1042,54 +1042,32 @@ function App() {
                   </div>
                 </div>
 
-                <p className="text-gray-600 text-sm mb-6">Your cart is ready! Choose how to open Walmart:</p>
+                <p className="text-gray-600 text-sm mb-6">Your cart is ready! Click below to open Walmart:</p>
                 
                 <div className="space-y-3">
                   <button
                     onClick={handleSendToWalmart}
                     className="w-full bg-gradient-to-r from-green-500 to-blue-500 text-white font-semibold py-4 px-6 rounded-xl hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200"
                   >
-                    🚀 Open Walmart (New Tab)
+                    🚀 Open Walmart Cart
                   </button>
                   
                   <button
                     onClick={() => {
-                      if (groceryCart && groceryCart.walmart_url) {
-                        // For Safari users having popup issues - open in same tab
-                        if (confirm('🍎 SAFARI USERS: Open Walmart in this tab?\n\n(You will leave the AI Chef app)\n\nClick OK to go to Walmart, or Cancel to copy URL instead')) {
-                          window.location.href = groceryCart.walmart_url;
-                        } else {
-                          // Copy URL for manual opening
-                          try {
-                            navigator.clipboard.writeText(groceryCart.walmart_url);
-                            alert(`🛒 URL COPIED!\n\nPaste in new tab: ${groceryCart.walmart_url}`);
-                          } catch (e) {
-                            alert(`🛒 COPY THIS URL:\n\n${groceryCart.walmart_url}`);
-                          }
-                        }
-                      }
-                      setShowWalmartConfirm(false);
-                    }}
-                    className="w-full bg-orange-500 text-white font-medium py-3 px-6 rounded-xl hover:bg-orange-600 transition-colors"
-                  >
-                    🍎 Safari: Open in This Tab
-                  </button>
-                  
-                  <button
-                    onClick={() => {
+                      // SAFE COPY METHOD: Never navigate away from app
                       if (groceryCart && groceryCart.walmart_url) {
                         try {
                           navigator.clipboard.writeText(groceryCart.walmart_url);
-                          alert(`🛒 URL COPIED TO CLIPBOARD!\n\nSteps for Safari:\n1. Open new tab (⌘+T)\n2. Paste (⌘+V) and press Enter\n\nURL: ${groceryCart.walmart_url}`);
+                          alert(`🛒 WALMART URL COPIED!\n\nSteps:\n1. Open new tab (Ctrl+T or ⌘+T)\n2. Paste (Ctrl+V or ⌘+V)\n3. Press Enter\n\nURL: ${groceryCart.walmart_url}`);
                         } catch (e) {
-                          alert(`🛒 COPY THIS URL:\n\n${groceryCart.walmart_url}\n\nOpen in new tab manually`);
+                          alert(`🛒 COPY THIS URL:\n\n${groceryCart.walmart_url}\n\nOpen in a new browser tab`);
                         }
                       }
                       setShowWalmartConfirm(false);
                     }}
                     className="w-full bg-blue-500 text-white font-medium py-3 px-6 rounded-xl hover:bg-blue-600 transition-colors"
                   >
-                    📋 Copy URL (⌘+T then ⌘+V)
+                    📋 Copy URL Instead
                   </button>
                   
                   <button
