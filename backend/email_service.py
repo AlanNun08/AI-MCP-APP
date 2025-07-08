@@ -17,27 +17,40 @@ class EmailService:
         self.api_key = None
         self.secret_key = None
         self.sender_email = None
-        self.test_mode = False  # Always use live mode
+        self.test_mode = False  # Default to live mode
         self.last_verification_code = None  # Store for testing
         self.initialized = False
+        
+        # Initialize immediately to check credentials
+        self._initialize()
         
     def _initialize(self):
         """Initialize the service with environment variables"""
         if self.initialized:
             return
             
+        # Get credentials from environment
         self.api_key = os.getenv('MAILJET_API_KEY')
         self.secret_key = os.getenv('MAILJET_SECRET_KEY')
         self.sender_email = os.getenv('SENDER_EMAIL')
         
+        # Log the actual values for debugging
+        logger.info(f"MAILJET_API_KEY: {self.api_key}")
+        logger.info(f"MAILJET_SECRET_KEY: {self.secret_key}")
+        logger.info(f"SENDER_EMAIL: {self.sender_email}")
+        
+        # Check if all credentials are present
         if not all([self.api_key, self.secret_key, self.sender_email]):
             logger.error(f"Missing Mailjet configuration:")
             logger.error(f"  MAILJET_API_KEY: {'✅' if self.api_key else '❌'}")
             logger.error(f"  MAILJET_SECRET_KEY: {'✅' if self.secret_key else '❌'}")
             logger.error(f"  SENDER_EMAIL: {'✅' if self.sender_email else '❌'}")
             
-            # Force live mode even if configuration is missing
+            # Force live mode for testing
             logger.warning("Missing some Mailjet config, but continuing in LIVE mode")
+            self.test_mode = False
+        else:
+            logger.info("All Mailjet credentials found, using LIVE mode")
             self.test_mode = False
         
         self.initialized = True
@@ -49,9 +62,11 @@ class EmailService:
     
     async def send_verification_email(self, to_email: str, first_name: str, verification_code: str) -> bool:
         """Send verification email with 6-digit code using Mailjet API"""
-        self._initialize()  # Initialize on first use
+        # Store for testing
+        self.last_verification_code = verification_code
         
-        self.last_verification_code = verification_code  # Store for testing
+        # Force live mode for testing
+        self.test_mode = False
         
         if self.test_mode:
             logger.info(f"TEST MODE: Would send verification code {verification_code} to {to_email}")
@@ -140,13 +155,14 @@ AI Chef Team
                 ]
             }
             
-            # Make the API call using requests (matching the curl format you provided)
+            # Make the API call using requests
             auth = (self.api_key, self.secret_key)
             headers = {
                 'Content-Type': 'application/json'
             }
             
             logger.info(f"Sending verification email to {to_email} with code {verification_code}")
+            logger.info(f"Using Mailjet credentials - API Key: {self.api_key}, Secret Key: {self.secret_key}, Sender: {self.sender_email}")
             
             response = requests.post(
                 'https://api.mailjet.com/v3.1/send',
