@@ -295,35 +295,39 @@ class AIRecipeAppTester:
             print("❌ No verification code found")
             return False
         
-    def test_user_registration(self):
-        """Test user registration with email verification"""
-        print("\n" + "=" * 50)
-        print("Testing User Registration with Email Verification")
-        print("=" * 50)
+    def test_case_insensitive_email(self):
+        """Test case-insensitive email handling"""
+        # Create a mixed case version of the email
+        if not self.test_email:
+            print("❌ No test email available")
+            return False
+            
+        # Create a mixed case version by capitalizing random characters
+        email_parts = self.test_email.split('@')
+        mixed_case_local = ''.join([c.upper() if random.choice([True, False]) else c for c in email_parts[0]])
+        self.mixed_case_email = f"{mixed_case_local}@{email_parts[1]}"
         
-        # Test valid registration
-        user_data = {
-            "first_name": "Test",
-            "last_name": "User",
-            "email": self.test_email,
-            "password": self.test_password,
-            "dietary_preferences": ["vegetarian"],
-            "allergies": ["nuts"],
-            "favorite_cuisines": ["italian", "mexican"]
+        print(f"Testing case-insensitive email handling with: {self.mixed_case_email}")
+        
+        # Try to login with mixed case email
+        login_data = {
+            "email": self.mixed_case_email,
+            "password": self.test_password
         }
         
         success, response = self.run_test(
-            "User Registration",
+            "Login with Mixed Case Email",
             "POST",
-            "auth/register",
+            "auth/login",
             200,
-            data=user_data
+            data=login_data
         )
         
-        if success and 'user_id' in response:
-            self.verified_user_id = response['user_id']
-            print(f"✅ User registered with ID: {self.verified_user_id}")
-            return True
+        if success and 'message' in response:
+            if 'successful' in response['message'].lower():
+                print(f"✅ Case-insensitive email login successful")
+                return True
+        
         return False
     
     def test_duplicate_email_registration(self):
