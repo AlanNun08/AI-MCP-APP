@@ -753,17 +753,27 @@ function App() {
           window.currentRecipe = { ...recipe, walmart_url: fallbackCart.walmart_url, cart_generated: true, cart_id: fallbackCart.id, last_updated: new Date().toISOString() };
         }
         
-        // Open fallback URL immediately too
+        // Open fallback URL immediately too - SAFE METHOD
         if (fallbackCart.walmart_url) {
           try {
-            const opened = window.open(fallbackCart.walmart_url, '_blank');
-            if (opened) {
-              alert('✅ Opened Walmart search for your recipe!');
-            } else {
-              alert(`🛒 WALMART SEARCH:\n\nPopup blocked. Copy this URL:\n\n${fallbackCart.walmart_url}`);
-            }
+            const link = document.createElement('a');
+            link.href = fallbackCart.walmart_url;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+            link.style.display = 'none';
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            alert('✅ Opened Walmart search for your recipe!');
           } catch (e) {
-            alert(`🛒 WALMART SEARCH:\n\nCopy this URL:\n\n${fallbackCart.walmart_url}`);
+            try {
+              navigator.clipboard.writeText(fallbackCart.walmart_url);
+              alert(`🛒 WALMART SEARCH URL COPIED:\n\n${fallbackCart.walmart_url}`);
+            } catch (e2) {
+              alert(`🛒 WALMART SEARCH:\n\n${fallbackCart.walmart_url}`);
+            }
           }
         }
         
