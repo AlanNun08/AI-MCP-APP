@@ -662,8 +662,12 @@ function App() {
       }
       
       setGenerating(true);
+      
+      // Clear any existing grocery cart to force fresh generation
+      setGroceryCart(null);
+      
       try {
-        console.log('🔄 Starting cart generation...');
+        console.log('🔄 Starting FRESH cart generation...');
         
         // Create grocery cart with options using the working endpoint
         const response = await axios.post(`${API}/grocery/cart-options?recipe_id=${recipe.id}&user_id=${user.id}`);
@@ -705,13 +709,15 @@ function App() {
             "https://walmart.com"
         };
         
-        console.log('🛒 Walmart URL generated:', simpleCart.walmart_url);
+        console.log('🛒 NEW Walmart URL generated:', simpleCart.walmart_url);
+        console.log('🆔 NEW Cart ID:', simpleCart.id);
         
         setGroceryCart(simpleCart);
         
-        // Save the Walmart URL to the recipe for future use
+        // FORCE UPDATE: Save the NEW Walmart URL to the recipe (overwrite any old one)
         if (recipe && recipe.id && simpleCart.walmart_url) {
-          window.currentRecipe = { ...recipe, walmart_url: simpleCart.walmart_url, cart_generated: true };
+          window.currentRecipe = { ...recipe, walmart_url: simpleCart.walmart_url, cart_generated: true, cart_id: simpleCart.id, last_updated: new Date().toISOString() };
+          console.log('💾 Updated recipe with NEW cart URL');
         }
         
         setShowWalmartConfirm(true); // Show confirmation dialog
@@ -740,6 +746,12 @@ function App() {
         };
         
         setGroceryCart(fallbackCart);
+        
+        // Save fallback URL too
+        if (recipe && recipe.id) {
+          window.currentRecipe = { ...recipe, walmart_url: fallbackCart.walmart_url, cart_generated: true, cart_id: fallbackCart.id, last_updated: new Date().toISOString() };
+        }
+        
         setShowWalmartConfirm(true);
       } finally {
         setGenerating(false);
