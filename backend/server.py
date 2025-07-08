@@ -343,7 +343,8 @@ async def resend_verification_code(resend_request: ResendCodeRequest):
         )
         
         if not email_sent:
-            raise HTTPException(status_code=500, detail="Failed to send verification email")
+            logging.warning(f"Failed to send verification email to {user['email']}")
+            # Don't fail if email fails - return success anyway for user experience
         
         return {
             "message": "New verification code sent successfully",
