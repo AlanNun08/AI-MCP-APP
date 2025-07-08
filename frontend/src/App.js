@@ -450,7 +450,6 @@ function App() {
           
           // Redirect to recipe detail for demo too
           window.currentRecipe = demoRecipe;
-          window.autoGenerateGroceries = true;
           setCurrentScreen('recipe-detail');
         } else {
           const errorMessage = error.response?.data?.detail || 'Failed to generate recipe. Please try again.';
