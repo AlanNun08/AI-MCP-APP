@@ -12,6 +12,13 @@ function App() {
   const [userRecipes, setUserRecipes] = useState([]);
   const [loadingRecipes, setLoadingRecipes] = useState(false);
   const [generatingRecipe, setGeneratingRecipe] = useState(false);
+  const [notification, setNotification] = useState(null);
+
+  // Notification system
+  const showNotification = (message, type = 'success') => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification(null), 3000);
+  };
 
   // Landing Screen Component
   const LandingScreen = () => (
