@@ -384,25 +384,38 @@ function App() {
     const [generatedRecipe, setGeneratedRecipe] = useState(null);
 
     const handleGenerate = async () => {
+      // Validate user is logged in
+      if (!user || !user.id) {
+        alert('Please log in to generate recipes');
+        setCurrentScreen('home');
+        return;
+      }
+
       setLoading(true);
       try {
+        console.log('Generating recipe for user:', user.id);
+        console.log('Recipe request:', genRequest);
+        
         const response = await axios.post(`${API}/recipes/generate`, {
           user_id: user.id,
           ...genRequest
         });
         const newRecipe = response.data;
+        console.log('Recipe generated successfully:', newRecipe);
         setGeneratedRecipe(newRecipe);
         
         // Refresh user recipes in localStorage for immediate UI update
         try {
           const recipesResponse = await axios.get(`${API}/recipes?user_id=${user.id}`);
           window.userRecipes = recipesResponse.data;
+          console.log('Updated user recipes:', recipesResponse.data.length);
         } catch (error) {
-          console.log('Could not refresh recipes list');
+          console.log('Could not refresh recipes list:', error);
         }
         
       } catch (error) {
         console.error('Recipe generation error:', error);
+        console.error('Error details:', error.response?.data);
         
         // If backend is not accessible, show demo recipe
         if (error.code === 'ERR_NETWORK') {
@@ -441,7 +454,8 @@ function App() {
           };
           setGeneratedRecipe(demoRecipe);
         } else {
-          alert('Failed to generate recipe. Please try again.');
+          const errorMessage = error.response?.data?.detail || 'Failed to generate recipe. Please try again.';
+          alert(`Error: ${errorMessage}`);
         }
       } finally {
         setLoading(false);
