@@ -1052,7 +1052,7 @@ function App() {
             >
               ← Back
             </button>
-            <h2 className="text-xl font-bold text-gray-800">My Recipes</h2>
+            <h2 className="text-xl font-bold text-gray-800">Recipe History</h2>
             <div></div>
           </div>
         </div>
