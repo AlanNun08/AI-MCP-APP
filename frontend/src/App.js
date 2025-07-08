@@ -635,18 +635,11 @@ function App() {
   const RecipeDetailScreen = ({ recipe, showBackButton = false }) => {
     const [showIngredients, setShowIngredients] = useState(true);
     const [groceryCart, setGroceryCart] = useState(null);
-    const [autoGenerating, setAutoGenerating] = useState(false);
+    const [generating, setGenerating] = useState(false);
+    const [showWalmartConfirm, setShowWalmartConfirm] = useState(false);
 
-    // Auto-generate Walmart URL when component mounts if flag is set
-    useEffect(() => {
-      if (window.autoGenerateGroceries && recipe && user) {
-        window.autoGenerateGroceries = false; // Reset flag
-        handleAutoGenerateGroceries();
-      }
-    }, [recipe, user]);
-
-    const handleAutoGenerateGroceries = async () => {
-      setAutoGenerating(true);
+    const handleGenerateCart = async () => {
+      setGenerating(true);
       try {
         // Create grocery cart with options using the working endpoint
         const response = await axios.post(`${API}/grocery/cart-options?recipe_id=${recipe.id}&user_id=${user.id}`);
@@ -687,17 +680,19 @@ function App() {
         };
         
         setGroceryCart(simpleCart);
+        setShowWalmartConfirm(true); // Show confirmation dialog
+        
       } catch (error) {
-        console.error('Auto grocery generation error:', error);
+        console.error('Grocery cart generation error:', error);
         
         // Create demo cart for offline mode
-        if (error.code === 'ERR_NETWORK') {
+        if (error.code === 'ERR_NETWORK' || error.response?.status >= 500) {
+          alert('Demo Mode: Backend unavailable. Showing sample cart.');
           const demoCart = {
             id: 'demo-cart-' + Date.now(),
             user_id: user.id,
             recipe_id: recipe.id,
             simple_items: recipe.ingredients.map((ingredient, index) => {
-              // Extract just the main ingredient name without portions
               const cleanName = ingredient.replace(/^\d+[\s\w\/]*\s+/, '').replace(/,.*$/, '').trim();
               return {
                 name: cleanName,
@@ -706,18 +701,34 @@ function App() {
                 price: Math.floor(Math.random() * 10) + 2 // Random price 2-12
               };
             }),
-            walmart_url: `https://affil.walmart.com/cart/addToCart?items=${recipe.ingredients.map((_, i) => `demo_${i}`).join(',')}`,
+            walmart_url: `https://walmart.com/search?q=${encodeURIComponent(recipe.title)}`,
             total_price: recipe.ingredients.length * 5, // Estimate
             demo: true
           };
           setGroceryCart(demoCart);
+          setShowWalmartConfirm(true);
+        } else {
+          alert('Failed to generate grocery cart. Please try again.');
         }
       } finally {
-        setAutoGenerating(false);
+        setGenerating(false);
       }
     };
 
-    const handleOrderGroceries = async () => {
+    const handleSendToWalmart = () => {
+      if (groceryCart && groceryCart.walmart_url) {
+        // Open Walmart URL in new tab
+        window.open(groceryCart.walmart_url, '_blank');
+        setShowWalmartConfirm(false);
+        
+        // Show success message
+        alert('🛒 Redirected to Walmart! Your cart has been pre-filled with the recipe ingredients.');
+      }
+    };
+
+    const handleCancelWalmart = () => {
+      setShowWalmartConfirm(false);
+    };
       setLoading(true);
       try {
         const response = await axios.post(`${API}/grocery/cart-options?recipe_id=${recipe.id}&user_id=${user.id}`);
