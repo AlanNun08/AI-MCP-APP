@@ -431,7 +431,11 @@ async def login_user(login_data: UserLogin):
         if not user:
             raise HTTPException(status_code=401, detail="Invalid email or password")
         
-        # Check if user is verified
+        # Verify password FIRST
+        if not verify_password(login_data.password, user["password_hash"]):
+            raise HTTPException(status_code=401, detail="Invalid email or password")
+        
+        # THEN check if user is verified (after valid credentials)
         if not user.get("is_verified", False):
             # Instead of error, return special response for unverified user
             logging.info(f"Login attempt with unverified email: {email_lower}")
@@ -442,10 +446,6 @@ async def login_user(login_data: UserLogin):
                 "user_id": user["id"],
                 "needs_verification": True
             }
-        
-        # Verify password
-        if not verify_password(login_data.password, user["password_hash"]):
-            raise HTTPException(status_code=401, detail="Invalid email or password")
         
         logging.info(f"User logged in successfully: {email_lower}")
         return {
