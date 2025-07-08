@@ -5,6 +5,7 @@ import sys
 import uuid
 import logging
 import re
+import random
 from datetime import datetime, timedelta
 
 # Configure logging
@@ -29,10 +30,12 @@ class AIRecipeAppTester:
         self.timeout_issues = False
         self.mongodb_objectid_issues = False
         # Email verification test variables
-        self.test_email = f"test_{uuid.uuid4()}@example.com"
+        self.random_id = random.randint(10000, 99999)
+        self.test_email = f"test.user.{self.random_id}@example.com"
         self.test_password = "SecureP@ssw0rd123"
         self.verification_code = None
         self.verified_user_id = None
+        self.mixed_case_email = None
 
     def run_test(self, name, method, endpoint, expected_status, data=None, params=None, timeout=30):
         """Run a single API test with configurable timeout"""
