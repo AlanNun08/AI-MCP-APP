@@ -271,6 +271,7 @@ metadata:
 test_plan:
   current_focus:
     - "Grocery Cart Integration"
+    - "Recipe Generation"
   stuck_tasks:
     - "Grocery Cart Integration"
   test_all: false
