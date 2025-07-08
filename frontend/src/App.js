@@ -1024,15 +1024,81 @@ function App() {
               </div>
             </div>
           ) : (
-            /* Generate Cart Button - show when no cart exists and not generating */
-            !generating && !groceryCart && (
-              <button
-                onClick={handleGenerateCart}
-                className="w-full bg-gradient-to-r from-green-500 to-blue-500 text-white font-semibold py-4 px-6 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 disabled:opacity-50 mb-4"
-              >
-                🛒 Generate Walmart Cart
-              </button>
-            )
+          {/* Cart Ready State - Prominent and Easy */}
+          {!generating && groceryCart && (
+            <div className="bg-gradient-to-r from-green-50 to-blue-50 border-2 border-green-300 rounded-2xl shadow-lg p-6 mb-4">
+              <div className="text-center">
+                <div className="text-4xl mb-3">🛒✨</div>
+                <h3 className="text-2xl font-bold text-green-800 mb-2">Your Walmart Cart is Ready!</h3>
+                <p className="text-green-700 mb-4">
+                  {groceryCart.simple_items?.filter(item => item.status !== 'not_found').length || 0} items • 
+                  ${groceryCart.total_price?.toFixed(2) || '0.00'} estimated total
+                </p>
+                
+                {/* ONE-CLICK WALMART BUTTON */}
+                <button
+                  onClick={() => {
+                    const walmartUrl = groceryCart.walmart_url;
+                    console.log('🚀 One-click Walmart opening:', walmartUrl);
+                    
+                    try {
+                      const link = document.createElement('a');
+                      link.href = walmartUrl;
+                      link.target = '_blank';
+                      link.rel = 'noopener noreferrer';
+                      link.style.display = 'none';
+                      
+                      document.body.appendChild(link);
+                      link.click();
+                      document.body.removeChild(link);
+                      
+                      console.log('✅ One-click success');
+                    } catch (e) {
+                      navigator.clipboard.writeText(walmartUrl);
+                      alert(`🛒 URL copied! Paste in new tab:\n\n${walmartUrl}`);
+                    }
+                  }}
+                  className="w-full bg-gradient-to-r from-green-500 to-blue-500 text-white font-bold text-xl py-6 px-8 rounded-2xl shadow-xl hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300 mb-4"
+                >
+                  🚀 SHOP NOW AT WALMART
+                </button>
+                
+                {/* Quick Copy URL */}
+                <div className="bg-white rounded-xl p-4 mb-4">
+                  <p className="text-sm text-gray-600 mb-2">Or copy this link:</p>
+                  <div className="flex items-center space-x-2">
+                    <input 
+                      type="text" 
+                      value={groceryCart.walmart_url || ''} 
+                      readOnly 
+                      className="flex-1 text-xs bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 font-mono"
+                      onClick={(e) => e.target.select()}
+                    />
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(groceryCart.walmart_url);
+                        alert('✅ Link copied to clipboard!');
+                      }}
+                      className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
+                    >
+                      📋 Copy
+                    </button>
+                  </div>
+                </div>
+                
+                {/* Generate New Cart Option */}
+                <button
+                  onClick={() => {
+                    setGroceryCart(null);
+                    handleGenerateCart();
+                  }}
+                  className="text-gray-600 hover:text-gray-800 text-sm underline"
+                >
+                  🔄 Generate New Cart
+                </button>
+              </div>
+            </div>
+          )}
           )}
 
           {/* Walmart Confirmation Dialog */}
