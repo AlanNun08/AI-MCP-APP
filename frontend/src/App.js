@@ -1003,6 +1003,10 @@ function App() {
         return <DashboardScreen />;
       case 'generate':
         return <GenerateScreen />;
+      case 'all-recipes':
+        return <AllRecipesScreen />;
+      case 'recipe-detail':
+        return window.currentRecipe ? <RecipeDetailScreen recipe={window.currentRecipe} showBackButton={true} /> : <DashboardScreen />;
       default:
         return <HomeScreen />;
     }
