@@ -404,9 +404,8 @@ function App() {
           console.log('Could not refresh recipes list:', error);
         }
         
-        // Automatically redirect to recipe detail with auto-grocery generation
+        // Redirect to recipe detail
         window.currentRecipe = newRecipe;
-        window.autoGenerateGroceries = true; // Flag to auto-generate groceries
         setCurrentScreen('recipe-detail');
         
       } catch (error) {
