@@ -20,7 +20,10 @@ import re
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding
 import bcrypt
-from .email_service import email_service
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+from email_service import email_service
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
