@@ -182,6 +182,10 @@ def verify_password(password: str, hashed_password: str) -> bool:
 async def register_user(user_data: UserRegistration):
     """Register a new user and send verification email"""
     try:
+        # Basic validation
+        if len(user_data.password) < 6:
+            raise HTTPException(status_code=400, detail="Password must be at least 6 characters long")
+        
         # Check if user already exists
         existing_user = await db.users.find_one({"email": user_data.email})
         if existing_user:
@@ -227,7 +231,8 @@ async def register_user(user_data: UserRegistration):
         )
         
         if not email_sent:
-            raise HTTPException(status_code=500, detail="Failed to send verification email")
+            logging.warning(f"Failed to send verification email to {user.email}")
+            # Don't fail registration if email fails - user can resend later
         
         return {
             "message": "Registration successful. Please check your email for verification code.",
@@ -235,6 +240,8 @@ async def register_user(user_data: UserRegistration):
             "user_id": user.id
         }
         
+    except HTTPException:
+        raise
     except Exception as e:
         logging.error(f"Registration error: {str(e)}")
         raise HTTPException(status_code=500, detail="Registration failed")
