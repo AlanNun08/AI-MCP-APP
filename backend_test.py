@@ -175,18 +175,23 @@ class AIRecipeAppTester:
             "difficulty": "easy"
         }
         
+        print("Testing recipe generation with 60 second timeout...")
         success, response = self.run_test(
             "Generate Recipe",
             "POST",
             "recipes/generate",
             200,
-            data=recipe_request
+            data=recipe_request,
+            timeout=60  # Set timeout to 60 seconds to check for timeout issues
         )
         
         if success and 'id' in response:
             self.recipe_id = response['id']
             print(f"Generated recipe with ID: {self.recipe_id}")
             return True
+        elif self.timeout_issues:
+            print("⚠️ Recipe generation timed out after 60 seconds")
+            logger.warning("Recipe generation timed out after 60 seconds")
         return False
 
     def test_get_recipes(self):
