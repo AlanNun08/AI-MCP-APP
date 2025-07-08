@@ -71,6 +71,9 @@ class Recipe(BaseModel):
     cuisine_type: str
     dietary_tags: List[str] = []
     difficulty: str  # easy, medium, hard
+    # New fields for healthy recipes
+    calories_per_serving: Optional[int] = None
+    is_healthy: bool = False
     created_at: datetime = Field(default_factory=datetime.utcnow)
     user_id: Optional[str] = None
 
