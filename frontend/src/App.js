@@ -1033,7 +1033,11 @@ function App() {
                   🚀 Go to Saved Walmart Cart
                 </button>
                 <button
-                  onClick={handleGenerateCart}
+                  onClick={() => {
+                    // Clear the old cart data and force regeneration
+                    window.currentRecipe = { ...recipe, walmart_url: null, cart_generated: false };
+                    handleGenerateCart();
+                  }}
                   className="w-full bg-gray-500 text-white font-medium py-2 px-4 rounded-xl hover:bg-gray-600 transition-colors"
                 >
                   🔄 Generate New Cart
