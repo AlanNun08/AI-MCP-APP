@@ -1031,6 +1031,17 @@ function App() {
                   
                   <button
                     onClick={() => {
+                      if (groceryCart?.walmart_url) {
+                        window.location.href = groceryCart.walmart_url;
+                      }
+                    }}
+                    className="w-full bg-red-500 text-white font-semibold py-3 px-4 rounded-xl hover:bg-red-600 transition-all duration-200"
+                  >
+                    🚨 FORCE OPEN WALMART (Same Tab)
+                  </button>
+                  
+                  <button
+                    onClick={() => {
                       navigator.clipboard.writeText(groceryCart.walmart_url);
                       alert(`🛒 WALMART URL COPIED!\n\nPaste in new tab:\n${groceryCart.walmart_url}`);
                       setShowWalmartConfirm(false);
