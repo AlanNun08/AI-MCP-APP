@@ -639,8 +639,13 @@ function App() {
     const handleGenerateCart = async () => {
       setGenerating(true);
       try {
+        console.log('🔄 Starting cart generation...');
+        alert('🔄 Starting cart generation for recipe: ' + recipe.title);
+        
         // Create grocery cart with options using the working endpoint
         const response = await axios.post(`${API}/grocery/cart-options?recipe_id=${recipe.id}&user_id=${user.id}`);
+        
+        console.log('✅ Cart generated successfully:', response.data);
         
         // Convert cart options to simple cart format for display
         const cartOptions = response.data;
@@ -677,11 +682,15 @@ function App() {
             "https://walmart.com"
         };
         
+        console.log('🛒 Walmart URL generated:', simpleCart.walmart_url);
+        alert('🛒 Cart ready! Total: $' + simpleCart.total_price.toFixed(2) + ' - Items: ' + simpleCart.simple_items.length);
+        
         setGroceryCart(simpleCart);
         setShowWalmartConfirm(true); // Show confirmation dialog
         
       } catch (error) {
-        console.error('Grocery cart generation error:', error);
+        console.error('❌ Grocery cart generation error:', error);
+        alert('❌ Cart generation failed: ' + error.message);
         
         // Create demo cart for offline mode
         if (error.code === 'ERR_NETWORK' || error.response?.status >= 500) {
