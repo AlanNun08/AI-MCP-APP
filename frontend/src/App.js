@@ -653,9 +653,304 @@ function App() {
     </div>
   );
 
-  // Keep all existing components for recipe generation, recipe detail, etc.
-  // ... (I'll continue with the rest of the components in the next part)
-  
+  // Forgot Password Screen Component
+  const ForgotPasswordScreen = () => {
+    const [email, setEmail] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+      
+      if (!email) {
+        showNotification('❌ Please enter your email address', 'error');
+        return;
+      }
+
+      // Email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        showNotification('❌ Please enter a valid email address', 'error');
+        return;
+      }
+
+      setIsSubmitting(true);
+      try {
+        await axios.post(`${API}/api/auth/forgot-password`, { email });
+        
+        setPendingResetEmail(email);
+        setCurrentScreen('reset-password');
+        showNotification('📧 Password reset code sent! Check your email', 'success');
+        
+      } catch (error) {
+        console.error('Password reset request failed:', error);
+        // Don't show specific error for security - always show success message
+        setPendingResetEmail(email);
+        setCurrentScreen('reset-password');
+        showNotification('📧 If an account exists, a reset code has been sent', 'success');
+      } finally {
+        setIsSubmitting(false);
+      }
+    };
+
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-green-400 to-blue-500 flex items-center justify-center p-4">
+        <div className="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md">
+          <div className="text-center mb-8">
+            <div className="text-4xl mb-2">🔒</div>
+            <h2 className="text-2xl font-bold text-gray-800">Forgot Password?</h2>
+            <p className="text-gray-600">No worries! We'll send you a reset code</p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+              <input
+                type="email"
+                placeholder="Enter your email address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                required
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full bg-gradient-to-r from-red-500 to-orange-500 text-white font-semibold py-4 px-6 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
+            >
+              {isSubmitting ? (
+                <div className="flex items-center justify-center space-x-2">
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <span>Sending Reset Code...</span>
+                </div>
+              ) : (
+                '📧 Send Reset Code'
+              )}
+            </button>
+          </form>
+
+          <div className="mt-6 text-center">
+            <p className="text-sm text-gray-600">
+              Remember your password?{' '}
+              <button
+                onClick={() => setCurrentScreen('login')}
+                className="text-blue-600 hover:text-blue-800 font-medium underline"
+              >
+                Sign in here
+              </button>
+            </p>
+          </div>
+
+          <button
+            onClick={() => setCurrentScreen('landing')}
+            className="w-full mt-4 text-gray-600 hover:text-gray-800 transition-colors"
+          >
+            ← Back to Home
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  // Reset Password Screen Component
+  const ResetPasswordScreen = () => {
+    const [formData, setFormData] = useState({
+      resetCode: '',
+      newPassword: '',
+      confirmPassword: ''
+    });
+    const [isResetting, setIsResetting] = useState(false);
+    const [showPasswords, setShowPasswords] = useState(false);
+    const [timeRemaining, setTimeRemaining] = useState(600); // 10 minutes
+
+    // Countdown timer
+    useEffect(() => {
+      if (timeRemaining > 0) {
+        const timer = setTimeout(() => setTimeRemaining(timeRemaining - 1), 1000);
+        return () => clearTimeout(timer);
+      }
+    }, [timeRemaining]);
+
+    const formatTime = (seconds) => {
+      const mins = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+      return `${mins}:${secs.toString().padStart(2, '0')}`;
+    };
+
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+      
+      if (!formData.resetCode || !formData.newPassword || !formData.confirmPassword) {
+        showNotification('❌ Please fill in all fields', 'error');
+        return;
+      }
+
+      if (formData.resetCode.length !== 6) {
+        showNotification('❌ Please enter a 6-digit reset code', 'error');
+        return;
+      }
+
+      if (formData.newPassword.length < 6) {
+        showNotification('❌ Password must be at least 6 characters', 'error');
+        return;
+      }
+
+      if (formData.newPassword !== formData.confirmPassword) {
+        showNotification('❌ Passwords do not match', 'error');
+        return;
+      }
+
+      setIsResetting(true);
+      try {
+        await axios.post(`${API}/api/auth/reset-password`, {
+          email: pendingResetEmail,
+          reset_code: formData.resetCode,
+          new_password: formData.newPassword
+        });
+        
+        setCurrentScreen('login');
+        showNotification('✅ Password reset successful! Please login with your new password', 'success');
+        
+      } catch (error) {
+        console.error('Password reset failed:', error);
+        const errorMessage = error.response?.data?.detail || 'Password reset failed. Please try again.';
+        showNotification(`❌ ${errorMessage}`, 'error');
+      } finally {
+        setIsResetting(false);
+      }
+    };
+
+    const handleResendCode = async () => {
+      try {
+        await axios.post(`${API}/api/auth/forgot-password`, { email: pendingResetEmail });
+        setTimeRemaining(600); // Reset timer
+        setFormData({...formData, resetCode: ''}); // Clear current code
+        showNotification('📧 New reset code sent!', 'success');
+      } catch (error) {
+        showNotification('📧 If an account exists, a new reset code has been sent', 'success');
+      }
+    };
+
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-green-400 to-blue-500 flex items-center justify-center p-4">
+        <div className="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md">
+          <div className="text-center mb-8">
+            <div className="text-4xl mb-2">🔑</div>
+            <h2 className="text-2xl font-bold text-gray-800">Reset Password</h2>
+            <p className="text-gray-600 text-sm">
+              Enter the 6-digit code sent to<br/>
+              <strong>{pendingResetEmail}</strong>
+            </p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2 text-center">
+                Reset Code
+              </label>
+              <input
+                type="text"
+                placeholder="123456"
+                value={formData.resetCode}
+                onChange={(e) => {
+                  const value = e.target.value.replace(/\D/g, '').slice(0, 6);
+                  setFormData({...formData, resetCode: value});
+                }}
+                className="w-full px-4 py-3 text-center text-xl font-mono border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent tracking-widest"
+                maxLength={6}
+                autoComplete="one-time-code"
+              />
+              <div className="text-center mt-2">
+                {timeRemaining > 0 ? (
+                  <p className="text-sm text-gray-500">
+                    Code expires in: <span className="font-mono text-red-500">{formatTime(timeRemaining)}</span>
+                  </p>
+                ) : (
+                  <p className="text-sm text-red-500">Code has expired</p>
+                )}
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">New Password</label>
+              <div className="relative">
+                <input
+                  type={showPasswords ? "text" : "password"}
+                  placeholder="Enter new password (min 6 characters)"
+                  value={formData.newPassword}
+                  onChange={(e) => setFormData({...formData, newPassword: e.target.value})}
+                  className="w-full px-4 py-3 pr-10 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                  required
+                  minLength={6}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPasswords(!showPasswords)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                >
+                  {showPasswords ? '🙈' : '👁️'}
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Confirm New Password</label>
+              <input
+                type={showPasswords ? "text" : "password"}
+                placeholder="Confirm your new password"
+                value={formData.confirmPassword}
+                onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                required
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={isResetting || formData.resetCode.length !== 6}
+              className="w-full bg-gradient-to-r from-red-500 to-orange-500 text-white font-semibold py-4 px-6 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
+            >
+              {isResetting ? (
+                <div className="flex items-center justify-center space-x-2">
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <span>Resetting Password...</span>
+                </div>
+              ) : (
+                '🔑 Reset Password'
+              )}
+            </button>
+          </form>
+
+          <div className="mt-6 text-center">
+            <p className="text-sm text-gray-600 mb-3">Didn't receive the code?</p>
+            <button
+              onClick={handleResendCode}
+              disabled={timeRemaining > 540} // Allow resend after 1 minute
+              className="text-blue-600 hover:text-blue-800 font-medium text-sm underline disabled:text-gray-400 disabled:no-underline"
+            >
+              {timeRemaining > 540 ? (
+                `Resend available in ${formatTime(timeRemaining - 540)}`
+              ) : (
+                '📤 Resend Reset Code'
+              )}
+            </button>
+          </div>
+
+          <button
+            onClick={() => {
+              setCurrentScreen('login');
+              setPendingResetEmail(null);
+            }}
+            className="w-full mt-6 text-gray-600 hover:text-gray-800 transition-colors text-sm"
+          >
+            ← Back to Login
+          </button>
+        </div>
+      </div>
+    );
+  };
+
   // For now, let me add a placeholder for other screens
   const OtherScreen = ({ screenName }) => (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
