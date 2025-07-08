@@ -439,6 +439,10 @@ async def save_recipe(recipe_id: str, user_id: str):
     
     return {"message": "Recipe saved successfully"}
 
+class SimpleCartRequest(BaseModel):
+    recipe_id: str
+    user_id: str
+
 # Simple cart generation with just ingredient names (no portions)
 @api_router.post("/grocery/simple-cart")
 async def create_simple_grocery_cart(recipe_id: str, user_id: str):
