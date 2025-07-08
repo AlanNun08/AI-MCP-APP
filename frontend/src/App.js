@@ -717,16 +717,17 @@ function App() {
           console.log('🚀 Opening Walmart URL immediately...');
           
           try {
-            window.open(simpleCart.walmart_url, '_blank');
-            console.log('✅ Successfully opened Walmart URL');
-            alert('✅ Successfully opened Walmart! Check your new tab.');
+            const opened = window.open(simpleCart.walmart_url, '_blank');
+            if (opened) {
+              console.log('✅ Successfully opened Walmart URL');
+              alert('✅ Successfully opened Walmart! Check your new tab.');
+            } else {
+              console.log('⚠️ Popup blocked, showing URL for manual copy');
+              alert(`🛒 WALMART CART READY!\n\nPopup blocked. Copy this URL and paste in a new tab:\n\n${simpleCart.walmart_url}`);
+            }
           } catch (e) {
             console.log('❌ Failed to open URL:', e);
-            try {
-              window.location.assign(simpleCart.walmart_url);
-            } catch (e2) {
-              alert(`🛒 WALMART URL:\n\n${simpleCart.walmart_url}\n\nCopy this URL to open manually.`);
-            }
+            alert(`🛒 WALMART CART READY!\n\nCopy this URL and paste in a new tab:\n\n${simpleCart.walmart_url}`);
           }
         }
         
