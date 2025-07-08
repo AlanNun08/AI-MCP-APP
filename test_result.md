@@ -167,15 +167,18 @@ backend:
 
   - task: "Email Verification System"
     implemented: true
-    working: "NA"
+    working: false
     file: "server.py"
-    stuck_count: 1
+    stuck_count: 2
     priority: "high"
     needs_retesting: false
     status_history:
       - working: "NA"
         agent: "testing"
         comment: "Email verification system is implemented but has configuration issues. The backend is failing to start properly due to missing Mailjet configuration. Modified email_service.py to use test mode, which allowed testing of the endpoints. Registration endpoint works correctly, but verification has issues. The system correctly rejects invalid verification codes and non-existent users. Login correctly rejects unverified users. However, there are issues with the verification process itself, duplicate email handling, and password validation."
+      - working: false
+        agent: "testing"
+        comment: "Tested the complete email verification workflow. The registration form works correctly with proper validation for required fields, email format, password length, and password matching. The form successfully submits to the backend, but there are issues with the registration endpoint. When trying to register a new user, the backend returns a 400 error. The error logs show 'Email already registered' for some attempts, but even with unique email addresses, registration fails. The email verification screen is implemented correctly with a countdown timer, but since registration fails, we couldn't test the full verification flow. The login form validation works correctly, rejecting invalid credentials. The password show/hide toggle functionality works as expected on both registration and login forms. The UI is responsive and displays correctly on different screen sizes."
 
 frontend:
   - task: "React App Loading"
