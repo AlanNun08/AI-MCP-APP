@@ -344,6 +344,114 @@ class AIRecipeAppTester:
         )
         
         return success
+        
+    def test_create_grocery_cart_with_options(self):
+        """Test creating grocery cart with multiple options per ingredient"""
+        if not self.recipe_id or not self.user_id:
+            print("❌ No recipe ID or user ID available for testing")
+            return False
+            
+        success, response = self.run_test(
+            "Create Grocery Cart with Options",
+            "POST",
+            "grocery/cart-options",
+            200,
+            params={"recipe_id": self.recipe_id, "user_id": self.user_id}
+        )
+        
+        if success and 'id' in response:
+            self.cart_options_id = response['id']
+            print(f"Created grocery cart with options, ID: {self.cart_options_id}")
+            
+            # Verify multiple options per ingredient
+            if 'ingredient_options' in response:
+                options_count = len(response['ingredient_options'])
+                print(f"Found {options_count} ingredients with options")
+                
+                # Check if each ingredient has multiple options
+                for i, ingredient_option in enumerate(response['ingredient_options']):
+                    if 'options' in ingredient_option:
+                        product_count = len(ingredient_option['options'])
+                        print(f"  Ingredient {i+1}: {ingredient_option.get('ingredient_name', 'Unknown')} - {product_count} product options")
+                        
+                        # Check if we have budget, mid-range, and premium options
+                        if product_count > 0:
+                            prices = [product.get('price', 0) for product in ingredient_option['options']]
+                            if len(prices) >= 3:
+                                print(f"    Price range: ${min(prices):.2f} - ${max(prices):.2f}")
+                            else:
+                                print(f"    Limited options: {product_count} (expected 3)")
+            
+            return True
+        return False
+        
+    def test_get_grocery_cart_options(self):
+        """Test getting grocery cart options by ID"""
+        if not self.cart_options_id:
+            print("❌ No cart options ID available for testing")
+            return False
+            
+        success, _ = self.run_test(
+            "Get Grocery Cart Options",
+            "GET",
+            f"grocery/cart-options/{self.cart_options_id}",
+            200
+        )
+        
+        return success
+        
+    def test_create_custom_cart(self):
+        """Test creating custom cart from selected options"""
+        if not self.cart_options_id or not self.user_id:
+            print("❌ No cart options ID or user ID available for testing")
+            return False
+            
+        # First, get the cart options to select from
+        _, cart_options = self.run_test(
+            "Get Cart Options for Selection",
+            "GET",
+            f"grocery/cart-options/{self.cart_options_id}",
+            200
+        )
+        
+        if not cart_options or 'ingredient_options' not in cart_options:
+            print("❌ Failed to get ingredient options")
+            return False
+            
+        # Create selections from available options
+        selections = []
+        for ingredient_option in cart_options['ingredient_options']:
+            if 'options' in ingredient_option and len(ingredient_option['options']) > 0:
+                # Select the first option for each ingredient
+                selections.append({
+                    "ingredient_name": ingredient_option['ingredient_name'],
+                    "selected_product_id": ingredient_option['options'][0]['product_id'],
+                    "quantity": ingredient_option.get('quantity', 1)
+                })
+        
+        if not selections:
+            print("❌ No product options available to select")
+            return False
+            
+        custom_cart_request = {
+            "cart_id": self.cart_options_id,
+            "selections": selections
+        }
+        
+        success, response = self.run_test(
+            "Create Custom Cart",
+            "POST",
+            "grocery/custom-cart",
+            200,
+            data=custom_cart_request
+        )
+        
+        if success and 'id' in response:
+            print(f"Created custom cart with ID: {response['id']}")
+            print(f"Total price: ${response.get('total_price', 0):.2f}")
+            print(f"Walmart URL: {response.get('walmart_url', 'N/A')}")
+            return True
+        return False
 
 def main():
     print("=" * 50)
