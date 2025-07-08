@@ -1033,7 +1033,21 @@ function App() {
     }
   };
 
-  return renderScreen();
+  return (
+    <div className="relative">
+      {renderScreen()}
+      
+      {/* Global Notification */}
+      {notification && (
+        <div className={`fixed top-4 left-1/2 transform -translate-x-1/2 z-50 px-6 py-3 rounded-2xl shadow-lg text-white font-medium ${
+          notification.type === 'success' ? 'bg-green-500' : 'bg-red-500'
+        } animate-pulse`}>
+          {notification.message}
+        </div>
+      )}
+    </div>
+  );
+};
 }
 
 export default App;
