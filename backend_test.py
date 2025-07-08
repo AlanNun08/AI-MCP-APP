@@ -31,11 +31,13 @@ class AIRecipeAppTester:
         self.mongodb_objectid_issues = False
         # Email verification test variables
         self.random_id = random.randint(10000, 99999)
-        self.test_email = f"test.user.{self.random_id}@example.com"
+        # Use a real email for testing Mailjet integration
+        self.test_email = "alan.nunez0310@icloud.com"
         self.test_password = "SecureP@ssw0rd123"
         self.verification_code = None
         self.verified_user_id = None
         self.mixed_case_email = None
+        self.email_live_mode = False
 
     def run_test(self, name, method, endpoint, expected_status, data=None, params=None, timeout=30):
         """Run a single API test with configurable timeout"""
