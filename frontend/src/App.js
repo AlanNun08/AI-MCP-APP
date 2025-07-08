@@ -14,6 +14,7 @@ function App() {
   const [generatingRecipe, setGeneratingRecipe] = useState(false);
   const [notification, setNotification] = useState(null);
   const [pendingVerificationEmail, setPendingVerificationEmail] = useState(null);
+  const [pendingResetEmail, setPendingResetEmail] = useState(null);
 
   // Notification system
   const showNotification = (message, type = 'success') => {
