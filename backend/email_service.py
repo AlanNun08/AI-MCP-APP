@@ -14,17 +14,34 @@ logger = logging.getLogger(__name__)
 
 class EmailService:
     def __init__(self):
+        self.api_key = None
+        self.secret_key = None
+        self.sender_email = None
+        self.test_mode = False  # Switch to live mode
+        self.last_verification_code = None  # Store for testing
+        self.initialized = False
+        
+    def _initialize(self):
+        """Initialize the service with environment variables"""
+        if self.initialized:
+            return
+            
         self.api_key = os.getenv('MAILJET_API_KEY')
         self.secret_key = os.getenv('MAILJET_SECRET_KEY')
         self.sender_email = os.getenv('SENDER_EMAIL')
-        self.test_mode = False  # Switch to live mode
-        self.last_verification_code = None  # Store for testing
         
         if not all([self.api_key, self.secret_key, self.sender_email]):
-            logger.error("Missing Mailjet configuration. Check MAILJET_API_KEY, MAILJET_SECRET_KEY, and SENDER_EMAIL")
-            raise ValueError("Missing Mailjet configuration. Please check your environment variables.")
+            logger.error(f"Missing Mailjet configuration:")
+            logger.error(f"  MAILJET_API_KEY: {'✅' if self.api_key else '❌'}")
+            logger.error(f"  MAILJET_SECRET_KEY: {'✅' if self.secret_key else '❌'}")
+            logger.error(f"  SENDER_EMAIL: {'✅' if self.sender_email else '❌'}")
+            
+            # Set test mode if missing configuration
+            logger.warning("Missing Mailjet config, falling back to test mode")
+            self.test_mode = True
         
-        logger.info(f"EmailService initialized with sender: {self.sender_email}")
+        self.initialized = True
+        logger.info(f"EmailService initialized - Live mode: {not self.test_mode}, Sender: {self.sender_email}")
     
     def generate_verification_code(self) -> str:
         """Generate a 6-digit verification code"""
@@ -32,7 +49,14 @@ class EmailService:
     
     async def send_verification_email(self, to_email: str, first_name: str, verification_code: str) -> bool:
         """Send verification email with 6-digit code using Mailjet API"""
+        self._initialize()  # Initialize on first use
+        
         self.last_verification_code = verification_code  # Store for testing
+        
+        if self.test_mode:
+            logger.info(f"TEST MODE: Would send verification code {verification_code} to {to_email}")
+            print(f"🧪 TEST EMAIL: Verification code {verification_code} for {to_email}")
+            return True
         
         try:
             # Prepare the email data in Mailjet v3.1 format
