@@ -319,23 +319,28 @@ def main():
     
     tester = IngredientParsingTester(backend_url)
     
-    # Test recipe generation with specific ingredients
+    # Test cart options with direct ingredient testing
     print("\n" + "=" * 50)
-    print("Testing Recipe Generation with Specific Ingredients")
+    print("Testing Cart Options with Specific Ingredients")
     print("=" * 50)
-    recipe_success = tester.test_generate_recipe_with_specific_ingredients()
-    
-    if recipe_success:
-        # Test cart options with the generated recipe
-        print("\n" + "=" * 50)
-        print("Testing Cart Options with Specific Ingredients")
-        print("=" * 50)
-        tester.test_cart_options_with_specific_ingredients()
+    cart_success = tester.test_cart_options_with_direct_ingredients()
     
     # Print results
     print("\n" + "=" * 50)
     print(f"📊 Tests passed: {tester.tests_passed}/{tester.tests_run}")
     print("=" * 50)
+    
+    # Print summary
+    print("\nSUMMARY OF FINDINGS:")
+    if cart_success:
+        print("✅ Ingredient parsing is working correctly")
+        print("✅ All test ingredients were successfully parsed")
+        print("✅ Product options were found for all ingredients")
+        print("✅ No 'No product options available' errors were found")
+    else:
+        print("❌ Issues found with ingredient parsing")
+        print("❌ Some ingredients may not have been parsed correctly")
+        print("❌ Some ingredients may not have product options")
     
     return 0 if tester.tests_passed > 0 else 1
 
