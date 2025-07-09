@@ -722,7 +722,7 @@ async def create_user(user: UserCreate):
         # Check if user exists
         existing_user = await db.users.find_one({"email": user.email})
         if existing_user:
-            return existing_user
+            return mongo_to_dict(existing_user)
         
         # Create user object
         user_obj = User(
@@ -740,6 +740,7 @@ async def create_user(user: UserCreate):
         user_dict = user_obj.dict()
         await db.users.insert_one(user_dict)
         
+        # Return the user dict without MongoDB _id
         return user_dict
     except Exception as e:
         logging.error(f"Error creating user: {str(e)}")
