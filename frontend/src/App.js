@@ -1485,7 +1485,11 @@ function App() {
               </div>
               
               <button
-                onClick={generateGroceryCart}
+                onClick={() => {
+                  console.log('🖱️ BUTTON CLICKED - Generate Walmart Shopping Cart');
+                  console.log('📊 Button click event triggered');
+                  generateGroceryCart();
+                }}
                 disabled={generatingCart}
                 className="w-full bg-gradient-to-r from-blue-500 via-purple-500 to-green-500 text-white font-bold py-5 px-6 rounded-2xl shadow-xl hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none active:scale-95"
               >
