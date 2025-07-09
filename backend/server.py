@@ -1073,8 +1073,14 @@ Return ONLY a valid JSON object with this exact structure:
     "instructions": ["step 1", "step 2"],
     "prep_time": 15,
     "cook_time": 30,
-    "calories_per_serving": 350
+    "calories_per_serving": 350,
+    "shopping_list": ["ingredient_name_1", "ingredient_name_2"]
 }
+
+The shopping_list should be a separate bullet-pointed shopping list that includes only the names of the ingredients (no amounts, no measurements). For example:
+- If ingredients include "1 cup diced tomatoes" and "2 tbsp olive oil", the shopping_list should be ["tomatoes", "olive oil"]
+- If ingredients include "1 can chickpeas, drained" and "1/2 cup BBQ sauce", the shopping_list should be ["chickpeas", "BBQ sauce"]
+- Clean ingredient names without quantities, measurements, or preparation instructions
 """)
         
         prompt = " ".join(prompt_parts)
