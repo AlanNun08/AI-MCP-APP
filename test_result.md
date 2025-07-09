@@ -146,6 +146,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "Comprehensive testing of the enhanced interactive Walmart cart functionality confirms that the backend APIs are working correctly. The /api/grocery/cart-options endpoint successfully returns multiple product options for each ingredient with all required fields (product_id, name, price). The /api/grocery/custom-cart endpoint correctly calculates the total price based on product quantities and generates a properly formatted Walmart affiliate URL with all product IDs. Error handling is implemented for missing recipe_id parameter (returns 422 Unprocessable Entity). The API correctly handles quantity adjustments and includes them in the total price calculation. All core functionality for the enhanced interactive cart is working as expected."
+      - working: true
+        agent: "testing"
+        comment: "Tested the updated Walmart API integration with the new credentials and signature method. Created a test recipe with common ingredients (pasta, tomatoes, garlic) and successfully called the /api/grocery/cart-options endpoint. Verified that we are now getting real Walmart product IDs (found 15 real product IDs and 0 mock product IDs) instead of mock data. The signature generation is working correctly as evidenced by successful API calls to the Walmart API. The backend logs show successful Walmart API calls with proper response data. The custom cart endpoint correctly generates a Walmart affiliate URL with all product IDs and calculates the total price accurately. The Walmart API integration is now fully functional with real product data."
   
   - task: "User Management & Recipe Saving"
     implemented: true
