@@ -1523,16 +1523,26 @@ function App() {
 
                 {/* Walmart Link Section */}
                 <div className="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-4 mb-4">
-                  <h4 className="font-bold text-yellow-800 mb-2 text-center">🔗 Walmart Affiliate Link</h4>
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="font-bold text-yellow-800">🔗 Walmart Affiliate Link</h4>
+                    <div className="flex items-center space-x-1">
+                      {cartItems.length > 0 && cartItems[0].product_id && !cartItems[0].product_id.startsWith('walmart-') ? (
+                        <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">Real IDs</span>
+                      ) : (
+                        <span className="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-full">Mock IDs</span>
+                      )}
+                    </div>
+                  </div>
                   <textarea
-                    value={finalWalmartUrl}
+                    value={finalWalmartUrl || 'Loading...'}
                     readOnly
                     className="w-full h-16 p-2 border border-yellow-300 rounded-lg bg-white text-xs resize-none mb-3"
                     onClick={(e) => e.target.select()}
                   />
                   <button
                     onClick={copyUrlToClipboard}
-                    className="w-full bg-yellow-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-yellow-600 transition-colors"
+                    disabled={!finalWalmartUrl}
+                    className="w-full bg-yellow-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-yellow-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     📋 Copy & Shop at Walmart
                   </button>
