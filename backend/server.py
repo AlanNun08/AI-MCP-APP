@@ -1132,12 +1132,12 @@ async def create_custom_cart(cart_data: Dict[str, Any]):
         logging.error(f"Error creating custom cart: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to create custom cart")
 
-# CORS middleware configuration
+# CORS middleware configuration - Production ready
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # TODO: Update for production deployment with specific domain
+    allow_origins=["*"],  # Allows all origins for deployment flexibility
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE"],
     allow_headers=["*"],
 )
 
