@@ -1324,14 +1324,36 @@ function App() {
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-sm p-6 mb-4">
-            <div className="text-center mb-6">
-              <h1 className="text-2xl font-bold text-gray-800 mb-2">{recipe.title}</h1>
-              <p className="text-gray-600">{recipe.description}</p>
-              
-              <div className="flex justify-center space-x-4 mt-4 text-sm">
-                <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full">
-                  ⏱️ {recipe.prep_time}min prep
+          {/* Recipe Info Cards */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            
+            {/* Recipe Details Card */}
+            <div className="lg:col-span-2">
+              <div className="bg-white rounded-2xl shadow-lg p-6">
+                
+                {/* Recipe Stats */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                  <div className="text-center p-3 bg-orange-50 rounded-xl">
+                    <div className="text-2xl mb-1">⏱️</div>
+                    <div className="text-sm text-gray-600">Prep Time</div>
+                    <div className="font-bold text-gray-800">{recipe.prep_time || '30 min'}</div>
+                  </div>
+                  <div className="text-center p-3 bg-blue-50 rounded-xl">
+                    <div className="text-2xl mb-1">🍽️</div>
+                    <div className="text-sm text-gray-600">Servings</div>
+                    <div className="font-bold text-gray-800">{recipe.servings || '4'}</div>
+                  </div>
+                  <div className="text-center p-3 bg-green-50 rounded-xl">
+                    <div className="text-2xl mb-1">🔥</div>
+                    <div className="text-sm text-gray-600">Calories</div>
+                    <div className="font-bold text-gray-800">{recipe.calories || '350'}</div>
+                  </div>
+                  <div className="text-center p-3 bg-purple-50 rounded-xl">
+                    <div className="text-2xl mb-1">💰</div>
+                    <div className="text-sm text-gray-600">Est. Cost</div>
+                    <div className="font-bold text-gray-800">${calculateTotal().toFixed(2)}</div>
+                  </div>
+                </div>
                 </span>
                 <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full">
                   🍽️ {recipe.servings} servings
