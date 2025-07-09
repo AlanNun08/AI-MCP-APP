@@ -1337,15 +1337,28 @@ class AIRecipeAppTester:
             return False
         return False
 
-    def test_get_grocery_cart(self):
-        """Test getting grocery cart by ID"""
-        if not self.cart_id:
-            print("❌ No cart ID available for testing")
+    def test_get_user_recipes(self):
+        """Test getting all recipes for a user"""
+        if not self.user_id:
+            print("❌ No user ID available for testing")
             return False
-            
-        # Note: This endpoint doesn't exist in the API, skipping this test
-        print("⚠️ Skipping test_get_grocery_cart as the endpoint doesn't exist")
-        return True
+                
+        success, response = self.run_test(
+            "Get User Recipes",
+            "GET",
+            f"users/{self.user_id}/recipes",
+            200
+        )
+        
+        if success:
+            print(f"✅ Successfully retrieved {len(response)} recipes for user")
+            # Check if we have any recipes
+            if len(response) > 0:
+                print(f"Recipe titles: {[recipe.get('title', 'Untitled') for recipe in response]}")
+            else:
+                print("No recipes found for this user")
+        
+        return success
         
     def test_create_grocery_cart_with_options(self):
         """Test creating grocery cart with multiple options per ingredient"""
