@@ -1637,7 +1637,7 @@ function App() {
                 <div className="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-4 mb-4">
                   <div className="flex items-center justify-between mb-2">
                     <h4 className="font-bold text-yellow-800">🔗 Walmart Affiliate Link</h4>
-                    <div className="flex items-center space-x-1">
+                    <div className="flex items-center space-x-2">
                       {cartItems.length > 0 && !loadingCart ? (
                         <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
                           {Object.keys(productOptions).length > 0 ? 'Real Products' : 'Demo Mode'}
@@ -1647,6 +1647,9 @@ function App() {
                           Loading...
                         </span>
                       )}
+                      <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
+                        💾 Selections Saved
+                      </span>
                     </div>
                   </div>
                   <textarea
