@@ -1,0 +1,93 @@
+================================================================================
+AI Recipe & Grocery App - Backend API Testing
+================================================================================
+Using backend URL from frontend/.env: https://3de015a9-d2f3-4c69-92f0-7a535d17381f.preview.emergentagent.com
+
+🔍 Testing API Root...
+2025-07-09 17:43:05,975 - __main__ - INFO - Testing API Root - GET https://3de015a9-d2f3-4c69-92f0-7a535d17381f.preview.emergentagent.com/api/
+⏱️ Request completed in 0.13 seconds
+2025-07-09 17:43:06,108 - __main__ - INFO - Request completed in 0.13 seconds
+✅ Passed - Status: 200
+
+==================================================
+Testing User Authentication
+==================================================
+Note: Login test may fail if we don't have the correct password for the test user.
+This won't prevent other tests from running.
+
+🔍 Testing Login with Test User...
+2025-07-09 17:43:06,109 - __main__ - INFO - Testing Login with Test User - POST https://3de015a9-d2f3-4c69-92f0-7a535d17381f.preview.emergentagent.com/api/auth/login
+⏱️ Request completed in 0.76 seconds
+2025-07-09 17:43:06,870 - __main__ - INFO - Request completed in 0.76 seconds
+❌ Failed - Expected 200, got 401
+Response: {'detail': 'Invalid email or password'}
+
+==================================================
+Testing Recipe History Retrieval
+==================================================
+❌ No user ID available for testing - trying with a test ID
+
+🔍 Testing Get User Recipes...
+2025-07-09 17:43:06,871 - __main__ - INFO - Testing Get User Recipes - GET https://3de015a9-d2f3-4c69-92f0-7a535d17381f.preview.emergentagent.com/api/users/test_user_id/recipes
+⏱️ Request completed in 0.05 seconds
+2025-07-09 17:43:06,922 - __main__ - INFO - Request completed in 0.05 seconds
+✅ Passed - Status: 200
+✅ Successfully retrieved 1 recipes for user
+Recipe titles: ['Garlic Tomato Pasta']
+Using recipe ID: 051c0ac6-e9ef-44a5-b140-6edcd1f4ff46 for further testing
+
+==================================================
+Testing Recipe Generation
+==================================================
+Testing recipe generation with 60 second timeout...
+
+🔍 Testing Generate Recipe...
+2025-07-09 17:43:06,923 - __main__ - INFO - Testing Generate Recipe - POST https://3de015a9-d2f3-4c69-92f0-7a535d17381f.preview.emergentagent.com/api/recipes/generate
+⏱️ Request completed in 2.40 seconds
+2025-07-09 17:43:09,320 - __main__ - INFO - Request completed in 2.40 seconds
+✅ Passed - Status: 200
+Generated recipe with ID: e59137a8-d130-4833-944a-8a58e5e6b540
+
+==================================================
+Testing Walmart Cart Options
+==================================================
+
+🔍 Testing Cart Options Endpoint...
+2025-07-09 17:43:09,321 - __main__ - INFO - Testing Cart Options Endpoint - POST https://3de015a9-d2f3-4c69-92f0-7a535d17381f.preview.emergentagent.com/api/grocery/cart-options
+⏱️ Request completed in 0.04 seconds
+2025-07-09 17:43:09,362 - __main__ - INFO - Request completed in 0.04 seconds
+✅ Passed - Status: 200
+Created grocery cart options with ID: 6e09b7d5-bd5a-4d51-a4bd-d6ca0d04df57
+Found 3 ingredients with options
+  Ingredient 1: 200g - 3 product options
+    ✅ Product 1: Barilla Pasta Penne 16oz - $1.99 (ID: 123456789)
+    ✅ Product 2: Great Value Spaghetti 1lb - $1.28 (ID: 123456790)
+    ✅ Product 3: Ronzoni Pasta Shells 12oz - $1.68 (ID: 123456791)
+  Ingredient 2: 4 - 3 product options
+    ✅ Product 1: Fresh Roma Tomatoes 2lb - $2.49 (ID: 987654321)
+    ✅ Product 2: Canned Diced Tomatoes 14.5oz - $1.18 (ID: 987654322)
+    ✅ Product 3: Cherry Tomatoes 1lb - $2.97 (ID: 987654323)
+  Ingredient 3: 2 - 2 product options
+    ✅ Product 1: Fresh Garlic Bulb 3oz - $0.98 (ID: 789123456)
+    ✅ Product 2: Minced Garlic Jar 8oz - $2.47 (ID: 789123457)
+
+==================================================
+Testing Custom Cart Creation
+==================================================
+
+🔍 Testing Create Custom Cart...
+2025-07-09 17:43:09,362 - __main__ - INFO - Testing Create Custom Cart - POST https://3de015a9-d2f3-4c69-92f0-7a535d17381f.preview.emergentagent.com/api/grocery/custom-cart
+⏱️ Request completed in 0.07 seconds
+2025-07-09 17:43:09,428 - __main__ - INFO - Request completed in 0.07 seconds
+✅ Passed - Status: 200
+Created custom cart with ID: 2a046332-83e5-4659-9ffd-117560bc7bc3
+Cart contains 3 products
+Total price: $9.41 (Expected: $9.41)
+✅ Total price calculated correctly
+Walmart URL: https://affil.walmart.com/cart/addToCart?items=123456789,987654321,789123456
+✅ Walmart URL correctly formatted
+✅ All product IDs included in Walmart URL
+
+==================================================
+📊 Tests passed: 5/6
+==================================================
