@@ -1342,10 +1342,6 @@ function App() {
       setFinalWalmartUrl(null);
       setCartItems([]);
     };
-      } catch (error) {
-        showNotification('📋 Please manually copy the URL below.', 'info');
-      }
-    };
 
     if (!recipe) {
       return (
