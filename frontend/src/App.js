@@ -1210,31 +1210,95 @@ function App() {
   const RecipeDetailScreen = ({ recipe, showBackButton = false }) => {
     const [cartItems, setCartItems] = useState([]);
     const [finalWalmartUrl, setFinalWalmartUrl] = useState(null);
+    const [loadingCart, setLoadingCart] = useState(false);
 
-    // Generate realistic mock prices
-    const mockPriceGenerator = (index) => {
-      const prices = [3.99, 2.49, 5.99, 1.89, 4.49, 2.99, 6.99, 3.49, 1.99, 4.99, 2.79, 5.49];
-      return prices[index % prices.length];
-    };
-
-    // Auto-generate cart when recipe loads
+    // Auto-generate cart when recipe loads using real Walmart API
     useEffect(() => {
+      if (recipe?.id && recipe?.ingredients?.length > 0) {
+        setLoadingCart(true);
+        
+        // Call the backend API to get real Walmart product options
+        axios.post(`${API}/api/grocery/cart-options`, {}, {
+          params: {
+            recipe_id: recipe.id,
+            user_id: user?.id || 'demo_user'
+          }
+        })
+        .then(response => {
+          console.log('✅ Cart options response:', response.data);
+          
+          if (response.data && response.data.ingredient_options) {
+            // Convert API response to cart items format
+            const newCartItems = response.data.ingredient_options.map((ingredientOption, index) => {
+              // Use the first product option for each ingredient
+              const firstProduct = ingredientOption.options && ingredientOption.options[0];
+              
+              if (firstProduct) {
+                return {
+                  name: firstProduct.name || ingredientOption.ingredient_name,
+                  price: parseFloat(firstProduct.price) || 2.99,
+                  quantity: 1,
+                  product_id: firstProduct.product_id || `walmart-${index + 1000}`,
+                  ingredient_name: ingredientOption.ingredient_name
+                };
+              } else {
+                // Fallback to mock data if no product found
+                return {
+                  name: ingredientOption.ingredient_name,
+                  price: 2.99,
+                  quantity: 1,
+                  product_id: `walmart-${index + 1000}`,
+                  ingredient_name: ingredientOption.ingredient_name
+                };
+              }
+            });
+            
+            setCartItems(newCartItems);
+            
+            // Generate affiliate URL with real product IDs
+            const itemIds = newCartItems.flatMap(item => 
+              Array(item.quantity).fill(item.product_id)
+            );
+            setFinalWalmartUrl(`https://affil.walmart.com/cart/addToCart?items=${itemIds.join(',')}`);
+            
+            console.log('✅ Cart generated with real product IDs:', itemIds);
+          } else {
+            // Fallback to mock data if API response is invalid
+            console.log('⚠️ Invalid API response, using mock data');
+            generateMockCart();
+          }
+        })
+        .catch(error => {
+          console.error('❌ Error fetching cart options:', error);
+          // Fallback to mock data if API call fails
+          generateMockCart();
+        })
+        .finally(() => {
+          setLoadingCart(false);
+        });
+      }
+    }, [recipe, user]);
+
+    // Fallback function to generate mock cart
+    const generateMockCart = () => {
       if (recipe?.ingredients?.length > 0) {
+        const mockPrices = [3.99, 2.49, 5.99, 1.89, 4.49, 2.99, 6.99, 3.49, 1.99, 4.99, 2.79, 5.49];
         const newCartItems = recipe.ingredients.map((ingredient, index) => ({
           name: ingredient,
-          price: mockPriceGenerator(index),
+          price: mockPrices[index % mockPrices.length],
           quantity: 1,
-          product_id: `walmart-${index + 1000}`
+          product_id: `walmart-${index + 1000}`,
+          ingredient_name: ingredient
         }));
         setCartItems(newCartItems);
         
-        // Generate affiliate URL
+        // Generate affiliate URL with mock IDs
         const itemIds = newCartItems.flatMap(item => 
           Array(item.quantity).fill(item.product_id)
         );
         setFinalWalmartUrl(`https://affil.walmart.com/cart/addToCart?items=${itemIds.join(',')}`);
       }
-    }, [recipe]);
+    };
 
     // Update quantity and regenerate URL
     const updateQuantity = (index, newQuantity) => {
