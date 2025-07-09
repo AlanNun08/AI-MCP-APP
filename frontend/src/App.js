@@ -1526,10 +1526,14 @@ function App() {
                   <div className="flex items-center justify-between mb-2">
                     <h4 className="font-bold text-yellow-800">🔗 Walmart Affiliate Link</h4>
                     <div className="flex items-center space-x-1">
-                      {cartItems.length > 0 && cartItems[0].product_id && !cartItems[0].product_id.startsWith('walmart-') ? (
-                        <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">Real IDs</span>
+                      {cartItems.length > 0 && !loadingCart ? (
+                        <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
+                          Demo Mode
+                        </span>
                       ) : (
-                        <span className="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-full">Mock IDs</span>
+                        <span className="text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded-full">
+                          Loading...
+                        </span>
                       )}
                     </div>
                   </div>
