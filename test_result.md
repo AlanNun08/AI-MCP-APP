@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "User wants to enhance the Generate Walmart Cart feature with an interactive shopping cart experience. After user generates recipe and clicks Generate Walmart Cart, a text box should appear with all Walmart items using Walmart search products API with prices next to them and plus/add buttons to add quantity of items. The quantity adjustments should add item IDs to the affiliate Walmart link, display total price, and after user confirms, show the final affiliate link to copy and paste."
+user_problem_statement: "User (Alan.nunez0310@icloud.com) reports that the new recipe detail UI with instructions, ingredients, and Walmart cart is not showing up. The user wants to ensure the new modern two-column UI is being used and any old code is permanently deleted. The recipe page should show instructions, ingredients, Walmart URL, prices, and total price in a clean modern design. The issue appears to be a caching problem preventing the user from seeing the updated UI."
 
 backend:
   - task: "AI Recipe Generation with OpenAI"
