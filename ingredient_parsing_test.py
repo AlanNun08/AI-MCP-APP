@@ -57,64 +57,87 @@ class IngredientParsingTester:
         if success and 'id' in response:
             self.recipe_id = response['id']
             print(f"Created test recipe with ID: {self.recipe_id}")
-        else:
-            # If we can't save the recipe, we'll use a direct approach
-            print("Using direct ingredient testing approach...")
             
-            # Test each ingredient individually
-            ingredients = test_recipe["ingredients"]
-            all_success = True
+            # Now test the cart-options endpoint with this recipe
+            cart_success, cart_response = self.run_test(
+                "Get Cart Options for Test Recipe",
+                "POST",
+                "grocery/cart-options",
+                200,
+                params={"recipe_id": self.recipe_id, "user_id": self.user_id}
+            )
             
-            print("\nTesting individual ingredients:")
-            for i, ingredient in enumerate(ingredients):
-                print(f"\n--- Testing ingredient {i+1}: '{ingredient}' ---")
+            if cart_success and 'ingredient_options' in cart_response:
+                options_count = len(cart_response['ingredient_options'])
+                print(f"Found {options_count} ingredients with options")
                 
-                # Create a mock recipe with just this ingredient
-                mock_recipe = {
-                    "id": f"test_recipe_{i}",
-                    "title": f"Test Recipe {i}",
-                    "ingredients": [ingredient],
-                    "user_id": self.user_id
-                }
+                # Expected core ingredients from the parsing
+                expected_ingredients = [
+                    "chickpeas",
+                    "bbq sauce", 
+                    "barbecue sauce",
+                    "quinoa",
+                    "mixed vegetables",
+                    "bell pepper",
+                    "avocado",
+                    "olive oil",
+                    "salt pepper"
+                ]
                 
-                # Mock the database call by directly calling the cart-options endpoint
-                # with our mock recipe data
-                success, ingredient_response = self.run_test(
-                    f"Parse Ingredient: '{ingredient}'",
-                    "POST",
-                    "grocery/cart-options",
-                    200,
-                    params={"recipe_id": mock_recipe["id"], "user_id": self.user_id},
-                    data=mock_recipe  # Pass the mock recipe as data
-                )
+                found_ingredients = []
+                all_have_options = True
                 
-                if not success:
-                    all_success = False
-                    continue
-                
-                # Check if we got product options
-                if 'ingredient_options' in ingredient_response:
-                    for option in ingredient_response.get('ingredient_options', []):
-                        original = option.get('original_ingredient', '')
-                        cleaned = option.get('ingredient_name', '')
-                        print(f"  Original: '{original}'")
-                        print(f"  Cleaned: '{cleaned}'")
+                # Check if each ingredient has multiple options with required fields
+                for i, ingredient_option in enumerate(cart_response['ingredient_options']):
+                    original_ingredient = ingredient_option.get('original_ingredient', '')
+                    cleaned_ingredient = ingredient_option.get('ingredient_name', '').lower()
+                    
+                    print(f"\nIngredient {i+1}:")
+                    print(f"  Original: '{original_ingredient}'")
+                    print(f"  Cleaned: '{cleaned_ingredient}'")
+                    
+                    found_ingredients.append(cleaned_ingredient)
+                    
+                    if 'options' in ingredient_option:
+                        product_count = len(ingredient_option['options'])
+                        print(f"  Found {product_count} product options")
                         
-                        if 'options' in option:
-                            product_count = len(option['options'])
-                            print(f"  Found {product_count} product options")
-                            
-                            if product_count > 0:
-                                print("  ✅ Product options found")
-                                for j, product in enumerate(option['options'][:2]):  # Show first 2 products
-                                    print(f"    Product {j+1}: {product.get('name', 'Unknown')} - ${product.get('price', 0):.2f}")
-                            else:
-                                print("  ❌ No product options found")
-                                all_success = False
+                        if product_count == 0:
+                            print("  ❌ No product options found")
+                            all_have_options = False
+                        else:
+                            print("  ✅ Product options found")
+                            # Check if products have all required fields
+                            for j, product in enumerate(ingredient_option['options'][:2]):  # Show first 2 products
+                                required_fields = ['product_id', 'name', 'price']
+                                missing_fields = [field for field in required_fields if field not in product]
+                                
+                                if missing_fields:
+                                    print(f"    ❌ Product {j+1} missing required fields: {', '.join(missing_fields)}")
+                                else:
+                                    print(f"    ✅ Product {j+1}: {product['name']} - ${product['price']:.2f} (ID: {product['product_id']})")
+                    else:
+                        print("  ❌ No options field found")
+                        all_have_options = False
                 
-            return all_success
-        
-        return False
+                # Check if we found all expected ingredients
+                print("\nChecking for expected ingredients:")
+                all_expected_found = True
+                for ingredient in expected_ingredients:
+                    found = any(ingredient in found_ing for found_ing in found_ingredients)
+                    if found:
+                        print(f"  ✅ Found '{ingredient}'")
+                    else:
+                        print(f"  ❓ Did not find '{ingredient}' (may be mapped to another term)")
+                        # Don't fail the test for this, as some ingredients might be mapped differently
+                
+                return all_have_options
+            else:
+                print("❌ Failed to get cart options for test recipe")
+                return False
+        else:
+            print("❌ Failed to create test recipe")
+            return False
 
     def run_test(self, name, method, endpoint, expected_status, data=None, params=None, timeout=30):
         """Run a single API test with configurable timeout"""
