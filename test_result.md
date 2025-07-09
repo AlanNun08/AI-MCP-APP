@@ -122,9 +122,9 @@ backend:
   
   - task: "Walmart API Integration"
     implemented: true
-    working: true
+    working: false
     file: "server.py"
-    stuck_count: 1
+    stuck_count: 2
     priority: "high"
     needs_retesting: false
     status_history:
@@ -140,6 +140,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "Comprehensive testing confirms Walmart API integration is working correctly. The /api/grocery/cart-options endpoint successfully returns multiple product options for each ingredient with different price ranges. The /api/grocery/custom-cart endpoint correctly generates a Walmart affiliate URL with product IDs. The /api/grocery/simple-cart endpoint returns a 404 error (not found), which is different from the previous 500 error. This suggests the endpoint may have been removed or renamed."
+      - working: false
+        agent: "testing"
+        comment: "Direct API testing shows the cart-options endpoint returns a 500 error when called with test parameters. Unable to test the UI functionality due to login issues. The Walmart cart generation appears to be broken at the API level."
   
   - task: "User Management & Recipe Saving"
     implemented: true
