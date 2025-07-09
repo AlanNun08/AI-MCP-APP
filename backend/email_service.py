@@ -7,6 +7,12 @@ from datetime import datetime, timedelta
 from typing import Optional
 import logging
 import base64
+from pathlib import Path
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+ROOT_DIR = Path(__file__).parent
+load_dotenv(ROOT_DIR / '.env')
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
