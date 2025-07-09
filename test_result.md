@@ -333,10 +333,11 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Unverified User Login Flow"
-    - "Password Reset Flow"
+    - "Deployment Readiness Testing"
+    - "Complete Application Flow Testing"
+    - "All Core Features Verification"
   stuck_tasks: []
-  test_all: false
+  test_all: true
   test_priority: "high_first"
 
 agent_communication:
