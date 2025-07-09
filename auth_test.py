@@ -16,7 +16,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 class BackendTester:
-    def __init__(self, base_url="https://2f8e0430-6917-47db-8b81-c217b1e799eb.preview.emergentagent.com"):
+    def __init__(self, base_url="https://3de015a9-d2f3-4c69-92f0-7a535d17381f.preview.emergentagent.com"):
         self.base_url = f"{base_url}/api"
         self.tests_run = 0
         self.tests_passed = 0
