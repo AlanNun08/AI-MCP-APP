@@ -1449,22 +1449,92 @@ function App() {
                   </div>
                 </div>
 
-                {/* Ingredients Section */}
+                {/* Ingredients Section with Product Selection */}
                 <div className="mb-8">
                   <h3 className="text-2xl font-bold text-gray-800 mb-4 flex items-center">
                     <span className="mr-2">🥘</span>
-                    Ingredients
+                    Ingredients & Product Selection
                   </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {recipe.ingredients && recipe.ingredients.map((ingredient, index) => (
-                      <div key={index} className="flex items-center p-3 bg-gray-50 rounded-lg">
-                        <span className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center text-orange-600 font-bold text-sm mr-3">
-                          {index + 1}
-                        </span>
-                        <span className="text-gray-800">{ingredient}</span>
-                      </div>
-                    ))}
-                  </div>
+                  
+                  {loadingCart ? (
+                    <div className="text-center py-8">
+                      <div className="w-8 h-8 border-3 border-green-500 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+                      <p className="text-gray-600">Loading product options from Walmart...</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-6">
+                      {recipe.ingredients && recipe.ingredients.map((ingredient, index) => {
+                        const ingredientOptions = productOptions[ingredient] || [];
+                        const selectedProductId = selectedProducts[ingredient];
+                        
+                        return (
+                          <div key={index} className="bg-gray-50 rounded-xl p-4">
+                            {/* Ingredient Header */}
+                            <div className="flex items-center mb-3">
+                              <span className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center text-orange-600 font-bold text-sm mr-3">
+                                {index + 1}
+                              </span>
+                              <h4 className="text-lg font-semibold text-gray-800">{ingredient}</h4>
+                            </div>
+                            
+                            {/* Product Options */}
+                            {ingredientOptions.length > 0 ? (
+                              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                {ingredientOptions.slice(0, 3).map((product, productIndex) => (
+                                  <div
+                                    key={productIndex}
+                                    className={`border-2 rounded-lg p-3 cursor-pointer transition-all duration-200 ${
+                                      selectedProductId === product.product_id
+                                        ? 'border-green-500 bg-green-50'
+                                        : 'border-gray-200 bg-white hover:border-green-300'
+                                    }`}
+                                    onClick={() => handleProductSelection(ingredient, product.product_id)}
+                                  >
+                                    <div className="flex items-start justify-between mb-2">
+                                      <div className="flex-1">
+                                        <h5 className="font-medium text-gray-800 text-sm leading-tight mb-1">
+                                          {product.name}
+                                        </h5>
+                                        <p className="text-lg font-bold text-green-600">
+                                          ${parseFloat(product.price).toFixed(2)}
+                                        </p>
+                                      </div>
+                                      <div className="ml-2">
+                                        {selectedProductId === product.product_id ? (
+                                          <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+                                            <span className="text-white text-xs">✓</span>
+                                          </div>
+                                        ) : (
+                                          <div className="w-5 h-5 border-2 border-gray-300 rounded-full"></div>
+                                        )}
+                                      </div>
+                                    </div>
+                                    
+                                    <div className="text-xs text-gray-500 mb-2">
+                                      Product ID: {product.product_id}
+                                    </div>
+                                    
+                                    {product.thumbnail_image && (
+                                      <img 
+                                        src={product.thumbnail_image} 
+                                        alt={product.name}
+                                        className="w-full h-16 object-cover rounded"
+                                        onError={(e) => { e.target.style.display = 'none'; }}
+                                      />
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            ) : (
+                              <div className="text-center py-4 text-gray-500">
+                                <p className="text-sm">No product options available for this ingredient</p>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
 
                 {/* Instructions Section */}
