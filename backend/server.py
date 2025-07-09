@@ -816,8 +816,59 @@ async def _get_walmart_product_options(ingredient: str, max_options: int = 3) ->
         clean_ingredient = re.sub(r'^\d+[\s\w\/]*\s+', '', ingredient)
         clean_ingredient = re.sub(r',.*$', '', clean_ingredient).strip()
         
-        # ENHANCED MOCK DATA: Using more realistic product IDs
-        # Note: Walmart API integration is experiencing 403 errors, so using enhanced mock data
+        # Try real Walmart API first
+        try:
+            # Generate signature and timestamp
+            timestamp, signature = _get_walmart_signature()
+            
+            # Prepare API call
+            query = clean_ingredient.replace(' ', '+')
+            url = f"https://developer.api.walmart.com/api-proxy/service/affil/product/v2/search?query={query}&numItems={max_options}"
+            
+            headers = {
+                "WM_CONSUMER.ID": WALMART_CONSUMER_ID,
+                "WM_CONSUMER.INTIMESTAMP": timestamp,
+                "WM_SEC.KEY_VERSION": WALMART_KEY_VERSION,
+                "WM_SEC.AUTH_SIGNATURE": signature,
+                "Content-Type": "application/json"
+            }
+            
+            logging.info(f"Making Walmart API call for ingredient: {clean_ingredient}")
+            logging.info(f"URL: {url}")
+            
+            async with httpx.AsyncClient() as client:
+                response = await client.get(url, headers=headers, timeout=10)
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    products = []
+                    
+                    if 'items' in data:
+                        logging.info(f"Found {len(data['items'])} items from Walmart API for '{clean_ingredient}'")
+                        for item in data['items'][:max_options]:
+                            if 'itemId' in item:
+                                product = WalmartProduct(
+                                    product_id=str(item.get('itemId', '')),
+                                    name=item.get('name', clean_ingredient),
+                                    price=float(item.get('salePrice', 0.0)),
+                                    thumbnail_image=item.get('thumbnailImage', ''),
+                                    availability="Available"
+                                )
+                                products.append(product)
+                                logging.info(f"Real Walmart product: {product.name} - ${product.price} (ID: {product.product_id})")
+                        
+                        if products:
+                            return products
+                    else:
+                        logging.warning(f"No items found in Walmart API response for '{clean_ingredient}'")
+                else:
+                    logging.warning(f"Walmart API error for '{clean_ingredient}': {response.status_code} - {response.text}")
+                    
+        except Exception as api_error:
+            logging.error(f"Walmart API call failed for '{clean_ingredient}': {str(api_error)}")
+        
+        # Fallback to enhanced mock data if API fails
+        logging.info(f"Using enhanced mock data for '{clean_ingredient}'")
         mock_products = []
         
         # Create realistic sample products based on ingredient type
@@ -888,38 +939,6 @@ async def _get_walmart_product_options(ingredient: str, max_options: int = 3) ->
             ]
         
         return mock_products[:max_options]
-        
-        # ORIGINAL WALMART API CODE (commented out due to 403 errors)
-        # url = f"/v1/search?query={clean_ingredient}&numItems={max_options}"
-        # full_url = f"https://developer.api.walmart.com{url}"
-        # signature = _get_walmart_signature(url)
-        # headers = {
-        #     'WM_CONSUMER.ID': WALMART_CONSUMER_ID,
-        #     'WM_SEC.KEY_VERSION': WALMART_KEY_VERSION,
-        #     'WM_CONSUMER.INTIMESTAMP': str(int(time.time() * 1000)),
-        #     'WM_SEC.AUTH_SIGNATURE': signature,
-        #     'Accept': 'application/json',
-        #     'Content-Type': 'application/json'
-        # }
-        # async with httpx.AsyncClient() as client:
-        #     response = await client.get(full_url, headers=headers, timeout=10)
-        #     if response.status_code == 200:
-        #         data = response.json()
-        #         products = []
-        #         if 'items' in data:
-        #             for item in data['items'][:max_options]:
-        #                 product = WalmartProduct(
-        #                     product_id=str(item.get('itemId', '')),
-        #                     name=item.get('name', clean_ingredient),
-        #                     price=float(item.get('salePrice', 0.0)),
-        #                     thumbnail_image=item.get('thumbnailImage', ''),
-        #                     availability="Available"
-        #                 )
-        #                 products.append(product)
-        #         return products
-        #     else:
-        #         logging.warning(f"Walmart API error for '{ingredient}': {response.status_code}")
-        #         return []
                 
     except Exception as e:
         logging.error(f"Error fetching Walmart products for '{ingredient}': {str(e)}")
