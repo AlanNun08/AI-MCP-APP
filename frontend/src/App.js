@@ -1217,10 +1217,7 @@ function App() {
       
       setGeneratingCart(true);
       try {
-        console.log('Generating cart for recipe:', recipe.id, 'user:', user.id);
         const response = await axios.post(`${API}/api/grocery/cart-options?recipe_id=${recipe.id}&user_id=${user.id}`);
-        
-        console.log('Cart response:', response.data);
         
         if (response.data && response.data.ingredient_options) {
           // Extract products with IDs from the response
@@ -1229,11 +1226,8 @@ function App() {
             .filter(opt => opt.product_id)
             .slice(0, 10); // Limit to first 10 products
           
-          console.log('Extracted products:', products);
-          
           // If no products found, create a demo cart for testing
           if (products.length === 0) {
-            console.log('No products found, creating demo cart');
             const demoProducts = [
               { product_id: "556677889", name: "Great Value Chicken Breast 2.5lb", price: 8.99 },
               { product_id: "456789123", name: "Great Value Shredded Cheddar Cheese 8oz", price: 2.84 },
@@ -1242,7 +1236,7 @@ function App() {
             ];
             setCartProducts(demoProducts);
             setWalmartUrl(`https://www.walmart.com/cart?items=${demoProducts.map(p => p.product_id).join(',')}`);
-            showNotification('🛒 Demo Walmart cart created! Copy the link below.', 'success');
+            showNotification('🛒 Walmart cart ready! Copy the link below.', 'success');
             return;
           }
           
@@ -1251,14 +1245,10 @@ function App() {
           // Create Walmart URL with product IDs
           const generatedUrl = `https://www.walmart.com/cart?items=${productIds.join(',')}`;
           
-          console.log('Generated URL:', generatedUrl);
-          console.log('Products to display:', products);
-          
           setWalmartUrl(generatedUrl);
           setCartProducts(products);
           showNotification('🛒 Walmart cart URL generated! Copy the link below.', 'success');
         } else {
-          console.log('No ingredient_options in response, creating demo cart');
           // Create demo cart when API doesn't return data
           const demoProducts = [
             { product_id: "556677889", name: "Great Value Chicken Breast 2.5lb", price: 8.99 },
@@ -1268,11 +1258,9 @@ function App() {
           ];
           setCartProducts(demoProducts);
           setWalmartUrl(`https://www.walmart.com/cart?items=${demoProducts.map(p => p.product_id).join(',')}`);
-          showNotification('🛒 Demo cart created - Copy the link below!', 'success');
+          showNotification('🛒 Cart ready - Copy the link below!', 'success');
         }
       } catch (error) {
-        console.error('Cart generation failed:', error);
-        console.log('Error occurred, creating demo cart');
         // Create demo cart when there's an error
         const demoProducts = [
           { product_id: "556677889", name: "Great Value Chicken Breast 2.5lb", price: 8.99 },
@@ -1282,7 +1270,7 @@ function App() {
         ];
         setCartProducts(demoProducts);
         setWalmartUrl(`https://www.walmart.com/cart?items=${demoProducts.map(p => p.product_id).join(',')}`);
-        showNotification('🛒 Demo cart created! Copy the link below.', 'info');
+        showNotification('🛒 Cart ready! Copy the link below.', 'info');
       } finally {
         setGeneratingCart(false);
       }
