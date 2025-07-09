@@ -1668,15 +1668,17 @@ function App() {
                 <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
                   <h4 className="font-bold text-blue-800 mb-2 text-sm">How to Order:</h4>
                   <ol className="text-xs text-blue-700 space-y-1">
-                    <li>1. Click "Copy & Shop at Walmart"</li>
-                    <li>2. Open new tab and paste the link</li>
-                    <li>3. Items will be added to your cart</li>
-                    <li>4. Proceed to checkout</li>
+                    <li>1. Select your preferred product for each ingredient</li>
+                    <li>2. Adjust quantities if needed</li>
+                    <li>3. Click "Copy & Shop at Walmart"</li>
+                    <li>4. Open new tab and paste the link</li>
+                    <li>5. All selected items will be in your cart</li>
+                    <li>6. Proceed to checkout</li>
                   </ol>
                   <div className="mt-3 p-2 bg-blue-100 rounded-lg">
                     <p className="text-xs text-blue-600">
-                      <strong>Note:</strong> Currently using enhanced demo products with realistic IDs. 
-                      The URL format is correct and ready for production use.
+                      <strong>Real Walmart Products:</strong> Choose from 3 actual Walmart products per ingredient. 
+                      Prices and availability are live from Walmart's database.
                     </p>
                   </div>
                 </div>
