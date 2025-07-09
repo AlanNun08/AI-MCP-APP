@@ -1670,15 +1670,15 @@ function App() {
                   <ol className="text-xs text-blue-700 space-y-1">
                     <li>1. Select your preferred product for each ingredient</li>
                     <li>2. Adjust quantities if needed</li>
-                    <li>3. Click "Copy & Shop at Walmart"</li>
+                    <li>3. Click "Copy Link & Continue Shopping"</li>
                     <li>4. Open new tab and paste the link</li>
                     <li>5. All selected items will be in your cart</li>
-                    <li>6. Proceed to checkout</li>
+                    <li>6. Return here to modify selections anytime</li>
                   </ol>
                   <div className="mt-3 p-2 bg-blue-100 rounded-lg">
                     <p className="text-xs text-blue-600">
-                      <strong>Real Walmart Products:</strong> Choose from 3 actual Walmart products per ingredient. 
-                      Prices and availability are live from Walmart's database.
+                      <strong>Persistent Selections:</strong> Your product choices remain saved after copying the link. 
+                      You can continue adjusting quantities, changing products, or generating new URLs as needed.
                     </p>
                   </div>
                 </div>
