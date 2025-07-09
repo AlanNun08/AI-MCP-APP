@@ -33,7 +33,15 @@ load_dotenv(ROOT_DIR / '.env')
 # MongoDB connection
 mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
+db = client[os.environ.get('DB_NAME', 'test_database')]
+
+# Custom JSON encoder for MongoDB documents
+def mongo_to_dict(obj):
+    """Convert MongoDB document to dict, handling _id field"""
+    if '_id' in obj:
+        # Don't include the MongoDB _id in the response
+        obj.pop('_id', None)
+    return obj
 
 # OpenAI setup
 openai_client = OpenAI(api_key=os.environ['OPENAI_API_KEY'])
