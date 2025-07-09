@@ -1302,15 +1302,27 @@ function App() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 p-4">
         <div className="max-w-6xl mx-auto">
-          {showBackButton && (
-            <button
-              onClick={() => setCurrentScreen('dashboard')}
-              className="mb-4 text-gray-600 hover:text-gray-800 flex items-center space-x-2"
-            >
-              <span>←</span>
-              <span>Back to Dashboard</span>
-            </button>
-          )}
+          {/* Header */}
+          <div className="mb-8">
+            {showBackButton && (
+              <button
+                onClick={() => setCurrentScreen('dashboard')}
+                className="mb-4 flex items-center space-x-2 text-orange-600 hover:text-orange-700 font-medium"
+              >
+                <span>←</span>
+                <span>Back to Dashboard</span>
+              </button>
+            )}
+            
+            <div className="text-center">
+              <h1 className="text-4xl font-bold text-gray-800 mb-2">
+                {recipe.title || 'Delicious Recipe'}
+              </h1>
+              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                {recipe.description || 'A wonderful recipe created just for you!'}
+              </p>
+            </div>
+          </div>
 
           <div className="bg-white rounded-2xl shadow-sm p-6 mb-4">
             <div className="text-center mb-6">
