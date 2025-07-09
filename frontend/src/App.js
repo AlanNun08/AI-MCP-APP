@@ -1217,7 +1217,10 @@ function App() {
       
       setGeneratingCart(true);
       try {
+        console.log('Generating cart for recipe:', recipe.id, 'user:', user.id);
         const response = await axios.post(`${API}/api/grocery/cart-options?recipe_id=${recipe.id}&user_id=${user.id}`);
+        
+        console.log('Cart response:', response.data);
         
         if (response.data && response.data.ingredient_options) {
           // Extract products with IDs from the response
@@ -1226,14 +1229,22 @@ function App() {
             .filter(opt => opt.product_id)
             .slice(0, 10); // Limit to first 10 products
           
+          console.log('Extracted products:', products);
+          
           const productIds = products.map(opt => opt.product_id);
           
           // Create Walmart URL with product IDs
           const generatedUrl = `https://www.walmart.com/cart?items=${productIds.join(',')}`;
           
+          console.log('Generated URL:', generatedUrl);
+          console.log('Products to display:', products);
+          
           setWalmartUrl(generatedUrl);
           setCartProducts(products);
           showNotification('🛒 Walmart cart URL generated! Copy the link below.', 'success');
+        } else {
+          console.log('No ingredient_options in response:', response.data);
+          showNotification('❌ No products found for this recipe.', 'error');
         }
       } catch (error) {
         console.error('Cart generation failed:', error);
