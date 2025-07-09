@@ -1206,53 +1206,48 @@ function App() {
     );
   };
 
-  // Recipe Detail Screen Component
+  // Recipe Detail Screen Component - COMPLETELY NEW DESIGN
   const RecipeDetailScreen = ({ recipe, showBackButton = false }) => {
     const [cartItems, setCartItems] = useState([]);
     const [finalWalmartUrl, setFinalWalmartUrl] = useState(null);
 
-    // Mock price generator for realistic pricing
+    // Generate realistic mock prices
     const mockPriceGenerator = (index) => {
       const prices = [3.99, 2.49, 5.99, 1.89, 4.49, 2.99, 6.99, 3.49, 1.99, 4.99, 2.79, 5.49];
       return prices[index % prices.length];
     };
 
-    // Auto-generate shopping cart from recipe ingredients
+    // Auto-generate cart when recipe loads
     useEffect(() => {
-      if (recipe?.ingredients && recipe.ingredients.length > 0) {
-        const cartItems = recipe.ingredients.map((ingredient, index) => ({
+      if (recipe?.ingredients?.length > 0) {
+        const newCartItems = recipe.ingredients.map((ingredient, index) => ({
           name: ingredient,
           price: mockPriceGenerator(index),
           quantity: 1,
           product_id: `walmart-${index + 1000}`
         }));
-
-        setCartItems(cartItems);
+        setCartItems(newCartItems);
         
-        // Generate Walmart affiliate URL
-        const itemIds = cartItems.flatMap(item => 
+        // Generate affiliate URL
+        const itemIds = newCartItems.flatMap(item => 
           Array(item.quantity).fill(item.product_id)
         );
-        const affiliateUrl = `https://affil.walmart.com/cart/addToCart?items=${itemIds.join(',')}`;
-        setFinalWalmartUrl(affiliateUrl);
+        setFinalWalmartUrl(`https://affil.walmart.com/cart/addToCart?items=${itemIds.join(',')}`);
       }
     }, [recipe]);
 
     // Update quantity and regenerate URL
     const updateQuantity = (index, newQuantity) => {
       if (newQuantity < 1) return;
-      
       const updatedItems = cartItems.map((item, i) => 
         i === index ? { ...item, quantity: newQuantity } : item
       );
       setCartItems(updatedItems);
       
-      // Regenerate affiliate URL
       const itemIds = updatedItems.flatMap(item => 
         Array(item.quantity).fill(item.product_id)
       );
-      const affiliateUrl = `https://affil.walmart.com/cart/addToCart?items=${itemIds.join(',')}`;
-      setFinalWalmartUrl(affiliateUrl);
+      setFinalWalmartUrl(`https://affil.walmart.com/cart/addToCart?items=${itemIds.join(',')}`);
     };
 
     // Remove item and regenerate URL
@@ -1260,12 +1255,10 @@ function App() {
       const updatedItems = cartItems.filter((_, i) => i !== index);
       setCartItems(updatedItems);
       
-      // Regenerate affiliate URL
       const itemIds = updatedItems.flatMap(item => 
         Array(item.quantity).fill(item.product_id)
       );
-      const affiliateUrl = `https://affil.walmart.com/cart/addToCart?items=${itemIds.join(',')}`;
-      setFinalWalmartUrl(affiliateUrl);
+      setFinalWalmartUrl(`https://affil.walmart.com/cart/addToCart?items=${itemIds.join(',')}`);
     };
 
     // Calculate total price
@@ -1273,7 +1266,7 @@ function App() {
       return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
     };
 
-    // Copy affiliate URL to clipboard
+    // Copy URL to clipboard
     const copyUrlToClipboard = async () => {
       try {
         await navigator.clipboard.writeText(finalWalmartUrl);
