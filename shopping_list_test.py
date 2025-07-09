@@ -302,17 +302,8 @@ def main():
     import os
     import re
     
-    backend_url = "http://localhost:8001"  # Default fallback
-    try:
-        with open('/app/frontend/.env', 'r') as f:
-            env_content = f.read()
-            match = re.search(r'REACT_APP_BACKEND_URL=(.+)', env_content)
-            if match:
-                backend_url = match.group(1).strip()
-                print(f"Using backend URL from frontend/.env: {backend_url}")
-    except Exception as e:
-        print(f"Error reading backend URL from .env: {str(e)}")
-        print(f"Using default backend URL: {backend_url}")
+    backend_url = "http://localhost:8001"  # Use local backend URL
+    print(f"Using local backend URL: {backend_url}")
     
     tester = ShoppingListTester(backend_url)
     
