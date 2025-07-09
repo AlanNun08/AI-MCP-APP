@@ -1461,7 +1461,7 @@ function App() {
                   <div className="flex items-center justify-center space-x-2">
                     <span className="text-gray-500">💡</span>
                     <p className="text-sm text-gray-600">
-                      Generate a recipe first to see your automatic shopping cart!
+                      Generate a recipe first to see your shopping cart!
                     </p>
                   </div>
                 </div>
