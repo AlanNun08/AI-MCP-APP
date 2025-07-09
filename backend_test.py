@@ -120,8 +120,10 @@ class AIRecipeAppTester:
     def test_create_user(self):
         """Test user creation"""
         test_user = {
-            "name": f"Test User {uuid.uuid4()}",
-            "email": f"test_{uuid.uuid4()}@example.com",
+            "first_name": "Test",
+            "last_name": "User",
+            "email": self.test_email,
+            "password": self.test_password,
             "dietary_preferences": ["vegetarian", "gluten-free"],
             "allergies": ["nuts", "dairy"],
             "favorite_cuisines": ["italian", "mexican"]
@@ -130,14 +132,44 @@ class AIRecipeAppTester:
         success, response = self.run_test(
             "Create User",
             "POST",
-            "users",
+            "auth/register",
             200,
             data=test_user
         )
         
-        if success and 'id' in response:
-            self.user_id = response['id']
+        if success and 'user_id' in response:
+            self.user_id = response['user_id']
             print(f"Created user with ID: {self.user_id}")
+            
+            # Get verification code
+            code_success, code_response = self.run_test(
+                "Get Verification Code",
+                "GET",
+                f"debug/verification-codes/{self.test_email}",
+                200
+            )
+            
+            if code_success and 'codes' in code_response and len(code_response['codes']) > 0:
+                verification_code = code_response['codes'][0]['code']
+                
+                # Verify email
+                verify_data = {
+                    "email": self.test_email,
+                    "code": verification_code
+                }
+                
+                verify_success, _ = self.run_test(
+                    "Email Verification",
+                    "POST",
+                    "auth/verify",
+                    200,
+                    data=verify_data
+                )
+                
+                if verify_success:
+                    print("✅ Email verified successfully")
+                    return True
+            
             return True
         return False
 
