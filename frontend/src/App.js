@@ -1362,17 +1362,11 @@ function App() {
 
             {/* Enhanced Grocery Cart Button */}
             <div className="border-t pt-6">
-              {/* Always show cart when recipe exists */}
-              {recipe && cartItems.length > 0 && confirmedCart && (
+              {/* Shopping Cart */}
+              {recipe && cartItems.length > 0 && (
                 <div className="mt-6 p-6 bg-white border-2 border-blue-200 rounded-2xl shadow-lg">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-xl font-bold text-gray-800">🛒 Your Walmart Shopping Cart</h3>
-                    <button
-                      onClick={resetCart}
-                      className="text-gray-500 hover:text-gray-700 text-sm px-3 py-1 border border-gray-300 rounded-lg"
-                    >
-                      🔄 Reset Cart
-                    </button>
                   </div>
                   
                   <div className="space-y-3 mb-6 max-h-96 overflow-y-auto">
@@ -1430,7 +1424,7 @@ function App() {
                     
                     <div className="mt-4 p-4 bg-gradient-to-r from-yellow-100 to-orange-100 border-2 border-yellow-300 rounded-xl">
                       <div className="flex items-center justify-center mb-3">
-                        <h4 className="text-lg font-semibold text-gray-800">📋 Your Walmart Affiliate Link</h4>
+                        <h4 className="text-lg font-semibold text-gray-800">🛒 Shop at Walmart</h4>
                       </div>
                       <textarea
                         value={finalWalmartUrl}
@@ -1443,7 +1437,7 @@ function App() {
                           onClick={copyUrlToClipboard}
                           className="flex-1 bg-gradient-to-r from-yellow-500 to-orange-500 text-white font-bold py-2 px-4 rounded-lg hover:from-yellow-600 hover:to-orange-600 transition-all duration-200"
                         >
-                          📋 Copy Link
+                          🛒 Copy & Shop at Walmart
                         </button>
                       </div>
                     </div>
@@ -1454,7 +1448,7 @@ function App() {
                         Total Cost: ${calculateTotal().toFixed(2)}
                       </p>
                       <p className="text-xs text-green-600">
-                        ✅ This affiliate link includes all your selected quantities
+                        ✅ Click "Copy & Shop" to open Walmart with your cart
                       </p>
                     </div>
                   </div>
