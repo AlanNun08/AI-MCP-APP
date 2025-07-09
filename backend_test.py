@@ -760,6 +760,165 @@ class AIRecipeAppTester:
         
         return success
         
+    def test_password_validation(self):
+        """Test password validation during registration and reset"""
+        print("\n" + "=" * 50)
+        print("Testing Password Validation")
+        print("=" * 50)
+        
+        # Test registration with short password
+        short_password_user = {
+            "first_name": "Short",
+            "last_name": "Password",
+            "email": f"short_{uuid.uuid4()}@example.com",
+            "password": "short",  # Less than 6 characters
+            "dietary_preferences": [],
+            "allergies": [],
+            "favorite_cuisines": []
+        }
+        
+        # We expect this to fail with 400 status code
+        success, response = self.run_test(
+            "Registration with Short Password",
+            "POST",
+            "auth/register",
+            400,
+            data=short_password_user
+        )
+        
+        # Check if the error message mentions password length
+        password_validation_works = False
+        if success and 'detail' in response:
+            if 'password' in response['detail'].lower() and ('length' in response['detail'].lower() or 'characters' in response['detail'].lower()):
+                print("✅ Short password correctly rejected during registration")
+                password_validation_works = True
+        
+        # Test password reset with short password
+        reset_email = f"reset_validation_{uuid.uuid4()}@example.com"
+        
+        # First, create a user with valid password
+        user_data = {
+            "first_name": "Reset",
+            "last_name": "Validation",
+            "email": reset_email,
+            "password": "ValidP@ssw0rd123",
+            "dietary_preferences": [],
+            "allergies": [],
+            "favorite_cuisines": []
+        }
+        
+        # Register the user
+        reg_success, _ = self.run_test(
+            "Register User for Password Validation Test",
+            "POST",
+            "auth/register",
+            200,
+            data=user_data
+        )
+        
+        if not reg_success:
+            print("❌ Failed to register user for password validation test")
+            return password_validation_works
+        
+        # Get verification code and verify the user
+        code_success, code_response = self.run_test(
+            "Get Verification Code for Validation Test",
+            "GET",
+            f"debug/verification-codes/{reset_email}",
+            200
+        )
+        
+        if not code_success or 'codes' not in code_response or len(code_response['codes']) == 0:
+            if 'last_test_code' in code_response and code_response['last_test_code']:
+                verification_code = code_response['last_test_code']
+            else:
+                print("❌ Failed to get verification code for validation test")
+                return password_validation_works
+        else:
+            verification_code = code_response['codes'][0]['code']
+        
+        # Verify the user
+        verify_data = {
+            "email": reset_email,
+            "code": verification_code
+        }
+        
+        verify_success, _ = self.run_test(
+            "Verify User for Validation Test",
+            "POST",
+            "auth/verify",
+            200,
+            data=verify_data
+        )
+        
+        if not verify_success:
+            print("❌ Failed to verify user for validation test")
+            return password_validation_works
+        
+        # Request password reset
+        reset_request = {
+            "email": reset_email
+        }
+        
+        reset_success, _ = self.run_test(
+            "Request Password Reset for Validation Test",
+            "POST",
+            "auth/forgot-password",
+            200,
+            data=reset_request
+        )
+        
+        if not reset_success:
+            print("❌ Failed to request password reset for validation test")
+            return password_validation_works
+        
+        # Get reset code
+        reset_code_success, reset_code_response = self.run_test(
+            "Get Reset Code for Validation Test",
+            "GET",
+            f"debug/verification-codes/{reset_email}",
+            200
+        )
+        
+        if not reset_code_success:
+            print("❌ Failed to get reset code for validation test")
+            return password_validation_works
+        
+        # Try to get the reset code from the response
+        reset_code = None
+        if 'last_test_code' in reset_code_response and reset_code_response['last_test_code']:
+            reset_code = reset_code_response['last_test_code']
+        elif 'codes' in reset_code_response and len(reset_code_response['codes']) > 0:
+            reset_code = reset_code_response['codes'][0]['code']
+        
+        if not reset_code:
+            print("❌ No reset code found for validation test")
+            return password_validation_works
+        
+        # Try to reset with short password
+        reset_data = {
+            "email": reset_email,
+            "reset_code": reset_code,
+            "new_password": "short"  # Less than 6 characters
+        }
+        
+        # We expect this to fail with 400 status code
+        reset_validation_success, reset_validation_response = self.run_test(
+            "Reset Password with Short Password",
+            "POST",
+            "auth/reset-password",
+            400,
+            data=reset_data
+        )
+        
+        # Check if the error message mentions password length
+        if reset_validation_success and 'detail' in reset_validation_response:
+            if 'password' in reset_validation_response['detail'].lower() and ('length' in reset_validation_response['detail'].lower() or 'characters' in reset_validation_response['detail'].lower()):
+                print("✅ Short password correctly rejected during password reset")
+                password_validation_works = True
+        
+        return password_validation_works
+        
     def test_login_with_invalid_credentials(self):
         """Test login with invalid credentials"""
         if not self.test_email:
