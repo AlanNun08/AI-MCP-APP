@@ -1179,17 +1179,32 @@ async def create_grocery_cart_options(recipe_id: str, user_id: str):
         if not recipe:
             raise HTTPException(status_code=404, detail="Recipe not found")
         
+        # Use shopping list if available, otherwise fall back to parsing ingredients
+        ingredients_to_search = []
+        
+        if recipe.get('shopping_list') and len(recipe.get('shopping_list', [])) > 0:
+            logging.info(f"Using shopping list for product search: {recipe['shopping_list']}")
+            ingredients_to_search = recipe['shopping_list']
+        else:
+            logging.info(f"No shopping list found, using ingredient parsing for: {recipe['ingredients']}")
+            ingredients_to_search = recipe['ingredients']
+        
         # Get product options for each ingredient
         ingredient_options = []
-        for ingredient in recipe['ingredients']:
+        for index, ingredient in enumerate(ingredients_to_search):
             products = await _get_walmart_product_options(ingredient, max_options=3)
             
+            # Use the original ingredient description for display if we have both
+            original_ingredient = recipe['ingredients'][index] if index < len(recipe['ingredients']) else ingredient
+            
             ingredient_option = IngredientOption(
-                ingredient_name=ingredient.split()[0] if ingredient else "item",
-                original_ingredient=ingredient,
+                ingredient_name=ingredient,  # Clean ingredient name for searching
+                original_ingredient=original_ingredient,  # Full ingredient description for display
                 options=products
             )
             ingredient_options.append(ingredient_option)
+            
+            logging.info(f"Ingredient: '{ingredient}' -> Found {len(products)} products")
         
         # Create cart options object
         cart_options = GroceryCartOptions(
