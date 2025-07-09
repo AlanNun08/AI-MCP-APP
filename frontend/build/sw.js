@@ -1,5 +1,5 @@
 // Service Worker for PWA functionality
-const CACHE_NAME = 'ai-chef-v1';
+const CACHE_NAME = 'ai-chef-v2';
 const urlsToCache = [
   '/',
   '/static/js/bundle.js',
