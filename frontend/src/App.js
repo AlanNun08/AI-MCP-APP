@@ -1466,6 +1466,14 @@ function App() {
                 )}
               </button>
               
+              {/* Debug Info */}
+              <div className="mt-4 p-2 bg-gray-100 rounded text-xs">
+                <p>Debug: showInteractiveCart = {showInteractiveCart.toString()}</p>
+                <p>Debug: confirmedCart = {confirmedCart.toString()}</p>
+                <p>Debug: cartItems.length = {cartItems.length}</p>
+                <p>Debug: generatingCart = {generatingCart.toString()}</p>
+              </div>
+
               {!showInteractiveCart && !confirmedCart && (
                 <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-xl">
                   <div className="flex items-center justify-center space-x-2">
