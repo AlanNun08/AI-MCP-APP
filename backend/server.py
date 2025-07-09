@@ -695,7 +695,7 @@ async def update_user(user_id: str, user_update: UserCreate):
             raise HTTPException(status_code=404, detail="User not found")
         
         updated_user = await db.users.find_one({"id": user_id})
-        return updated_user
+        return mongo_to_dict(updated_user)
     except Exception as e:
         logging.error(f"Error updating user: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to update user")
