@@ -1623,14 +1623,7 @@ function App() {
               recipes.map((recipe) => (
                 <div key={recipe.id} className="bg-white rounded-2xl shadow-sm p-4 hover:shadow-md transition-shadow cursor-pointer"
                      onClick={() => {
-                       console.log('📚 Recipe History - Recipe clicked:');
-                       console.log('- Recipe object:', recipe);
-                       console.log('- Recipe ID:', recipe.id);
-                       console.log('- Recipe title:', recipe.title);
-                       console.log('- Setting window.currentRecipe');
                        window.currentRecipe = recipe;
-                       console.log('- window.currentRecipe set to:', window.currentRecipe);
-                       console.log('- Navigating to recipe-detail screen');
                        setCurrentScreen('recipe-detail');
                      }}>
                   <h3 className="font-semibold text-gray-800 mb-1">{recipe.title}</h3>
