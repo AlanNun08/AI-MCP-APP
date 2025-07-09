@@ -183,7 +183,6 @@ class GroceryCartOptions(BaseModel):
 
     class Config:
         json_encoders = {
-            ObjectId: str,
             datetime: lambda v: v.isoformat()
         }
 
