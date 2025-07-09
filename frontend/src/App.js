@@ -1391,82 +1391,119 @@ function App() {
                       <h4 className="text-lg font-semibold text-gray-800 mb-4 text-center">
                         🛍️ Cart Items ({cartProducts.length})
                       </h4>
-                      <div className="bg-white rounded-xl p-4 shadow-sm">
+                      <div className="bg-white rounded-xl p-4 shadow-sm max-h-96 overflow-y-auto">
                         <div className="space-y-3">
-                          {cartProducts.slice(0, 6).map((product, index) => (
-                            <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border-l-4 border-green-400">
-                              <div className="flex-1">
-                                <span className="font-medium text-gray-800 text-sm leading-tight block">
-                                  {product.name || `Product ${product.product_id}`}
-                                </span>
-                                <span className="text-xs text-gray-500 mt-1 block">
-                                  ID: {product.product_id}
-                                </span>
+                          {cartProducts.slice(0, 8).map((product, index) => (
+                            <div key={index} className="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-green-50 rounded-xl border border-gray-200 hover:shadow-md transition-shadow">
+                              <div className="flex items-center space-x-4">
+                                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                                  <span className="text-green-600 font-bold text-sm">{index + 1}</span>
+                                </div>
+                                <div className="flex-1">
+                                  <span className="font-semibold text-gray-800 text-sm leading-tight block">
+                                    {product.name || `Product ${product.product_id}`}
+                                  </span>
+                                  <span className="text-xs text-gray-500 mt-1 block">
+                                    🏷️ ID: {product.product_id}
+                                  </span>
+                                </div>
                               </div>
-                              <div className="ml-4 text-right">
-                                <span className="text-lg font-bold text-green-600">
-                                  ${product.price || 'TBD'}
-                                </span>
+                              <div className="text-right">
+                                <div className="bg-green-100 px-3 py-1 rounded-full">
+                                  <span className="text-xl font-bold text-green-700">
+                                    ${product.price || 'TBD'}
+                                  </span>
+                                </div>
                               </div>
                             </div>
                           ))}
-                          {cartProducts.length > 6 && (
-                            <div className="text-center text-gray-500 py-2 bg-gray-100 rounded-lg">
-                              ... and {cartProducts.length - 6} more items
+                          {cartProducts.length > 8 && (
+                            <div className="text-center text-gray-500 py-3 bg-gray-100 rounded-xl">
+                              <span className="font-medium">... and {cartProducts.length - 8} more items</span>
+                              <p className="text-xs mt-1">All items will be added to your cart</p>
                             </div>
                           )}
                         </div>
                         
-                        {/* Total Price Calculation */}
+                        {/* Enhanced Total Price Section */}
                         {cartProducts.some(p => p.price) && (
-                          <div className="mt-4 pt-4 border-t-2 border-gray-200">
-                            <div className="flex justify-between items-center">
-                              <span className="text-lg font-semibold text-gray-800">Estimated Total:</span>
-                              <span className="text-xl font-bold text-green-600">
+                          <div className="mt-6 p-4 bg-gradient-to-r from-green-50 to-blue-50 border-2 border-green-200 rounded-xl">
+                            <div className="flex justify-between items-center mb-2">
+                              <span className="text-lg font-bold text-gray-800">💰 Estimated Total:</span>
+                              <span className="text-2xl font-bold text-green-600">
                                 ${cartProducts.reduce((total, product) => total + (product.price || 0), 0).toFixed(2)}
                               </span>
                             </div>
-                            <p className="text-xs text-gray-500 mt-1 text-center">
-                              * Prices are estimates and may vary
-                            </p>
+                            <div className="text-center">
+                              <p className="text-sm text-gray-600 mb-1">
+                                📊 Average price per item: ${(cartProducts.reduce((total, product) => total + (product.price || 0), 0) / cartProducts.filter(p => p.price).length).toFixed(2)}
+                              </p>
+                              <p className="text-xs text-gray-500">
+                                * Prices are estimates and may vary at checkout
+                              </p>
+                            </div>
                           </div>
                         )}
                       </div>
                     </div>
                   )}
 
-                  {/* Enhanced URL Display */}
+                  {/* Enhanced URL Display with Visual Emphasis */}
                   <div className="mb-4">
-                    <div className="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-4">
-                      <div className="flex items-center justify-center mb-3">
-                        <span className="text-yellow-700 font-bold text-lg">🔗 Copy & Paste This URL</span>
+                    <div className="bg-gradient-to-r from-yellow-100 to-orange-100 border-3 border-yellow-300 rounded-2xl p-6 shadow-lg">
+                      <div className="flex items-center justify-center mb-4">
+                        <span className="text-yellow-800 font-bold text-xl">🔗 Copy & Paste This URL</span>
                       </div>
-                      <div className="flex space-x-2">
+                      <div className="flex space-x-3">
                         <input
                           type="text"
                           value={walmartUrl}
                           readOnly
-                          className="flex-1 p-4 border-2 border-yellow-300 rounded-xl bg-white text-sm font-mono shadow-inner focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                          className="flex-1 p-4 border-2 border-yellow-400 rounded-xl bg-white text-sm font-mono shadow-inner focus:outline-none focus:ring-2 focus:ring-yellow-500 select-all"
                           onClick={(e) => e.target.select()}
+                          style={{ userSelect: 'all' }}
                         />
                         <button
                           onClick={copyUrlToClipboard}
-                          className="px-6 py-4 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-xl hover:from-yellow-600 hover:to-orange-600 transition-all duration-200 text-sm font-bold shadow-lg transform hover:scale-105 active:scale-95"
+                          className="px-6 py-4 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-xl hover:from-yellow-600 hover:to-orange-600 transition-all duration-200 text-sm font-bold shadow-lg transform hover:scale-105 active:scale-95 flex items-center space-x-2"
                         >
-                          📋 Copy
+                          <span>📋</span>
+                          <span>Copy</span>
                         </button>
+                      </div>
+                      <div className="mt-4 text-center">
+                        <p className="text-yellow-700 font-medium">
+                          🚀 This link will instantly add all items to your Walmart cart!
+                        </p>
                       </div>
                     </div>
                   </div>
 
-                  {/* Instructions */}
-                  <div className="bg-blue-100 border border-blue-200 rounded-xl p-4">
-                    <h5 className="font-semibold text-blue-800 mb-2">📋 How to Use:</h5>
-                    <div className="text-sm text-blue-700 space-y-1">
-                      <p>1. Click the "📋 Copy" button above</p>
-                      <p>2. Open a new browser tab</p>
-                      <p>3. Paste the URL in the address bar</p>
-                      <p>4. Items will be added to your Walmart cart automatically!</p>
+                  {/* Enhanced Instructions with Visual Steps */}
+                  <div className="bg-gradient-to-r from-blue-100 to-purple-100 border-2 border-blue-200 rounded-2xl p-6">
+                    <h5 className="font-bold text-blue-800 mb-4 text-center text-lg">📋 How to Complete Your Order</h5>
+                    <div className="space-y-3">
+                      <div className="flex items-start space-x-3">
+                        <div className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold text-sm">1</div>
+                        <p className="text-blue-700 font-medium">Click the "📋 Copy" button above</p>
+                      </div>
+                      <div className="flex items-start space-x-3">
+                        <div className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold text-sm">2</div>
+                        <p className="text-blue-700 font-medium">Open a new browser tab (Ctrl/Cmd + T)</p>
+                      </div>
+                      <div className="flex items-start space-x-3">
+                        <div className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold text-sm">3</div>
+                        <p className="text-blue-700 font-medium">Paste the URL in the address bar (Ctrl/Cmd + V)</p>
+                      </div>
+                      <div className="flex items-start space-x-3">
+                        <div className="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center font-bold text-sm">✓</div>
+                        <p className="text-green-700 font-bold">Items will be automatically added to your Walmart cart!</p>
+                      </div>
+                    </div>
+                    <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-xl">
+                      <p className="text-sm text-yellow-800 text-center">
+                        💡 <strong>Pro Tip:</strong> Make sure you're logged into your Walmart account for the best experience!
+                      </p>
                     </div>
                   </div>
                 </div>
