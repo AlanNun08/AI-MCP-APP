@@ -1381,52 +1381,93 @@ function App() {
 
               {/* Walmart URL Display */}
               {walmartUrl && (
-                <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-xl">
-                  <div className="flex items-center mb-3">
-                    <span className="text-blue-600 font-semibold text-lg">🛒 Your Walmart Cart is Ready!</span>
+                <div className="mt-6 p-6 bg-gradient-to-r from-blue-50 to-purple-50 border-2 border-blue-200 rounded-2xl shadow-lg">
+                  <div className="flex items-center justify-center mb-4">
+                    <span className="text-blue-700 font-bold text-xl">🛒 Your Walmart Cart is Ready!</span>
                   </div>
                   
                   {cartProducts.length > 0 && (
-                    <div className="mb-3">
-                      <p className="text-sm text-gray-600 mb-2">Items found ({cartProducts.length}):</p>
-                      <div className="text-xs text-gray-500 space-y-1">
-                        {cartProducts.slice(0, 5).map((product, index) => (
-                          <div key={index} className="flex justify-between">
-                            <span className="truncate">{product.name || `Product ${product.product_id}`}</span>
-                            <span className="text-green-600 font-medium">${product.price || 'Price TBD'}</span>
+                    <div className="mb-6">
+                      <h4 className="text-lg font-semibold text-gray-800 mb-4 text-center">
+                        🛍️ Cart Items ({cartProducts.length})
+                      </h4>
+                      <div className="bg-white rounded-xl p-4 shadow-sm">
+                        <div className="space-y-3">
+                          {cartProducts.slice(0, 6).map((product, index) => (
+                            <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border-l-4 border-green-400">
+                              <div className="flex-1">
+                                <span className="font-medium text-gray-800 text-sm leading-tight block">
+                                  {product.name || `Product ${product.product_id}`}
+                                </span>
+                                <span className="text-xs text-gray-500 mt-1 block">
+                                  ID: {product.product_id}
+                                </span>
+                              </div>
+                              <div className="ml-4 text-right">
+                                <span className="text-lg font-bold text-green-600">
+                                  ${product.price || 'TBD'}
+                                </span>
+                              </div>
+                            </div>
+                          ))}
+                          {cartProducts.length > 6 && (
+                            <div className="text-center text-gray-500 py-2 bg-gray-100 rounded-lg">
+                              ... and {cartProducts.length - 6} more items
+                            </div>
+                          )}
+                        </div>
+                        
+                        {/* Total Price Calculation */}
+                        {cartProducts.some(p => p.price) && (
+                          <div className="mt-4 pt-4 border-t-2 border-gray-200">
+                            <div className="flex justify-between items-center">
+                              <span className="text-lg font-semibold text-gray-800">Estimated Total:</span>
+                              <span className="text-xl font-bold text-green-600">
+                                ${cartProducts.reduce((total, product) => total + (product.price || 0), 0).toFixed(2)}
+                              </span>
+                            </div>
+                            <p className="text-xs text-gray-500 mt-1 text-center">
+                              * Prices are estimates and may vary
+                            </p>
                           </div>
-                        ))}
-                        {cartProducts.length > 5 && (
-                          <div className="text-gray-400 text-center">... and {cartProducts.length - 5} more items</div>
                         )}
                       </div>
                     </div>
                   )}
 
-                  <div className="mb-3">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Copy this URL and paste it in your browser:
-                    </label>
-                    <div className="flex space-x-2">
-                      <input
-                        type="text"
-                        value={walmartUrl}
-                        readOnly
-                        className="flex-1 p-3 border border-gray-300 rounded-lg bg-white text-sm font-mono"
-                        onClick={(e) => e.target.select()}
-                      />
-                      <button
-                        onClick={copyUrlToClipboard}
-                        className="px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium"
-                      >
-                        📋 Copy
-                      </button>
+                  {/* Enhanced URL Display */}
+                  <div className="mb-4">
+                    <div className="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-4">
+                      <div className="flex items-center justify-center mb-3">
+                        <span className="text-yellow-700 font-bold text-lg">🔗 Copy & Paste This URL</span>
+                      </div>
+                      <div className="flex space-x-2">
+                        <input
+                          type="text"
+                          value={walmartUrl}
+                          readOnly
+                          className="flex-1 p-4 border-2 border-yellow-300 rounded-xl bg-white text-sm font-mono shadow-inner focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                          onClick={(e) => e.target.select()}
+                        />
+                        <button
+                          onClick={copyUrlToClipboard}
+                          className="px-6 py-4 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-xl hover:from-yellow-600 hover:to-orange-600 transition-all duration-200 text-sm font-bold shadow-lg transform hover:scale-105 active:scale-95"
+                        >
+                          📋 Copy
+                        </button>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="text-xs text-gray-500 space-y-1">
-                    <p>🔗 This URL contains product IDs: {cartProducts.map(p => p.product_id).join(', ')}</p>
-                    <p>💡 Tip: Open this URL in a new tab to add items to your Walmart cart</p>
+                  {/* Instructions */}
+                  <div className="bg-blue-100 border border-blue-200 rounded-xl p-4">
+                    <h5 className="font-semibold text-blue-800 mb-2">📋 How to Use:</h5>
+                    <div className="text-sm text-blue-700 space-y-1">
+                      <p>1. Click the "📋 Copy" button above</p>
+                      <p>2. Open a new browser tab</p>
+                      <p>3. Paste the URL in the address bar</p>
+                      <p>4. Items will be added to your Walmart cart automatically!</p>
+                    </div>
                   </div>
                 </div>
               )}
