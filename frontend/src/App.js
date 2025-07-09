@@ -1460,42 +1460,53 @@ function App() {
 
                 {/* Cart Items */}
                 <div className="space-y-3 mb-6 max-h-64 overflow-y-auto">
-                  {cartItems.map((item, index) => (
-                    <div key={index} className="p-3 bg-gray-50 rounded-lg">
-                      <div className="flex justify-between items-start mb-2">
-                        <h4 className="font-medium text-gray-800 text-sm leading-tight">{item.name}</h4>
-                        <button
-                          onClick={() => removeItem(index)}
-                          className="text-red-500 hover:text-red-700 text-xs"
-                        >
-                          ✕
-                        </button>
-                      </div>
-                      
-                      <div className="flex justify-between items-center">
-                        <div className="flex items-center space-x-2">
-                          <button
-                            onClick={() => updateQuantity(index, item.quantity - 1)}
-                            disabled={item.quantity <= 1}
-                            className="w-6 h-6 bg-red-500 text-white rounded-full hover:bg-red-600 disabled:opacity-50 flex items-center justify-center text-xs"
-                          >
-                            -
-                          </button>
-                          <span className="w-8 text-center font-bold text-sm">{item.quantity}</span>
-                          <button
-                            onClick={() => updateQuantity(index, item.quantity + 1)}
-                            className="w-6 h-6 bg-green-500 text-white rounded-full hover:bg-green-600 flex items-center justify-center text-xs"
-                          >
-                            +
-                          </button>
-                        </div>
-                        <div className="text-right">
-                          <div className="font-bold text-green-600">${(item.price * item.quantity).toFixed(2)}</div>
-                          <div className="text-xs text-gray-500">${item.price.toFixed(2)} each</div>
-                        </div>
-                      </div>
+                  {loadingCart ? (
+                    <div className="text-center py-8">
+                      <div className="w-8 h-8 border-3 border-green-500 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+                      <p className="text-gray-600 text-sm">Loading Walmart products...</p>
                     </div>
-                  ))}
+                  ) : cartItems.length > 0 ? (
+                    cartItems.map((item, index) => (
+                      <div key={index} className="p-3 bg-gray-50 rounded-lg">
+                        <div className="flex justify-between items-start mb-2">
+                          <h4 className="font-medium text-gray-800 text-sm leading-tight">{item.name}</h4>
+                          <button
+                            onClick={() => removeItem(index)}
+                            className="text-red-500 hover:text-red-700 text-xs"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                        
+                        <div className="flex justify-between items-center">
+                          <div className="flex items-center space-x-2">
+                            <button
+                              onClick={() => updateQuantity(index, item.quantity - 1)}
+                              disabled={item.quantity <= 1}
+                              className="w-6 h-6 bg-red-500 text-white rounded-full hover:bg-red-600 disabled:opacity-50 flex items-center justify-center text-xs"
+                            >
+                              -
+                            </button>
+                            <span className="w-8 text-center font-bold text-sm">{item.quantity}</span>
+                            <button
+                              onClick={() => updateQuantity(index, item.quantity + 1)}
+                              className="w-6 h-6 bg-green-500 text-white rounded-full hover:bg-green-600 flex items-center justify-center text-xs"
+                            >
+                              +
+                            </button>
+                          </div>
+                          <div className="text-right">
+                            <div className="font-bold text-green-600">${(item.price * item.quantity).toFixed(2)}</div>
+                            <div className="text-xs text-gray-500">${item.price.toFixed(2)} each</div>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-8 text-gray-500">
+                      <p>No items in cart</p>
+                    </div>
+                  )}
                 </div>
 
                 {/* Cart Summary */}
