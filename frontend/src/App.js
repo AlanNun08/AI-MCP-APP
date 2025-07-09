@@ -1209,8 +1209,10 @@ function App() {
   // Recipe Detail Screen Component
   const RecipeDetailScreen = ({ recipe, showBackButton = false }) => {
     const [generatingCart, setGeneratingCart] = useState(false);
-    const [walmartUrl, setWalmartUrl] = useState(null);
-    const [cartProducts, setCartProducts] = useState([]);
+    const [cartItems, setCartItems] = useState([]);
+    const [showInteractiveCart, setShowInteractiveCart] = useState(false);
+    const [confirmedCart, setConfirmedCart] = useState(false);
+    const [finalWalmartUrl, setFinalWalmartUrl] = useState(null);
 
     const generateGroceryCart = async () => {
       if (!recipe) {
@@ -1232,62 +1234,114 @@ function App() {
           const products = response.data.ingredient_options
             .flatMap(ing => ing.options || [])
             .filter(opt => opt.product_id)
-            .slice(0, 10); // Limit to first 10 products
+            .slice(0, 12); // Limit to 12 products for better UX
           
           // If no products found, create a demo cart for demonstration
           if (products.length === 0) {
             const demoProducts = [
-              { product_id: "556677889", name: "Great Value Chicken Breast 2.5lb", price: 8.99 },
-              { product_id: "456789123", name: "Great Value Shredded Cheddar Cheese 8oz", price: 2.84 },
-              { product_id: "445566778", name: "Mission Corn Tortillas 30ct", price: 2.98 },
-              { product_id: "334455667", name: "Old El Paso Enchilada Sauce 10oz", price: 1.18 }
+              { product_id: "556677889", name: "Great Value Chicken Breast 2.5lb", price: 8.99, quantity: 1 },
+              { product_id: "456789123", name: "Great Value Shredded Cheddar Cheese 8oz", price: 2.84, quantity: 1 },
+              { product_id: "445566778", name: "Mission Corn Tortillas 30ct", price: 2.98, quantity: 1 },
+              { product_id: "334455667", name: "Old El Paso Enchilada Sauce 10oz", price: 1.18, quantity: 1 },
+              { product_id: "789123456", name: "Fresh Garlic Bulb 3oz", price: 0.98, quantity: 1 },
+              { product_id: "321654987", name: "Extra Virgin Olive Oil 16.9oz", price: 6.99, quantity: 1 }
             ];
-            setCartProducts(demoProducts);
-            setWalmartUrl(`https://www.walmart.com/cart?items=${demoProducts.map(p => p.product_id).join(',')}`);
-            showNotification('🛒 Walmart cart ready! Copy the link below.', 'success');
-            return;
+            setCartItems(demoProducts);
+          } else {
+            // Add quantity property to each product
+            const productsWithQuantity = products.map(product => ({
+              ...product,
+              quantity: 1
+            }));
+            setCartItems(productsWithQuantity);
           }
           
-          const productIds = products.map(opt => opt.product_id);
-          
-          // Create Walmart URL with product IDs
-          const generatedUrl = `https://www.walmart.com/cart?items=${productIds.join(',')}`;
-          
-          setWalmartUrl(generatedUrl);
-          setCartProducts(products);
-          showNotification('🛒 Walmart cart URL generated! Copy the link below.', 'success');
+          setShowInteractiveCart(true);
+          setConfirmedCart(false);
+          setFinalWalmartUrl(null);
+          showNotification('🛒 Interactive cart loaded! Adjust quantities and confirm.', 'success');
         } else {
           // Create demo cart when API doesn't return expected data
           const demoProducts = [
-            { product_id: "556677889", name: "Great Value Chicken Breast 2.5lb", price: 8.99 },
-            { product_id: "456789123", name: "Great Value Shredded Cheddar Cheese 8oz", price: 2.84 },
-            { product_id: "445566778", name: "Mission Corn Tortillas 30ct", price: 2.98 },
-            { product_id: "334455667", name: "Old El Paso Enchilada Sauce 10oz", price: 1.18 }
+            { product_id: "556677889", name: "Great Value Chicken Breast 2.5lb", price: 8.99, quantity: 1 },
+            { product_id: "456789123", name: "Great Value Shredded Cheddar Cheese 8oz", price: 2.84, quantity: 1 },
+            { product_id: "445566778", name: "Mission Corn Tortillas 30ct", price: 2.98, quantity: 1 },
+            { product_id: "334455667", name: "Old El Paso Enchilada Sauce 10oz", price: 1.18, quantity: 1 }
           ];
-          setCartProducts(demoProducts);
-          setWalmartUrl(`https://www.walmart.com/cart?items=${demoProducts.map(p => p.product_id).join(',')}`);
-          showNotification('🛒 Cart ready - Copy the link below!', 'success');
+          setCartItems(demoProducts);
+          setShowInteractiveCart(true);
+          setConfirmedCart(false);
+          setFinalWalmartUrl(null);
+          showNotification('🛒 Interactive cart loaded! Adjust quantities and confirm.', 'success');
         }
       } catch (error) {
         // Create demo cart when there's an error to ensure functionality
         const demoProducts = [
-          { product_id: "556677889", name: "Great Value Chicken Breast 2.5lb", price: 8.99 },
-          { product_id: "456789123", name: "Great Value Shredded Cheddar Cheese 8oz", price: 2.84 },
-          { product_id: "445566778", name: "Mission Corn Tortillas 30ct", price: 2.98 },
-          { product_id: "334455667", name: "Old El Paso Enchilada Sauce 10oz", price: 1.18 }
+          { product_id: "556677889", name: "Great Value Chicken Breast 2.5lb", price: 8.99, quantity: 1 },
+          { product_id: "456789123", name: "Great Value Shredded Cheddar Cheese 8oz", price: 2.84, quantity: 1 },
+          { product_id: "445566778", name: "Mission Corn Tortillas 30ct", price: 2.98, quantity: 1 },
+          { product_id: "334455667", name: "Old El Paso Enchilada Sauce 10oz", price: 1.18, quantity: 1 }
         ];
-        setCartProducts(demoProducts);
-        setWalmartUrl(`https://www.walmart.com/cart?items=${demoProducts.map(p => p.product_id).join(',')}`);
-        showNotification('🛒 Cart ready! Copy the link below.', 'info');
+        setCartItems(demoProducts);
+        setShowInteractiveCart(true);
+        setConfirmedCart(false);
+        setFinalWalmartUrl(null);
+        showNotification('🛒 Interactive cart loaded! Adjust quantities and confirm.', 'info');
       } finally {
         setGeneratingCart(false);
       }
     };
 
+    const updateQuantity = (index, newQuantity) => {
+      if (newQuantity < 1) return; // Prevent negative quantities
+      
+      const updatedItems = cartItems.map((item, i) => 
+        i === index ? { ...item, quantity: newQuantity } : item
+      );
+      setCartItems(updatedItems);
+    };
+
+    const removeItem = (index) => {
+      const updatedItems = cartItems.filter((_, i) => i !== index);
+      setCartItems(updatedItems);
+    };
+
+    const calculateTotal = () => {
+      return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+    };
+
+    const confirmCart = () => {
+      // Generate the affiliate link with quantities
+      const itemsWithQuantity = cartItems
+        .filter(item => item.quantity > 0)
+        .map(item => {
+          // For quantities > 1, repeat the product_id
+          return Array(item.quantity).fill(item.product_id);
+        })
+        .flat();
+      
+      const affiliateUrl = `https://affil.walmart.com/cart/addToCart?items=${itemsWithQuantity.join(',')}`;
+      
+      setFinalWalmartUrl(affiliateUrl);
+      setConfirmedCart(true);
+      showNotification('✅ Cart confirmed! Your affiliate link is ready.', 'success');
+    };
+
     const copyUrlToClipboard = async () => {
       try {
-        await navigator.clipboard.writeText(walmartUrl);
-        showNotification('📋 URL copied to clipboard!', 'success');
+        await navigator.clipboard.writeText(finalWalmartUrl);
+        showNotification('📋 Affiliate URL copied to clipboard!', 'success');
+      } catch (err) {
+        showNotification('❌ Failed to copy URL. Please copy manually.', 'error');
+      }
+    };
+
+    const resetCart = () => {
+      setShowInteractiveCart(false);
+      setConfirmedCart(false);
+      setFinalWalmartUrl(null);
+      setCartItems([]);
+    };
       } catch (error) {
         showNotification('📋 Please manually copy the URL below.', 'info');
       }
