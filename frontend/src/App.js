@@ -1362,22 +1362,55 @@ function App() {
               </ol>
             </div>
 
-            {/* Grocery Cart Button */}
+            {/* Enhanced Grocery Cart Button */}
             <div className="border-t pt-6">
+              <div className="text-center mb-4">
+                <h3 className="text-lg font-semibold text-gray-800 mb-2">🛒 Ready to Shop?</h3>
+                <p className="text-sm text-gray-600">Generate your personalized Walmart shopping cart with all recipe ingredients</p>
+              </div>
+              
               <button
                 onClick={generateGroceryCart}
                 disabled={generatingCart}
-                className="w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold py-4 px-6 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
+                className="w-full bg-gradient-to-r from-blue-500 via-purple-500 to-green-500 text-white font-bold py-5 px-6 rounded-2xl shadow-xl hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none active:scale-95"
               >
                 {generatingCart ? (
-                  <div className="flex items-center justify-center space-x-2">
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    <span>Generating Cart...</span>
+                  <div className="flex items-center justify-center space-x-3">
+                    <div className="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <span className="text-lg">🤖 AI is building your cart...</span>
                   </div>
                 ) : (
-                  '🛒 Generate Walmart Shopping Cart'
+                  <div className="flex items-center justify-center space-x-3">
+                    <span className="text-xl">🛒</span>
+                    <span className="text-lg">Generate Walmart Shopping Cart</span>
+                    <span className="text-xl">✨</span>
+                  </div>
                 )}
               </button>
+              
+              {!walmartUrl && (
+                <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-xl">
+                  <div className="flex items-center justify-center space-x-2">
+                    <span className="text-blue-600">💡</span>
+                    <p className="text-sm text-blue-700 font-medium">
+                      Click above to automatically find all ingredients on Walmart with competitive prices!
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Success Message */}
+              {walmartUrl && (
+                <div className="mt-4 p-4 bg-green-50 border-2 border-green-200 rounded-xl">
+                  <div className="flex items-center justify-center space-x-2 mb-2">
+                    <span className="text-green-600 text-xl">✅</span>
+                    <p className="text-green-700 font-bold">Cart Generated Successfully!</p>
+                  </div>
+                  <p className="text-sm text-green-600 text-center">
+                    Your personalized shopping cart is ready below. All ingredients have been found and priced for you!
+                  </p>
+                </div>
+              )}
 
               {/* Walmart URL Display */}
               {walmartUrl && (
