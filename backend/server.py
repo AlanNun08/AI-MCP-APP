@@ -166,6 +166,8 @@ class Recipe(BaseModel):
     is_healthy: bool = False
     created_at: datetime = Field(default_factory=datetime.utcnow)
     user_id: Optional[str] = None
+    # Shopping list for Walmart API (just ingredient names)
+    shopping_list: Optional[List[str]] = []
 
     class Config:
         json_encoders = {
