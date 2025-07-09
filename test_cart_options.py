@@ -4,6 +4,7 @@ import uuid
 import logging
 import re
 import random
+import time
 from datetime import datetime
 
 # Configure logging
@@ -28,26 +29,73 @@ def test_cart_options_endpoint():
     print("TESTING /api/grocery/cart-options ENDPOINT")
     print("=" * 80)
     
-    # First, create a test user
+    # First, create a test user with the new authentication system
     user_email = f"test_{uuid.uuid4()}@example.com"
+    user_password = "TestPassword123"
+    
     user_data = {
-        "name": f"Test User {uuid.uuid4()}",
+        "first_name": "Test",
+        "last_name": "User",
         "email": user_email,
+        "password": user_password,
         "dietary_preferences": ["vegetarian"],
         "allergies": [],
         "favorite_cuisines": ["italian"]
     }
     
     print("\n1. Creating test user...")
-    user_response = requests.post(f"{BASE_URL}/users", json=user_data)
+    user_response = requests.post(f"{BASE_URL}/auth/register", json=user_data)
     
     if user_response.status_code != 200:
         print(f"❌ Failed to create test user: {user_response.status_code}")
         print(user_response.text)
-        return False
-    
-    user_id = user_response.json().get("id")
-    print(f"✅ Created test user with ID: {user_id}")
+        
+        # Try using the legacy user creation endpoint as fallback
+        legacy_user_data = {
+            "name": f"Test User {uuid.uuid4()}",
+            "email": user_email,
+            "dietary_preferences": ["vegetarian"],
+            "allergies": [],
+            "favorite_cuisines": ["italian"]
+        }
+        
+        print("Trying legacy user creation endpoint...")
+        legacy_response = requests.post(f"{BASE_URL}/users", json=legacy_user_data)
+        
+        if legacy_response.status_code != 200:
+            print(f"❌ Failed to create legacy test user: {legacy_response.status_code}")
+            print(legacy_response.text)
+            return False
+        
+        user_id = legacy_response.json().get("id")
+        print(f"✅ Created legacy test user with ID: {user_id}")
+    else:
+        user_id = user_response.json().get("user_id")
+        print(f"✅ Created test user with ID: {user_id}")
+        
+        # Get verification code
+        time.sleep(1)  # Wait a bit for the code to be stored
+        code_response = requests.get(f"{BASE_URL}/debug/verification-codes/{user_email}")
+        
+        if code_response.status_code == 200 and 'codes' in code_response.json() and len(code_response.json()['codes']) > 0:
+            verification_code = code_response.json()['codes'][0]['code']
+            print(f"✅ Retrieved verification code: {verification_code}")
+            
+            # Verify email
+            verify_data = {
+                "email": user_email,
+                "code": verification_code
+            }
+            
+            verify_response = requests.post(f"{BASE_URL}/auth/verify", json=verify_data)
+            
+            if verify_response.status_code == 200:
+                print("✅ Email verified successfully")
+            else:
+                print(f"⚠️ Email verification failed: {verify_response.status_code}")
+                print(verify_response.text)
+        else:
+            print("⚠️ Could not retrieve verification code, continuing anyway")
     
     # Generate a test recipe
     recipe_request = {
