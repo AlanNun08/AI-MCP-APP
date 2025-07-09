@@ -321,9 +321,11 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Enhanced Grocery Cart UI Testing"
-    - "Improved Item Display with Prices"
+    - "Additional UI Enhancement Testing"
+    - "Improved Item Display with Enhanced Visuals"
+    - "Enhanced Total Price Calculation with Average Pricing"
     - "Better URL Visibility and Copy Functionality"
+    - "Mobile Responsive Design Verification"
   stuck_tasks: []
   test_all: true
   test_priority: "high_first"
