@@ -1360,14 +1360,14 @@ class AIRecipeAppTester:
         
         return success
         
-    def test_create_grocery_cart_with_options(self):
-        """Test creating grocery cart with multiple options per ingredient"""
+    def test_cart_options_endpoint(self):
+        """Test the cart-options endpoint with recipe_id and user_id parameters"""
         if not self.recipe_id or not self.user_id:
             print("❌ No recipe ID or user ID available for testing")
             return False
             
         success, response = self.run_test(
-            "Create Grocery Cart with Options",
+            "Cart Options Endpoint",
             "POST",
             "grocery/cart-options",
             200,
@@ -1376,76 +1376,99 @@ class AIRecipeAppTester:
         
         if success and 'id' in response:
             self.cart_options_id = response['id']
-            print(f"Created grocery cart with options, ID: {self.cart_options_id}")
+            print(f"Created grocery cart options with ID: {self.cart_options_id}")
             
-            # Verify multiple options per ingredient
+            # Verify the response structure
             if 'ingredient_options' in response:
                 options_count = len(response['ingredient_options'])
                 print(f"Found {options_count} ingredients with options")
                 
-                # Check if each ingredient has multiple options
+                # Check if each ingredient has multiple options with required fields
                 for i, ingredient_option in enumerate(response['ingredient_options']):
                     if 'options' in ingredient_option:
                         product_count = len(ingredient_option['options'])
                         print(f"  Ingredient {i+1}: {ingredient_option.get('ingredient_name', 'Unknown')} - {product_count} product options")
                         
-                        # Check if we have budget, mid-range, and premium options
-                        if product_count > 0:
-                            prices = [product.get('price', 0) for product in ingredient_option['options']]
-                            if len(prices) >= 3:
-                                print(f"    Price range: ${min(prices):.2f} - ${max(prices):.2f}")
+                        # Check if products have all required fields
+                        for j, product in enumerate(ingredient_option['options']):
+                            required_fields = ['product_id', 'name', 'price']
+                            missing_fields = [field for field in required_fields if field not in product]
+                            
+                            if missing_fields:
+                                print(f"    ❌ Product {j+1} missing required fields: {', '.join(missing_fields)}")
                             else:
-                                print(f"    Limited options: {product_count} (expected 3)")
+                                print(f"    ✅ Product {j+1}: {product['name']} - ${product['price']:.2f} (ID: {product['product_id']})")
             
             return True
         return False
-        
-    def test_get_grocery_cart_options(self):
-        """Test getting grocery cart options by ID"""
-        if not self.cart_options_id:
-            print("❌ No cart options ID available for testing")
+
+    def test_cart_options_missing_recipe_id(self):
+        """Test cart-options endpoint with missing recipe_id parameter"""
+        if not self.user_id:
+            print("❌ No user ID available for testing")
             return False
             
-        success, _ = self.run_test(
-            "Get Grocery Cart Options",
-            "GET",
-            f"grocery/cart-options/{self.cart_options_id}",
-            200
+        # We expect this to fail with 404 or 400 status code
+        success, response = self.run_test(
+            "Cart Options with Missing Recipe ID",
+            "POST",
+            "grocery/cart-options",
+            404,  # or 400, depending on how the API handles missing parameters
+            params={"user_id": self.user_id}
         )
         
+        # This test passes if the API correctly rejects the request
         return success
-        
-    def test_create_custom_cart(self):
-        """Test creating custom cart from selected options"""
-        if not self.recipe_id or not self.user_id:
-            print("❌ No recipe ID or user ID available for testing")
+
+    def test_cart_options_invalid_user_id(self):
+        """Test cart-options endpoint with invalid user_id parameter"""
+        if not self.recipe_id:
+            print("❌ No recipe ID available for testing")
             return False
             
-        # Create a custom cart directly
+        # We expect this to fail with 404 or 400 status code
+        success, response = self.run_test(
+            "Cart Options with Invalid User ID",
+            "POST",
+            "grocery/cart-options",
+            404,  # or 400, depending on how the API handles invalid parameters
+            params={"recipe_id": self.recipe_id, "user_id": "invalid-user-id"}
+        )
+        
+        # This test passes if the API correctly rejects the request
+        return success
+
+    def test_custom_cart_creation(self):
+        """Test creating a custom cart with selected products"""
+        if not self.recipe_id or not self.user_id or not self.cart_options_id:
+            print("❌ No recipe ID, user ID, or cart options ID available for testing")
+            return False
+            
+        # Create a custom cart with selected products
         custom_cart_data = {
             "user_id": self.user_id,
             "recipe_id": self.recipe_id,
             "products": [
                 {
                     "ingredient_name": "pasta",
-                    "product_id": "12345",
-                    "name": "Barilla Pasta",
-                    "price": 2.99,
-                    "quantity": 1
-                },
-                {
-                    "ingredient_name": "tomatoes",
-                    "product_id": "67890",
-                    "name": "Roma Tomatoes",
+                    "product_id": "123456789",
+                    "name": "Barilla Pasta Penne 16oz",
                     "price": 1.99,
                     "quantity": 2
                 },
                 {
-                    "ingredient_name": "garlic",
-                    "product_id": "54321",
-                    "name": "Fresh Garlic",
-                    "price": 0.99,
+                    "ingredient_name": "tomatoes",
+                    "product_id": "987654321",
+                    "name": "Fresh Roma Tomatoes 2lb",
+                    "price": 2.49,
                     "quantity": 1
+                },
+                {
+                    "ingredient_name": "garlic",
+                    "product_id": "789123456",
+                    "name": "Fresh Garlic Bulb 3oz",
+                    "price": 0.98,
+                    "quantity": 3
                 }
             ]
         }
@@ -1459,28 +1482,70 @@ class AIRecipeAppTester:
         )
         
         if success and 'id' in response:
-            print(f"Created custom cart with ID: {response['id']}")
-            print(f"Total price: ${response.get('total_price', 0):.2f}")
-            print(f"Walmart URL: {response.get('walmart_url', 'N/A')}")
+            self.custom_cart_id = response['id']
+            print(f"Created custom cart with ID: {self.custom_cart_id}")
             
-            # Verify Walmart URL format
-            if 'walmart_url' in response:
-                walmart_url = response['walmart_url']
-                if 'affil.walmart.com' in walmart_url and 'items=' in walmart_url:
-                    print("✅ Walmart URL correctly formatted")
+            # Verify the response structure
+            if 'products' in response:
+                products_count = len(response['products'])
+                print(f"Cart contains {products_count} products")
+                
+                # Check if total price is calculated correctly
+                if 'total_price' in response:
+                    expected_total = sum(p['price'] * p['quantity'] for p in custom_cart_data['products'])
+                    actual_total = response['total_price']
+                    print(f"Total price: ${actual_total:.2f} (Expected: ${expected_total:.2f})")
                     
-                    # Check if all product IDs are in the URL
-                    product_ids = [p['product_id'] for p in custom_cart_data['products']]
-                    all_ids_in_url = all(pid in walmart_url for pid in product_ids)
-                    if all_ids_in_url:
-                        print("✅ All product IDs included in Walmart URL")
+                    if abs(actual_total - expected_total) < 0.01:  # Allow for small floating-point differences
+                        print("✅ Total price calculated correctly")
                     else:
-                        print("⚠️ Not all product IDs found in Walmart URL")
-                else:
-                    print("⚠️ Walmart URL format may be incorrect")
+                        print("❌ Total price calculation error")
+                
+                # Check if Walmart URL is generated correctly
+                if 'walmart_url' in response:
+                    walmart_url = response['walmart_url']
+                    print(f"Walmart URL: {walmart_url}")
+                    
+                    if 'affil.walmart.com' in walmart_url and 'items=' in walmart_url:
+                        print("✅ Walmart URL correctly formatted")
+                        
+                        # Check if all product IDs are in the URL
+                        product_ids = [p['product_id'] for p in custom_cart_data['products']]
+                        all_ids_in_url = all(pid in walmart_url for pid in product_ids)
+                        if all_ids_in_url:
+                            print("✅ All product IDs included in Walmart URL")
+                        else:
+                            print("❌ Not all product IDs found in Walmart URL")
+                    else:
+                        print("❌ Walmart URL format may be incorrect")
             
             return True
         return False
+
+    def test_custom_cart_missing_fields(self):
+        """Test custom cart creation with missing required fields"""
+        if not self.recipe_id or not self.user_id:
+            print("❌ No recipe ID or user ID available for testing")
+            return False
+            
+        # Create a cart with missing products field
+        invalid_cart_data = {
+            "user_id": self.user_id,
+            "recipe_id": self.recipe_id
+            # Missing 'products' field
+        }
+        
+        # We expect this to fail with 400 status code
+        success, response = self.run_test(
+            "Custom Cart with Missing Fields",
+            "POST",
+            "grocery/custom-cart",
+            400,
+            data=invalid_cart_data
+        )
+        
+        # This test passes if the API correctly rejects the request
+        return success
         
     def test_deployment_readiness(self):
         """Comprehensive deployment readiness test"""
