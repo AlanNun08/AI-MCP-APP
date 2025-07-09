@@ -809,12 +809,87 @@ def _get_walmart_signature() -> tuple:
         logging.error(f"Error generating Walmart signature: {str(e)}")
         raise
 
+def _extract_core_ingredient(ingredient: str) -> str:
+    """Extract the core ingredient name from complex recipe descriptions"""
+    
+    # Convert to lowercase for processing
+    ingredient_lower = ingredient.lower().strip()
+    
+    # Remove common recipe measurements and quantities at the beginning
+    ingredient_lower = re.sub(r'^(\d+[\s\/\-]*\d*\s*)?(cups?|cup|tbsp|tablespoons?|tablespoon|tsp|teaspoons?|teaspoon|lbs?|pounds?|pound|oz|ounces?|ounce|cans?|can|jars?|jar|bottles?|bottle|packages?|package|bags?|bag|cloves?|clove|slices?|slice|pieces?|piece|pinch|dash)\s+', '', ingredient_lower)
+    
+    # Remove quantities at the beginning (like "1", "2", "1/2", "1-2", etc.)
+    ingredient_lower = re.sub(r'^\d+[\s\/\-]*\d*\s+', '', ingredient_lower)
+    
+    # Remove preparation instructions (everything after comma, parentheses, or "to taste")
+    ingredient_lower = re.sub(r'[,\(].*$', '', ingredient_lower)
+    ingredient_lower = re.sub(r'\s+to\s+taste.*$', '', ingredient_lower)
+    ingredient_lower = re.sub(r'\s+(drained|rinsed|chopped|sliced|diced|minced|cooked|fresh|dried|ground|whole|halved|quartered).*$', '', ingredient_lower)
+    
+    # Handle specific ingredient mappings for better search results
+    ingredient_mappings = {
+        'bbq sauce': 'barbecue sauce',
+        'mixed vegetables': 'frozen mixed vegetables',
+        'bell peppers': 'bell pepper',
+        'olive oil': 'olive oil',
+        'chickpeas': 'chickpeas',
+        'garbanzo beans': 'chickpeas',
+        'quinoa': 'quinoa',
+        'avocado': 'avocado',
+        'salt and pepper': 'salt pepper',
+        'tomato sauce': 'tomato sauce',
+        'tomato paste': 'tomato paste',
+        'chicken breast': 'chicken breast',
+        'ground beef': 'ground beef',
+        'pasta': 'pasta',
+        'spaghetti': 'spaghetti pasta',
+        'rice': 'rice',
+        'onion': 'onion',
+        'garlic': 'garlic',
+        'cheese': 'shredded cheese'
+    }
+    
+    # Clean up extra spaces
+    ingredient_lower = ' '.join(ingredient_lower.split())
+    
+    # Check for direct mappings first
+    for key, value in ingredient_mappings.items():
+        if key in ingredient_lower:
+            return value
+    
+    # If no direct mapping, try to extract the main ingredient
+    # Remove adjectives and modifiers
+    ingredient_lower = re.sub(r'\b(fresh|dried|ground|whole|chopped|sliced|diced|minced|cooked|raw|organic|extra\s+virgin|virgin|pure|natural|unsalted|salted|sweet|hot|mild|spicy|large|small|medium)\b\s*', '', ingredient_lower)
+    
+    # Remove extra spaces again
+    ingredient_lower = ' '.join(ingredient_lower.split())
+    
+    # If the result is too short or empty, return the original (cleaned)
+    if len(ingredient_lower) < 3:
+        # Fallback: try to extract noun from original
+        original_words = ingredient.lower().split()
+        # Look for common food nouns
+        food_nouns = ['oil', 'sauce', 'vegetables', 'quinoa', 'chickpeas', 'avocado', 'tomatoes', 'onion', 'garlic', 'cheese', 'pasta', 'rice', 'chicken', 'beef', 'pork', 'salt', 'pepper', 'herbs', 'spices']
+        for word in original_words:
+            clean_word = re.sub(r'[,\(\)]', '', word)
+            if clean_word in food_nouns:
+                return clean_word
+        
+        # If still nothing found, return first substantial word
+        for word in original_words:
+            clean_word = re.sub(r'[,\(\)\d]', '', word).strip()
+            if len(clean_word) > 2 and clean_word not in ['cup', 'cups', 'tbsp', 'tsp', 'can', 'jar', 'bottle', 'package', 'bag']:
+                return clean_word
+    
+    return ingredient_lower.strip() if ingredient_lower.strip() else ingredient
+
 async def _get_walmart_product_options(ingredient: str, max_options: int = 3) -> List[WalmartProduct]:
     """Get Walmart product options for an ingredient"""
     try:
-        # Clean ingredient name
-        clean_ingredient = re.sub(r'^\d+[\s\w\/]*\s+', '', ingredient)
-        clean_ingredient = re.sub(r',.*$', '', clean_ingredient).strip()
+        # Extract core ingredient name using improved parsing
+        clean_ingredient = _extract_core_ingredient(ingredient)
+        
+        logging.info(f"Original ingredient: '{ingredient}' -> Cleaned: '{clean_ingredient}'")
         
         # Try real Walmart API first
         try:
@@ -833,7 +908,7 @@ async def _get_walmart_product_options(ingredient: str, max_options: int = 3) ->
                 "Content-Type": "application/json"
             }
             
-            logging.info(f"Making Walmart API call for ingredient: {clean_ingredient}")
+            logging.info(f"Making Walmart API call for ingredient: '{clean_ingredient}'")
             logging.info(f"URL: {url}")
             
             async with httpx.AsyncClient() as client:
@@ -871,7 +946,7 @@ async def _get_walmart_product_options(ingredient: str, max_options: int = 3) ->
         logging.info(f"Using enhanced mock data for '{clean_ingredient}'")
         mock_products = []
         
-        # Create realistic sample products based on ingredient type
+        # Create realistic sample products based on cleaned ingredient type
         ingredient_lower = clean_ingredient.lower()
         
         if any(word in ingredient_lower for word in ['chicken']):
@@ -880,17 +955,47 @@ async def _get_walmart_product_options(ingredient: str, max_options: int = 3) ->
                 WalmartProduct(product_id="10315162", name="Tyson Grilled Chicken Strips 9oz", price=5.48, thumbnail_image="", availability="Available"),
                 WalmartProduct(product_id="10452855", name="Rotisserie Chicken Whole", price=4.98, thumbnail_image="", availability="Available")
             ]
-        elif any(word in ingredient_lower for word in ['tortilla', 'tortillas']):
+        elif any(word in ingredient_lower for word in ['chickpeas', 'garbanzo']):
             mock_products = [
-                WalmartProduct(product_id="10313913", name="Mission Corn Tortillas 30ct", price=2.98, thumbnail_image="", availability="Available"),
-                WalmartProduct(product_id="10533089", name="Great Value Corn Tortillas 20ct", price=1.84, thumbnail_image="", availability="Available"),
-                WalmartProduct(product_id="10315264", name="La Banderita Corn Tortillas 24ct", price=2.24, thumbnail_image="", availability="Available")
+                WalmartProduct(product_id="10315201", name="Bush's Chickpeas 15.5oz Can", price=1.18, thumbnail_image="", availability="Available"),
+                WalmartProduct(product_id="10315202", name="Great Value Chickpeas 15oz", price=0.98, thumbnail_image="", availability="Available"),
+                WalmartProduct(product_id="10315203", name="Goya Chickpeas 15.5oz", price=1.28, thumbnail_image="", availability="Available")
             ]
-        elif any(word in ingredient_lower for word in ['enchilada', 'sauce']):
+        elif any(word in ingredient_lower for word in ['bbq', 'barbecue']):
             mock_products = [
-                WalmartProduct(product_id="10315486", name="Old El Paso Enchilada Sauce 10oz", price=1.18, thumbnail_image="", availability="Available"),
-                WalmartProduct(product_id="10315487", name="Las Palmas Red Enchilada Sauce 14oz", price=1.28, thumbnail_image="", availability="Available"),
-                WalmartProduct(product_id="10315488", name="Hatch Green Enchilada Sauce 15oz", price=2.47, thumbnail_image="", availability="Available")
+                WalmartProduct(product_id="10315204", name="Sweet Baby Ray's BBQ Sauce 18oz", price=1.98, thumbnail_image="", availability="Available"),
+                WalmartProduct(product_id="10315205", name="KC Masterpiece BBQ Sauce 18oz", price=2.28, thumbnail_image="", availability="Available"),
+                WalmartProduct(product_id="10315206", name="Great Value BBQ Sauce 18oz", price=1.48, thumbnail_image="", availability="Available")
+            ]
+        elif any(word in ingredient_lower for word in ['quinoa']):
+            mock_products = [
+                WalmartProduct(product_id="10315207", name="Ancient Harvest Quinoa 12oz", price=4.98, thumbnail_image="", availability="Available"),
+                WalmartProduct(product_id="10315208", name="Great Value Organic Quinoa 16oz", price=3.98, thumbnail_image="", availability="Available"),
+                WalmartProduct(product_id="10315209", name="Bob's Red Mill Quinoa 18oz", price=5.99, thumbnail_image="", availability="Available")
+            ]
+        elif any(word in ingredient_lower for word in ['mixed vegetables', 'frozen vegetables']):
+            mock_products = [
+                WalmartProduct(product_id="10315210", name="Great Value Frozen Mixed Vegetables 12oz", price=1.24, thumbnail_image="", availability="Available"),
+                WalmartProduct(product_id="10315211", name="Birds Eye Mixed Vegetables 10oz", price=1.98, thumbnail_image="", availability="Available"),
+                WalmartProduct(product_id="10315212", name="Green Giant Mixed Vegetables 12oz", price=2.18, thumbnail_image="", availability="Available")
+            ]
+        elif any(word in ingredient_lower for word in ['avocado']):
+            mock_products = [
+                WalmartProduct(product_id="10315213", name="Fresh Avocados 4 count", price=3.98, thumbnail_image="", availability="Available"),
+                WalmartProduct(product_id="10315214", name="Organic Avocados 4 count", price=5.98, thumbnail_image="", availability="Available"),
+                WalmartProduct(product_id="10315215", name="Large Avocados 3 count", price=4.48, thumbnail_image="", availability="Available")
+            ]
+        elif any(word in ingredient_lower for word in ['olive oil']):
+            mock_products = [
+                WalmartProduct(product_id="10315216", name="Bertolli Extra Virgin Olive Oil 16.9oz", price=6.99, thumbnail_image="", availability="Available"),
+                WalmartProduct(product_id="10315217", name="Great Value Olive Oil 17oz", price=4.97, thumbnail_image="", availability="Available"),
+                WalmartProduct(product_id="10315218", name="Pompeian Extra Virgin Olive Oil 16oz", price=5.48, thumbnail_image="", availability="Available")
+            ]
+        elif any(word in ingredient_lower for word in ['salt', 'pepper']):
+            mock_products = [
+                WalmartProduct(product_id="10315219", name="Morton Salt 26oz", price=1.24, thumbnail_image="", availability="Available"),
+                WalmartProduct(product_id="10315220", name="McCormick Black Pepper 3oz", price=2.68, thumbnail_image="", availability="Available"),
+                WalmartProduct(product_id="10315221", name="Great Value Salt & Pepper Set", price=1.98, thumbnail_image="", availability="Available")
             ]
         elif any(word in ingredient_lower for word in ['pasta', 'spaghetti', 'penne', 'noodle']):
             mock_products = [
@@ -915,27 +1020,13 @@ async def _get_walmart_product_options(ingredient: str, max_options: int = 3) ->
                 WalmartProduct(product_id="10315264", name="Fresh Garlic Bulb 3oz", price=0.98, thumbnail_image="", availability="Available"),
                 WalmartProduct(product_id="10315486", name="Great Value Minced Garlic 8oz", price=2.47, thumbnail_image="", availability="Available")
             ]
-        elif any(word in ingredient_lower for word in ['oil', 'olive']):
-            mock_products = [
-                WalmartProduct(product_id="10315487", name="Bertolli Extra Virgin Olive Oil 16.9oz", price=6.99, thumbnail_image="", availability="Available"),
-                WalmartProduct(product_id="10315488", name="Great Value Olive Oil 17oz", price=4.97, thumbnail_image="", availability="Available")
-            ]
-        elif any(word in ingredient_lower for word in ['basil', 'herb']):
-            mock_products = [
-                WalmartProduct(product_id="44391492", name="Fresh Basil 0.75oz", price=2.99, thumbnail_image="", availability="Available"),
-                WalmartProduct(product_id="10315162", name="McCormick Basil Leaves 0.62oz", price=1.98, thumbnail_image="", availability="Available")
-            ]
-        elif any(word in ingredient_lower for word in ['salt', 'pepper']):
-            mock_products = [
-                WalmartProduct(product_id="10533089", name="Morton Salt 26oz", price=1.24, thumbnail_image="", availability="Available"),
-                WalmartProduct(product_id="10315264", name="McCormick Black Pepper 3oz", price=2.68, thumbnail_image="", availability="Available")
-            ]
         else:
             # Generic products for other ingredients with realistic IDs
             base_id = abs(hash(clean_ingredient)) % 90000000 + 10000000  # Generate 8-digit realistic ID
             mock_products = [
                 WalmartProduct(product_id=str(base_id), name=f"Great Value {clean_ingredient.title()}", price=2.99, thumbnail_image="", availability="Available"),
-                WalmartProduct(product_id=str(base_id + 1), name=f"Fresh {clean_ingredient.title()}", price=3.49, thumbnail_image="", availability="Available")
+                WalmartProduct(product_id=str(base_id + 1), name=f"Fresh {clean_ingredient.title()}", price=3.49, thumbnail_image="", availability="Available"),
+                WalmartProduct(product_id=str(base_id + 2), name=f"Organic {clean_ingredient.title()}", price=4.99, thumbnail_image="", availability="Available")
             ]
         
         return mock_products[:max_options]
