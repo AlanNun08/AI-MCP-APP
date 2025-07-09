@@ -1468,6 +1468,631 @@ class AIRecipeAppTester:
             
             return True
         return False
+        
+    def test_deployment_readiness(self):
+        """Comprehensive deployment readiness test"""
+        print("\n" + "=" * 80)
+        print("🚀 DEPLOYMENT READINESS TESTING 🚀")
+        print("=" * 80)
+        
+        # Track test results for final report
+        deployment_tests = {
+            "Core API Health": False,
+            "Authentication System": False,
+            "Recipe Generation": False,
+            "Walmart Integration": False,
+            "Email Service": False,
+            "Database Operations": False,
+            "Error Handling": False
+        }
+        
+        # 1. Core API Health Check
+        print("\n" + "=" * 50)
+        print("1. Core API Health Check")
+        print("=" * 50)
+        
+        # Test API root endpoint
+        api_root = self.test_api_root()
+        
+        # Test all critical endpoints for availability
+        endpoints = [
+            ("auth/register", "POST"),
+            ("auth/verify", "POST"),
+            ("auth/login", "POST"),
+            ("auth/forgot-password", "POST"),
+            ("auth/reset-password", "POST"),
+            ("recipes/generate", "POST"),
+            ("grocery/cart-options", "POST"),
+            ("grocery/custom-cart", "POST")
+        ]
+        
+        endpoint_health = []
+        for endpoint, method in endpoints:
+            print(f"\n🔍 Checking endpoint: {method} /{endpoint}")
+            if method == "GET":
+                try:
+                    response = requests.get(f"{self.base_url}/{endpoint}", timeout=5)
+                    status = response.status_code < 500  # Consider any non-500 response as "available"
+                    endpoint_health.append(status)
+                    print(f"{'✅' if status else '❌'} {method} /{endpoint} - Status: {response.status_code}")
+                except Exception as e:
+                    endpoint_health.append(False)
+                    print(f"❌ {method} /{endpoint} - Error: {str(e)}")
+            else:
+                # For non-GET endpoints, we'll just check if they return a response (even 400 is OK)
+                try:
+                    response = requests.post(f"{self.base_url}/{endpoint}", json={}, timeout=5)
+                    status = response.status_code < 500  # Consider any non-500 response as "available"
+                    endpoint_health.append(status)
+                    print(f"{'✅' if status else '❌'} {method} /{endpoint} - Status: {response.status_code}")
+                except Exception as e:
+                    endpoint_health.append(False)
+                    print(f"❌ {method} /{endpoint} - Error: {str(e)}")
+        
+        # Mark Core API Health as passed if API root and at least 75% of endpoints are healthy
+        deployment_tests["Core API Health"] = api_root and (sum(endpoint_health) / len(endpoint_health) >= 0.75)
+        print(f"\nCore API Health: {'✅ PASSED' if deployment_tests['Core API Health'] else '❌ FAILED'}")
+        
+        # 2. Authentication System
+        print("\n" + "=" * 50)
+        print("2. Authentication System")
+        print("=" * 50)
+        
+        # Test complete user registration → email verification → login flow
+        auth_email = f"deploy_test_{uuid.uuid4()}@example.com"
+        auth_password = "SecureP@ssw0rd123"
+        
+        # Step 1: Register user
+        user_data = {
+            "first_name": "Deploy",
+            "last_name": "Test",
+            "email": auth_email,
+            "password": auth_password,
+            "dietary_preferences": ["vegetarian"],
+            "allergies": ["nuts"],
+            "favorite_cuisines": ["italian", "mexican"]
+        }
+        
+        register_success, register_response = self.run_test(
+            "User Registration (Deployment)",
+            "POST",
+            "auth/register",
+            200,
+            data=user_data
+        )
+        
+        if not register_success:
+            print("❌ User registration failed - cannot continue authentication flow test")
+        else:
+            print("✅ User registration successful")
+            
+            # Step 2: Get verification code
+            code_success, code_response = self.run_test(
+                "Get Verification Code (Deployment)",
+                "GET",
+                f"debug/verification-codes/{auth_email}",
+                200
+            )
+            
+            verification_code = None
+            if code_success:
+                if 'codes' in code_response and len(code_response['codes']) > 0:
+                    verification_code = code_response['codes'][0]['code']
+                    print(f"✅ Retrieved verification code: {verification_code}")
+                elif 'last_test_code' in code_response and code_response['last_test_code']:
+                    verification_code = code_response['last_test_code']
+                    print(f"✅ Retrieved last test verification code: {verification_code}")
+                else:
+                    print("❌ No verification code found")
+            
+            if verification_code:
+                # Step 3: Verify email
+                verify_data = {
+                    "email": auth_email,
+                    "code": verification_code
+                }
+                
+                verify_success, _ = self.run_test(
+                    "Email Verification (Deployment)",
+                    "POST",
+                    "auth/verify",
+                    200,
+                    data=verify_data
+                )
+                
+                if verify_success:
+                    print("✅ Email verification successful")
+                    
+                    # Step 4: Login with verified user
+                    login_data = {
+                        "email": auth_email,
+                        "password": auth_password
+                    }
+                    
+                    login_success, login_response = self.run_test(
+                        "Login (Deployment)",
+                        "POST",
+                        "auth/login",
+                        200,
+                        data=login_data
+                    )
+                    
+                    if login_success and 'status' in login_response and login_response['status'] == 'success':
+                        print("✅ Login successful")
+                        
+                        # Step 5: Test password reset flow
+                        reset_request = {
+                            "email": auth_email
+                        }
+                        
+                        reset_success, _ = self.run_test(
+                            "Request Password Reset (Deployment)",
+                            "POST",
+                            "auth/forgot-password",
+                            200,
+                            data=reset_request
+                        )
+                        
+                        if reset_success:
+                            print("✅ Password reset request successful")
+                            
+                            # Get reset code
+                            reset_code_success, reset_code_response = self.run_test(
+                                "Get Reset Code (Deployment)",
+                                "GET",
+                                f"debug/verification-codes/{auth_email}",
+                                200
+                            )
+                            
+                            reset_code = None
+                            if reset_code_success:
+                                if 'codes' in reset_code_response and len(reset_code_response['codes']) > 0:
+                                    reset_code = reset_code_response['codes'][0]['code']
+                                    print(f"✅ Retrieved reset code: {reset_code}")
+                                elif 'last_test_code' in reset_code_response and reset_code_response['last_test_code']:
+                                    reset_code = reset_code_response['last_test_code']
+                                    print(f"✅ Retrieved last test reset code: {reset_code}")
+                                else:
+                                    print("❌ No reset code found")
+                            
+                            if reset_code:
+                                # Reset password
+                                new_password = "NewSecureP@ssw0rd456"
+                                reset_data = {
+                                    "email": auth_email,
+                                    "reset_code": reset_code,
+                                    "new_password": new_password
+                                }
+                                
+                                reset_verify_success, _ = self.run_test(
+                                    "Reset Password (Deployment)",
+                                    "POST",
+                                    "auth/reset-password",
+                                    200,
+                                    data=reset_data
+                                )
+                                
+                                if reset_verify_success:
+                                    print("✅ Password reset successful")
+                                    
+                                    # Login with new password
+                                    new_login_data = {
+                                        "email": auth_email,
+                                        "password": new_password
+                                    }
+                                    
+                                    new_login_success, new_login_response = self.run_test(
+                                        "Login with New Password (Deployment)",
+                                        "POST",
+                                        "auth/login",
+                                        200,
+                                        data=new_login_data
+                                    )
+                                    
+                                    if new_login_success and 'status' in new_login_response and new_login_response['status'] == 'success':
+                                        print("✅ Login with new password successful")
+                                        deployment_tests["Authentication System"] = True
+        
+        print(f"\nAuthentication System: {'✅ PASSED' if deployment_tests['Authentication System'] else '❌ FAILED'}")
+        
+        # 3. Recipe Generation
+        print("\n" + "=" * 50)
+        print("3. Recipe Generation")
+        print("=" * 50)
+        
+        # Create a user for recipe testing if needed
+        if not self.user_id:
+            recipe_user = {
+                "name": f"Recipe Test User {uuid.uuid4()}",
+                "email": f"recipe_test_{uuid.uuid4()}@example.com",
+                "dietary_preferences": ["vegetarian"],
+                "allergies": ["nuts"],
+                "favorite_cuisines": ["italian", "mexican"]
+            }
+            
+            user_success, user_response = self.run_test(
+                "Create User for Recipe Testing",
+                "POST",
+                "users",
+                200,
+                data=recipe_user
+            )
+            
+            if user_success and 'id' in user_response:
+                recipe_user_id = user_response['id']
+                print(f"✅ Created user for recipe testing: {recipe_user_id}")
+            else:
+                recipe_user_id = None
+                print("❌ Failed to create user for recipe testing")
+        else:
+            recipe_user_id = self.user_id
+        
+        if recipe_user_id:
+            # Test standard recipe generation
+            recipe_request = {
+                "user_id": recipe_user_id,
+                "cuisine_type": "italian",
+                "dietary_preferences": ["vegetarian"],
+                "ingredients_on_hand": ["pasta", "tomatoes", "garlic"],
+                "prep_time_max": 30,
+                "servings": 2,
+                "difficulty": "easy"
+            }
+            
+            standard_recipe_success, standard_recipe_response = self.run_test(
+                "Standard Recipe Generation",
+                "POST",
+                "recipes/generate",
+                200,
+                data=recipe_request,
+                timeout=60
+            )
+            
+            if standard_recipe_success and 'id' in standard_recipe_response:
+                standard_recipe_id = standard_recipe_response['id']
+                print(f"✅ Generated standard recipe: {standard_recipe_id}")
+                
+                # Test healthy recipe generation
+                healthy_recipe_request = {
+                    "user_id": recipe_user_id,
+                    "cuisine_type": "mediterranean",
+                    "dietary_preferences": ["vegetarian"],
+                    "ingredients_on_hand": ["chickpeas", "olive oil", "tomatoes"],
+                    "prep_time_max": 30,
+                    "servings": 2,
+                    "difficulty": "medium",
+                    "is_healthy": True,
+                    "max_calories_per_serving": 400
+                }
+                
+                healthy_recipe_success, healthy_recipe_response = self.run_test(
+                    "Healthy Recipe Generation",
+                    "POST",
+                    "recipes/generate",
+                    200,
+                    data=healthy_recipe_request,
+                    timeout=60
+                )
+                
+                if healthy_recipe_success and 'id' in healthy_recipe_response:
+                    healthy_recipe_id = healthy_recipe_response['id']
+                    print(f"✅ Generated healthy recipe: {healthy_recipe_id}")
+                    
+                    # Verify calorie information
+                    if 'calories_per_serving' in healthy_recipe_response and healthy_recipe_response['calories_per_serving']:
+                        print(f"✅ Calorie information present: {healthy_recipe_response['calories_per_serving']} calories per serving")
+                        
+                        # Test budget recipe generation
+                        budget_recipe_request = {
+                            "user_id": recipe_user_id,
+                            "cuisine_type": "american",
+                            "dietary_preferences": [],
+                            "ingredients_on_hand": ["potatoes", "onions", "beans"],
+                            "prep_time_max": 45,
+                            "servings": 4,
+                            "difficulty": "easy",
+                            "is_budget_friendly": True,
+                            "max_budget": 15.0
+                        }
+                        
+                        budget_recipe_success, budget_recipe_response = self.run_test(
+                            "Budget Recipe Generation",
+                            "POST",
+                            "recipes/generate",
+                            200,
+                            data=budget_recipe_request,
+                            timeout=60
+                        )
+                        
+                        if budget_recipe_success and 'id' in budget_recipe_response:
+                            budget_recipe_id = budget_recipe_response['id']
+                            print(f"✅ Generated budget recipe: {budget_recipe_id}")
+                            
+                            # Test combined healthy + budget recipe
+                            combined_recipe_request = {
+                                "user_id": recipe_user_id,
+                                "cuisine_type": "asian",
+                                "dietary_preferences": ["low-carb"],
+                                "ingredients_on_hand": ["tofu", "broccoli", "ginger"],
+                                "prep_time_max": 30,
+                                "servings": 2,
+                                "difficulty": "medium",
+                                "is_healthy": True,
+                                "max_calories_per_serving": 350,
+                                "is_budget_friendly": True,
+                                "max_budget": 12.0
+                            }
+                            
+                            combined_recipe_success, combined_recipe_response = self.run_test(
+                                "Combined Healthy & Budget Recipe",
+                                "POST",
+                                "recipes/generate",
+                                200,
+                                data=combined_recipe_request,
+                                timeout=60
+                            )
+                            
+                            if combined_recipe_success and 'id' in combined_recipe_response:
+                                combined_recipe_id = combined_recipe_response['id']
+                                print(f"✅ Generated combined healthy & budget recipe: {combined_recipe_id}")
+                                
+                                # Mark Recipe Generation as passed if all tests succeeded
+                                deployment_tests["Recipe Generation"] = True
+        
+        print(f"\nRecipe Generation: {'✅ PASSED' if deployment_tests['Recipe Generation'] else '❌ FAILED'}")
+        
+        # 4. Walmart Integration
+        print("\n" + "=" * 50)
+        print("4. Walmart Integration")
+        print("=" * 50)
+        
+        # We need a recipe ID for testing Walmart integration
+        recipe_id_for_walmart = None
+        if hasattr(self, 'recipe_id') and self.recipe_id:
+            recipe_id_for_walmart = self.recipe_id
+        elif hasattr(self, 'healthy_recipe_id') and self.healthy_recipe_id:
+            recipe_id_for_walmart = self.healthy_recipe_id
+        elif hasattr(self, 'budget_recipe_id') and self.budget_recipe_id:
+            recipe_id_for_walmart = self.budget_recipe_id
+        elif hasattr(self, 'combined_recipe_id') and self.combined_recipe_id:
+            recipe_id_for_walmart = self.combined_recipe_id
+        elif 'standard_recipe_id' in locals():
+            recipe_id_for_walmart = standard_recipe_id
+        elif 'healthy_recipe_id' in locals():
+            recipe_id_for_walmart = healthy_recipe_id
+        elif 'budget_recipe_id' in locals():
+            recipe_id_for_walmart = budget_recipe_id
+        elif 'combined_recipe_id' in locals():
+            recipe_id_for_walmart = combined_recipe_id
+        
+        if recipe_id_for_walmart and recipe_user_id:
+            # Test cart-options endpoint
+            cart_options_success, cart_options_response = self.run_test(
+                "Grocery Cart Options",
+                "POST",
+                "grocery/cart-options",
+                200,
+                params={"recipe_id": recipe_id_for_walmart, "user_id": recipe_user_id}
+            )
+            
+            if cart_options_success and 'id' in cart_options_response:
+                cart_options_id = cart_options_response['id']
+                print(f"✅ Created grocery cart options: {cart_options_id}")
+                
+                # Verify ingredient options
+                if 'ingredient_options' in cart_options_response and len(cart_options_response['ingredient_options']) > 0:
+                    print(f"✅ Found {len(cart_options_response['ingredient_options'])} ingredients with options")
+                    
+                    # Test custom-cart endpoint
+                    # Create a custom cart with the first option for each ingredient
+                    products = []
+                    for ingredient_option in cart_options_response['ingredient_options']:
+                        if 'options' in ingredient_option and len(ingredient_option['options']) > 0:
+                            product = ingredient_option['options'][0]
+                            products.append({
+                                "ingredient_name": ingredient_option.get('ingredient_name', 'Unknown'),
+                                "product_id": product.get('product_id', '12345'),
+                                "name": product.get('name', 'Test Product'),
+                                "price": product.get('price', 1.99),
+                                "quantity": 1
+                            })
+                    
+                    if products:
+                        custom_cart_data = {
+                            "user_id": recipe_user_id,
+                            "recipe_id": recipe_id_for_walmart,
+                            "products": products
+                        }
+                        
+                        custom_cart_success, custom_cart_response = self.run_test(
+                            "Custom Grocery Cart",
+                            "POST",
+                            "grocery/custom-cart",
+                            200,
+                            data=custom_cart_data
+                        )
+                        
+                        if custom_cart_success and 'id' in custom_cart_response:
+                            print(f"✅ Created custom grocery cart: {custom_cart_response['id']}")
+                            print(f"✅ Total price: ${custom_cart_response.get('total_price', 0):.2f}")
+                            
+                            # Verify Walmart URL
+                            if 'walmart_url' in custom_cart_response:
+                                walmart_url = custom_cart_response['walmart_url']
+                                print(f"✅ Walmart URL: {walmart_url}")
+                                
+                                if 'affil.walmart.com' in walmart_url and 'items=' in walmart_url:
+                                    print("✅ Walmart URL correctly formatted")
+                                    
+                                    # Check if product IDs are in the URL
+                                    product_ids = [p['product_id'] for p in products]
+                                    all_ids_in_url = all(pid in walmart_url for pid in product_ids)
+                                    if all_ids_in_url:
+                                        print("✅ All product IDs included in Walmart URL")
+                                        deployment_tests["Walmart Integration"] = True
+                                    else:
+                                        print("⚠️ Not all product IDs found in Walmart URL")
+                                else:
+                                    print("⚠️ Walmart URL format may be incorrect")
+        
+        print(f"\nWalmart Integration: {'✅ PASSED' if deployment_tests['Walmart Integration'] else '❌ FAILED'}")
+        
+        # 5. Email Service
+        print("\n" + "=" * 50)
+        print("5. Email Service")
+        print("=" * 50)
+        
+        # Test if email service is in live mode
+        email_service_success = self.test_email_service_mode()
+        deployment_tests["Email Service"] = email_service_success and self.email_live_mode
+        
+        print(f"\nEmail Service: {'✅ PASSED' if deployment_tests['Email Service'] else '❌ FAILED'}")
+        if self.email_live_mode:
+            print("✅ Email service is in LIVE MODE - sending real emails")
+        else:
+            print("⚠️ Email service is in TEST MODE - not sending real emails")
+        
+        # 6. Database Operations
+        print("\n" + "=" * 50)
+        print("6. Database Operations")
+        print("=" * 50)
+        
+        # Test user management
+        user_management_success = False
+        if self.test_create_user():
+            print("✅ User creation successful")
+            if self.test_get_user():
+                print("✅ User retrieval successful")
+                if self.test_update_user():
+                    print("✅ User update successful")
+                    user_management_success = True
+        
+        # Test recipe saving and retrieval
+        recipe_storage_success = False
+        if hasattr(self, 'recipe_id') and self.recipe_id and self.user_id:
+            # Test getting recipe by ID
+            get_recipe_success, _ = self.run_test(
+                "Get Recipe by ID",
+                "GET",
+                f"recipes/{self.recipe_id}",
+                200
+            )
+            
+            if get_recipe_success:
+                print("✅ Recipe retrieval by ID successful")
+                
+                # Test getting user recipes
+                get_user_recipes_success, _ = self.run_test(
+                    "Get User Recipes",
+                    "GET",
+                    f"users/{self.user_id}/recipes",
+                    200
+                )
+                
+                if get_user_recipes_success:
+                    print("✅ User recipes retrieval successful")
+                    recipe_storage_success = True
+        
+        deployment_tests["Database Operations"] = user_management_success and recipe_storage_success
+        
+        print(f"\nDatabase Operations: {'✅ PASSED' if deployment_tests['Database Operations'] else '❌ FAILED'}")
+        
+        # 7. Error Handling
+        print("\n" + "=" * 50)
+        print("7. Error Handling")
+        print("=" * 50)
+        
+        # Test various error scenarios
+        error_handling_tests = []
+        
+        # Test 1: Invalid verification code
+        invalid_verify_data = {
+            "email": f"error_test_{uuid.uuid4()}@example.com",
+            "code": "999999"  # Invalid code
+        }
+        
+        invalid_verify_success, invalid_verify_response = self.run_test(
+            "Invalid Verification Code Error Handling",
+            "POST",
+            "auth/verify",
+            400,  # Expect 400 Bad Request
+            data=invalid_verify_data
+        )
+        
+        error_handling_tests.append(invalid_verify_success)
+        
+        # Test 2: Invalid login credentials
+        invalid_login_data = {
+            "email": f"nonexistent_{uuid.uuid4()}@example.com",
+            "password": "InvalidPassword123"
+        }
+        
+        invalid_login_success, invalid_login_response = self.run_test(
+            "Invalid Login Credentials Error Handling",
+            "POST",
+            "auth/login",
+            401,  # Expect 401 Unauthorized
+            data=invalid_login_data
+        )
+        
+        error_handling_tests.append(invalid_login_success)
+        
+        # Test 3: Short password validation
+        short_password_data = {
+            "first_name": "Error",
+            "last_name": "Test",
+            "email": f"error_test_{uuid.uuid4()}@example.com",
+            "password": "short",  # Too short
+            "dietary_preferences": [],
+            "allergies": [],
+            "favorite_cuisines": []
+        }
+        
+        short_password_success, short_password_response = self.run_test(
+            "Short Password Validation Error Handling",
+            "POST",
+            "auth/register",
+            400,  # Expect 400 Bad Request
+            data=short_password_data
+        )
+        
+        error_handling_tests.append(short_password_success)
+        
+        # Mark Error Handling as passed if all tests succeeded
+        deployment_tests["Error Handling"] = all(error_handling_tests)
+        
+        print(f"\nError Handling: {'✅ PASSED' if deployment_tests['Error Handling'] else '❌ FAILED'}")
+        
+        # Final Deployment Readiness Assessment
+        print("\n" + "=" * 80)
+        print("🚀 DEPLOYMENT READINESS ASSESSMENT 🚀")
+        print("=" * 80)
+        
+        for test, result in deployment_tests.items():
+            print(f"{test}: {'✅ PASSED' if result else '❌ FAILED'}")
+        
+        overall_readiness = all(deployment_tests.values())
+        critical_readiness = all([
+            deployment_tests["Core API Health"],
+            deployment_tests["Authentication System"],
+            deployment_tests["Recipe Generation"]
+        ])
+        
+        print("\n" + "=" * 50)
+        if overall_readiness:
+            print("✅ OVERALL ASSESSMENT: READY FOR DEPLOYMENT")
+            print("All systems are functioning correctly.")
+        elif critical_readiness:
+            print("⚠️ OVERALL ASSESSMENT: PARTIALLY READY FOR DEPLOYMENT")
+            print("Critical systems are working, but some non-critical systems have issues.")
+        else:
+            print("❌ OVERALL ASSESSMENT: NOT READY FOR DEPLOYMENT")
+            print("Critical systems have issues that need to be addressed before deployment.")
+        
+        print("=" * 50)
+        
+        # Return overall readiness status
+        return overall_readiness
 
 def main():
     print("=" * 50)
