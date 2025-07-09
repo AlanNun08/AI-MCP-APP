@@ -324,10 +324,6 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Additional UI Enhancement Testing"
-    - "Improved Item Display with Enhanced Visuals"
-    - "Enhanced Total Price Calculation with Average Pricing"
-    - "Better URL Visibility and Copy Functionality"
     - "Mobile Responsive Design Verification"
   stuck_tasks: []
   test_all: true
