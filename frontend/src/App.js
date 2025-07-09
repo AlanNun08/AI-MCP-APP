@@ -1209,6 +1209,8 @@ function App() {
   // Recipe Detail Screen Component
   const RecipeDetailScreen = ({ recipe, showBackButton = false }) => {
     const [generatingCart, setGeneratingCart] = useState(false);
+    const [walmartUrl, setWalmartUrl] = useState(null);
+    const [cartProducts, setCartProducts] = useState([]);
 
     const generateGroceryCart = async () => {
       if (!recipe) return;
@@ -1218,23 +1220,35 @@ function App() {
         const response = await axios.post(`${API}/api/grocery/cart-options?recipe_id=${recipe.id}&user_id=${user.id}`);
         
         if (response.data && response.data.ingredient_options) {
-          // For demo, create a Walmart URL
-          const productIds = response.data.ingredient_options
+          // Extract products with IDs from the response
+          const products = response.data.ingredient_options
             .flatMap(ing => ing.options || [])
-            .map(opt => opt.product_id)
-            .slice(0, 5); // Limit to first 5 products
+            .filter(opt => opt.product_id)
+            .slice(0, 10); // Limit to first 10 products
           
-          const walmartUrl = `https://www.walmart.com/cart?items=${productIds.join(',')}`;
+          const productIds = products.map(opt => opt.product_id);
           
-          // Open Walmart in new tab
-          window.open(walmartUrl, '_blank');
-          showNotification('🛒 Walmart cart opened! Happy shopping!', 'success');
+          // Create Walmart URL with product IDs
+          const generatedUrl = `https://www.walmart.com/cart?items=${productIds.join(',')}`;
+          
+          setWalmartUrl(generatedUrl);
+          setCartProducts(products);
+          showNotification('🛒 Walmart cart URL generated! Copy the link below.', 'success');
         }
       } catch (error) {
         console.error('Cart generation failed:', error);
         showNotification('❌ Failed to generate cart. Please try again.', 'error');
       } finally {
         setGeneratingCart(false);
+      }
+    };
+
+    const copyUrlToClipboard = async () => {
+      try {
+        await navigator.clipboard.writeText(walmartUrl);
+        showNotification('📋 URL copied to clipboard!', 'success');
+      } catch (error) {
+        showNotification('📋 Please manually copy the URL below.', 'info');
       }
     };
 
