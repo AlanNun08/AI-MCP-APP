@@ -989,7 +989,12 @@ async def create_custom_cart(cart_data: Dict[str, Any]):
         
         # Save to database
         cart_dict = cart.dict()
-        await db.grocery_carts.insert_one(cart_dict)
+        result = await db.grocery_carts.insert_one(cart_dict)
+        
+        # Get the inserted document and return it
+        if result.inserted_id:
+            inserted_cart = await db.grocery_carts.find_one({"_id": result.inserted_id})
+            return mongo_to_dict(inserted_cart)
         
         return cart_dict
         
