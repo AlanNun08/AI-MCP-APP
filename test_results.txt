@@ -4,9 +4,7 @@ AI Recipe & Grocery App - Backend API Testing
 Using backend URL from frontend/.env: https://3de015a9-d2f3-4c69-92f0-7a535d17381f.preview.emergentagent.com
 
 🔍 Testing API Root...
-2025-07-09 17:43:05,975 - __main__ - INFO - Testing API Root - GET https://3de015a9-d2f3-4c69-92f0-7a535d17381f.preview.emergentagent.com/api/
-⏱️ Request completed in 0.13 seconds
-2025-07-09 17:43:06,108 - __main__ - INFO - Request completed in 0.13 seconds
+⏱️ Request completed in 0.09 seconds
 ✅ Passed - Status: 200
 
 ==================================================
@@ -16,9 +14,7 @@ Note: Login test may fail if we don't have the correct password for the test use
 This won't prevent other tests from running.
 
 🔍 Testing Login with Test User...
-2025-07-09 17:43:06,109 - __main__ - INFO - Testing Login with Test User - POST https://3de015a9-d2f3-4c69-92f0-7a535d17381f.preview.emergentagent.com/api/auth/login
-⏱️ Request completed in 0.76 seconds
-2025-07-09 17:43:06,870 - __main__ - INFO - Request completed in 0.76 seconds
+⏱️ Request completed in 0.46 seconds
 ❌ Failed - Expected 200, got 401
 Response: {'detail': 'Invalid email or password'}
 
@@ -28,13 +24,11 @@ Testing Recipe History Retrieval
 ❌ No user ID available for testing - trying with a test ID
 
 🔍 Testing Get User Recipes...
-2025-07-09 17:43:06,871 - __main__ - INFO - Testing Get User Recipes - GET https://3de015a9-d2f3-4c69-92f0-7a535d17381f.preview.emergentagent.com/api/users/test_user_id/recipes
-⏱️ Request completed in 0.05 seconds
-2025-07-09 17:43:06,922 - __main__ - INFO - Request completed in 0.05 seconds
+⏱️ Request completed in 0.04 seconds
 ✅ Passed - Status: 200
-✅ Successfully retrieved 1 recipes for user
-Recipe titles: ['Garlic Tomato Pasta']
-Using recipe ID: 051c0ac6-e9ef-44a5-b140-6edcd1f4ff46 for further testing
+✅ Successfully retrieved 3 recipes for user
+Recipe titles: ['Spaghetti Aglio e Pomodoro', 'Pasta Pomodoro', 'Garlic Tomato Pasta']
+Using recipe ID: 8e724c50-ca14-4511-8c79-607631b91ed7 for further testing
 
 ==================================================
 Testing Recipe Generation
@@ -42,45 +36,48 @@ Testing Recipe Generation
 Testing recipe generation with 60 second timeout...
 
 🔍 Testing Generate Recipe...
-2025-07-09 17:43:06,923 - __main__ - INFO - Testing Generate Recipe - POST https://3de015a9-d2f3-4c69-92f0-7a535d17381f.preview.emergentagent.com/api/recipes/generate
-⏱️ Request completed in 2.40 seconds
-2025-07-09 17:43:09,320 - __main__ - INFO - Request completed in 2.40 seconds
+⏱️ Request completed in 3.31 seconds
 ✅ Passed - Status: 200
-Generated recipe with ID: e59137a8-d130-4833-944a-8a58e5e6b540
+Generated recipe with ID: 2cc73f59-9f7e-48f8-8a9d-d6f34dc4a936
 
 ==================================================
 Testing Walmart Cart Options
 ==================================================
 
 🔍 Testing Cart Options Endpoint...
-2025-07-09 17:43:09,321 - __main__ - INFO - Testing Cart Options Endpoint - POST https://3de015a9-d2f3-4c69-92f0-7a535d17381f.preview.emergentagent.com/api/grocery/cart-options
-⏱️ Request completed in 0.04 seconds
-2025-07-09 17:43:09,362 - __main__ - INFO - Request completed in 0.04 seconds
+⏱️ Request completed in 0.07 seconds
 ✅ Passed - Status: 200
-Created grocery cart options with ID: 6e09b7d5-bd5a-4d51-a4bd-d6ca0d04df57
-Found 3 ingredients with options
+Created grocery cart options with ID: 05aacbbf-4f94-4ad1-b629-b044a7cd4a32
+Found 6 ingredients with options
   Ingredient 1: 200g - 3 product options
     ✅ Product 1: Barilla Pasta Penne 16oz - $1.99 (ID: 123456789)
     ✅ Product 2: Great Value Spaghetti 1lb - $1.28 (ID: 123456790)
     ✅ Product 3: Ronzoni Pasta Shells 12oz - $1.68 (ID: 123456791)
-  Ingredient 2: 4 - 3 product options
+  Ingredient 2: 4 - 2 product options
+    ✅ Product 1: Fresh Garlic Bulb 3oz - $0.98 (ID: 789123456)
+    ✅ Product 2: Minced Garlic Jar 8oz - $2.47 (ID: 789123457)
+  Ingredient 3: 2 - 2 product options
+    ✅ Product 1: Extra Virgin Olive Oil 16.9oz - $6.99 (ID: 321654987)
+    ✅ Product 2: Great Value Olive Oil 17oz - $4.97 (ID: 321654988)
+  Ingredient 4: 1 - 3 product options
     ✅ Product 1: Fresh Roma Tomatoes 2lb - $2.49 (ID: 987654321)
     ✅ Product 2: Canned Diced Tomatoes 14.5oz - $1.18 (ID: 987654322)
     ✅ Product 3: Cherry Tomatoes 1lb - $2.97 (ID: 987654323)
-  Ingredient 3: 2 - 2 product options
-    ✅ Product 1: Fresh Garlic Bulb 3oz - $0.98 (ID: 789123456)
-    ✅ Product 2: Minced Garlic Jar 8oz - $2.47 (ID: 789123457)
+  Ingredient 5: Salt - 2 product options
+    ✅ Product 1: Morton Salt 26oz - $1.24 (ID: 147258369)
+    ✅ Product 2: Black Pepper Ground 3oz - $2.68 (ID: 147258370)
+  Ingredient 6: Fresh - 2 product options
+    ✅ Product 1: Great Value Fresh Parsley For Garnish - $2.99 (ID: 999460577)
+    ✅ Product 2: Fresh Fresh Parsley For Garnish - $3.49 (ID: 888460577)
 
 ==================================================
 Testing Custom Cart Creation
 ==================================================
 
 🔍 Testing Create Custom Cart...
-2025-07-09 17:43:09,362 - __main__ - INFO - Testing Create Custom Cart - POST https://3de015a9-d2f3-4c69-92f0-7a535d17381f.preview.emergentagent.com/api/grocery/custom-cart
-⏱️ Request completed in 0.07 seconds
-2025-07-09 17:43:09,428 - __main__ - INFO - Request completed in 0.07 seconds
+⏱️ Request completed in 0.02 seconds
 ✅ Passed - Status: 200
-Created custom cart with ID: 2a046332-83e5-4659-9ffd-117560bc7bc3
+Created custom cart with ID: 6539ea3f-497c-446f-9df6-9c928a231b6a
 Cart contains 3 products
 Total price: $9.41 (Expected: $9.41)
 ✅ Total price calculated correctly
