@@ -1640,7 +1640,7 @@ function App() {
                     <div className="flex items-center space-x-1">
                       {cartItems.length > 0 && !loadingCart ? (
                         <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
-                          Demo Mode
+                          {Object.keys(productOptions).length > 0 ? 'Real Products' : 'Demo Mode'}
                         </span>
                       ) : (
                         <span className="text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded-full">
