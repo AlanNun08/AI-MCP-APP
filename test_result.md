@@ -243,9 +243,9 @@ frontend:
   
   - task: "User Registration & Authentication"
     implemented: true
-    working: true
+    working: false
     file: "App.js"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
     needs_retesting: false
     status_history:
@@ -258,6 +258,9 @@ frontend:
       - working: true
         agent: "testing"
         comment: "Tested the enhanced authentication system. Registration form works correctly with proper validation for required fields, email format, password length (minimum 6 characters), and password matching. The form successfully submits to the backend and redirects to the verification screen. The email verification screen displays correctly with the user's email address and a countdown timer. Successfully retrieved verification code from the debug endpoint and completed verification. After verification, user is correctly redirected to the dashboard with the verified badge. Password show/hide toggle functionality works correctly on both registration and login forms."
+      - working: false
+        agent: "testing"
+        comment: "Unable to successfully log in with multiple test accounts. Registration form works correctly and submits successfully, but the verification code retrieval endpoint returns 'Not Found'. Login attempts with known test accounts fail with 'AxiosError' in the console. This prevents testing of authenticated features like recipe generation, recipe history, and Walmart cart generation."
   
   - task: "Recipe Generation"
     implemented: true
