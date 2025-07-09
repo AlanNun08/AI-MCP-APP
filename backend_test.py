@@ -2101,6 +2101,13 @@ def main():
     
     tester = AIRecipeAppTester()
     
+    # Check if we're running in deployment readiness mode
+    import sys
+    if len(sys.argv) > 1 and sys.argv[1] == "--deployment-readiness":
+        # Run comprehensive deployment readiness test
+        deployment_ready = tester.test_deployment_readiness()
+        return 0 if deployment_ready else 1
+    
     # Test API root
     tester.test_api_root()
     
