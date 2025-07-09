@@ -1331,6 +1331,10 @@ function App() {
     };
 
     const confirmCart = () => {
+      console.log('🔍 confirmCart called');
+      console.log('🔍 cartItems:', cartItems);
+      console.log('🔍 cartItems.length:', cartItems.length);
+      
       // Generate the affiliate link with quantities
       const itemsWithQuantity = cartItems
         .filter(item => item.quantity > 0)
@@ -1340,10 +1344,18 @@ function App() {
         })
         .flat();
       
+      console.log('🔍 itemsWithQuantity:', itemsWithQuantity);
+      
       const affiliateUrl = `https://affil.walmart.com/cart/addToCart?items=${itemsWithQuantity.join(',')}`;
       
+      console.log('🔍 Affiliate URL:', affiliateUrl);
+      
       setFinalWalmartUrl(affiliateUrl);
+      console.log('🔍 setFinalWalmartUrl called with:', affiliateUrl);
+      
       setConfirmedCart(true);
+      console.log('🔍 Confirmed cart:', true);
+      
       showNotification('✅ Cart confirmed! Your affiliate link is ready.', 'success');
     };
 
