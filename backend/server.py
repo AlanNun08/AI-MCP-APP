@@ -860,7 +860,12 @@ Return ONLY a valid JSON object with this exact structure:
         
         # Save to database
         recipe_dict = recipe.dict()
-        await db.recipes.insert_one(recipe_dict)
+        result = await db.recipes.insert_one(recipe_dict)
+        
+        # Get the inserted document and return it
+        if result.inserted_id:
+            inserted_recipe = await db.recipes.find_one({"_id": result.inserted_id})
+            return mongo_to_dict(inserted_recipe)
         
         return recipe_dict
         
