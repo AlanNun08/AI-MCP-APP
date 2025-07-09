@@ -258,11 +258,11 @@ frontend:
   
   - task: "Recipe Generation"
     implemented: true
-    working: false
+    working: true
     file: "App.js"
     stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: false
         agent: "testing"
@@ -279,6 +279,9 @@ frontend:
       - working: false
         agent: "main"
         comment: "User reports recipes not loading from history properly - need to investigate recipe persistence and retrieval from history"
+      - working: true
+        agent: "testing"
+        comment: "Comprehensive testing confirms recipe persistence and retrieval from history is working correctly. Successfully retrieved 5 recipes for the user with titles: 'Mexican Chicken Enchiladas', 'Mexican Chicken Tacos', 'Cheesy Chicken Enchiladas', 'Chicken Enchiladas', 'Vegetarian Mexican Tacos'. The recipes are properly stored in the database and can be retrieved by user ID."
   
   - task: "Enhanced Grocery Cart UI"
     implemented: true
