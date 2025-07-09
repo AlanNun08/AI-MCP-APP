@@ -18,6 +18,103 @@ class IngredientParsingTester:
         self.tests_passed = 0
         self.user_id = "test_user_id"  # Using a test user ID
         self.recipe_id = None
+        
+    def test_cart_options_with_direct_ingredients(self):
+        """Test the cart-options endpoint directly with specific ingredients"""
+        # Create a test recipe with the specific ingredients
+        test_recipe = {
+            "id": "test_recipe_id",
+            "title": "Test Recipe with Specific Ingredients",
+            "description": "A test recipe to verify ingredient parsing",
+            "ingredients": [
+                "1 can chickpeas, drained and rinsed",
+                "1/2 cup BBQ sauce",
+                "1 cup cooked quinoa",
+                "1 cup mixed vegetables (bell peppers, zucchini, onions)",
+                "1 avocado, sliced",
+                "2 tbsp olive oil",
+                "Salt and pepper to taste"
+            ],
+            "instructions": ["Mix all ingredients together", "Serve and enjoy"],
+            "prep_time": 15,
+            "cook_time": 10,
+            "servings": 2,
+            "cuisine_type": "test",
+            "dietary_tags": ["vegetarian"],
+            "difficulty": "easy",
+            "user_id": self.user_id
+        }
+        
+        # First, try to save the test recipe
+        success, response = self.run_test(
+            "Create Test Recipe",
+            "POST",
+            "recipes/generate",
+            200,
+            data=test_recipe
+        )
+        
+        if success and 'id' in response:
+            self.recipe_id = response['id']
+            print(f"Created test recipe with ID: {self.recipe_id}")
+        else:
+            # If we can't save the recipe, we'll use a direct approach
+            print("Using direct ingredient testing approach...")
+            
+            # Test each ingredient individually
+            ingredients = test_recipe["ingredients"]
+            all_success = True
+            
+            print("\nTesting individual ingredients:")
+            for i, ingredient in enumerate(ingredients):
+                print(f"\n--- Testing ingredient {i+1}: '{ingredient}' ---")
+                
+                # Create a mock recipe with just this ingredient
+                mock_recipe = {
+                    "id": f"test_recipe_{i}",
+                    "title": f"Test Recipe {i}",
+                    "ingredients": [ingredient],
+                    "user_id": self.user_id
+                }
+                
+                # Mock the database call by directly calling the cart-options endpoint
+                # with our mock recipe data
+                success, ingredient_response = self.run_test(
+                    f"Parse Ingredient: '{ingredient}'",
+                    "POST",
+                    "grocery/cart-options",
+                    200,
+                    params={"recipe_id": mock_recipe["id"], "user_id": self.user_id},
+                    data=mock_recipe  # Pass the mock recipe as data
+                )
+                
+                if not success:
+                    all_success = False
+                    continue
+                
+                # Check if we got product options
+                if 'ingredient_options' in ingredient_response:
+                    for option in ingredient_response.get('ingredient_options', []):
+                        original = option.get('original_ingredient', '')
+                        cleaned = option.get('ingredient_name', '')
+                        print(f"  Original: '{original}'")
+                        print(f"  Cleaned: '{cleaned}'")
+                        
+                        if 'options' in option:
+                            product_count = len(option['options'])
+                            print(f"  Found {product_count} product options")
+                            
+                            if product_count > 0:
+                                print("  ✅ Product options found")
+                                for j, product in enumerate(option['options'][:2]):  # Show first 2 products
+                                    print(f"    Product {j+1}: {product.get('name', 'Unknown')} - ${product.get('price', 0):.2f}")
+                            else:
+                                print("  ❌ No product options found")
+                                all_success = False
+                
+            return all_success
+        
+        return False
 
     def run_test(self, name, method, endpoint, expected_status, data=None, params=None, timeout=30):
         """Run a single API test with configurable timeout"""
