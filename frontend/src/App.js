@@ -1563,25 +1563,28 @@ function App() {
                 
                 {/* Cart Header */}
                 <div className="text-center mb-6">
-                  <h3 className="text-2xl font-bold text-gray-800 mb-2">🛒 Shopping Cart</h3>
-                  <p className="text-sm text-gray-600">Ready to order from Walmart</p>
+                  <h3 className="text-2xl font-bold text-gray-800 mb-2">🛒 Selected Items</h3>
+                  <p className="text-sm text-gray-600">Your chosen products from Walmart</p>
                 </div>
 
-                {/* Cart Items */}
+                {/* Selected Products Summary */}
                 <div className="space-y-3 mb-6 max-h-64 overflow-y-auto">
                   {loadingCart ? (
                     <div className="text-center py-8">
                       <div className="w-8 h-8 border-3 border-green-500 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
-                      <p className="text-gray-600 text-sm">Loading Walmart products...</p>
+                      <p className="text-gray-600 text-sm">Loading products...</p>
                     </div>
                   ) : cartItems.length > 0 ? (
                     cartItems.map((item, index) => (
                       <div key={index} className="p-3 bg-gray-50 rounded-lg">
                         <div className="flex justify-between items-start mb-2">
-                          <h4 className="font-medium text-gray-800 text-sm leading-tight">{item.name}</h4>
+                          <div className="flex-1">
+                            <h4 className="font-medium text-gray-800 text-sm leading-tight mb-1">{item.name}</h4>
+                            <p className="text-xs text-gray-500">For: {item.ingredient_name}</p>
+                          </div>
                           <button
                             onClick={() => removeItem(index)}
-                            className="text-red-500 hover:text-red-700 text-xs"
+                            className="text-red-500 hover:text-red-700 text-xs ml-2"
                           >
                             ✕
                           </button>
@@ -1613,7 +1616,7 @@ function App() {
                     ))
                   ) : (
                     <div className="text-center py-8 text-gray-500">
-                      <p>No items in cart</p>
+                      <p>No items selected</p>
                     </div>
                   )}
                 </div>
