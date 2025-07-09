@@ -1,5 +1,5 @@
-// Service Worker for PWA functionality
-const CACHE_NAME = 'ai-chef-v5-ui-fix-2024';
+// Service Worker for PWA functionality with aggressive cache clearing
+const CACHE_NAME = 'ai-chef-v6-no-cache-2024';
 const urlsToCache = [
   '/',
   '/static/js/bundle.js',
@@ -7,40 +7,70 @@ const urlsToCache = [
   '/manifest.json'
 ];
 
-// Install event
+// Install event - clear all old caches immediately
 self.addEventListener('install', (event) => {
+  console.log('Installing new service worker...');
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => {
-        console.log('Opened cache');
-        return cache.addAll(urlsToCache);
-      })
-  );
-});
-
-// Fetch event
-self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request)
-      .then((response) => {
-        // Return cached version or fetch from network
-        return response || fetch(event.request);
-      })
-  );
-});
-
-// Activate event
-self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches.keys().then((cacheNames) => {
+    caches.keys().then(cacheNames => {
       return Promise.all(
-        cacheNames.map((cacheName) => {
+        cacheNames.map(cacheName => {
+          console.log('Deleting old cache:', cacheName);
+          return caches.delete(cacheName);
+        })
+      );
+    }).then(() => {
+      console.log('All old caches cleared');
+      self.skipWaiting();
+    })
+  );
+});
+
+// Activate event - take control immediately
+self.addEventListener('activate', (event) => {
+  console.log('Activating new service worker...');
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cacheName => {
           if (cacheName !== CACHE_NAME) {
+            console.log('Deleting cache:', cacheName);
             return caches.delete(cacheName);
           }
         })
       );
+    }).then(() => {
+      console.log('Service worker activated');
+      return self.clients.claim();
     })
+  );
+});
+
+// Fetch event - always fetch from network for HTML and JS files
+self.addEventListener('fetch', (event) => {
+  const url = new URL(event.request.url);
+  
+  // Always fetch from network for HTML, JS, and CSS files
+  if (url.pathname.endsWith('.html') || 
+      url.pathname.endsWith('.js') || 
+      url.pathname.endsWith('.css') ||
+      url.pathname === '/') {
+    event.respondWith(
+      fetch(event.request.clone(), {
+        cache: 'no-store'
+      }).catch(() => {
+        // Fallback to cache only if network fails
+        return caches.match(event.request);
+      })
+    );
+    return;
+  }
+  
+  // For other resources, use cache-first strategy
+  event.respondWith(
+    caches.match(event.request)
+      .then((response) => {
+        return response || fetch(event.request);
+      })
   );
 });
 
