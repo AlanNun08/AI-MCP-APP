@@ -1300,8 +1300,8 @@ function App() {
     }
 
     return (
-      <div className="min-h-screen bg-gray-50 p-4">
-        <div className="max-w-2xl mx-auto">
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 p-4">
+        <div className="max-w-6xl mx-auto">
           {showBackButton && (
             <button
               onClick={() => setCurrentScreen('dashboard')}
