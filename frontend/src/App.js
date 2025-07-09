@@ -1446,156 +1446,137 @@ function App() {
                 )}
               </button>
               
-              {!walmartUrl && (
+              {!showInteractiveCart && !confirmedCart && (
                 <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-xl">
                   <div className="flex items-center justify-center space-x-2">
                     <span className="text-blue-600">💡</span>
                     <p className="text-sm text-blue-700 font-medium">
-                      Click above to automatically find all ingredients on Walmart with competitive prices!
+                      Click above to build your interactive Walmart shopping cart!
                     </p>
                   </div>
                 </div>
               )}
 
-              {/* Success Message */}
-              {walmartUrl && (
-                <div className="mt-4 p-4 bg-green-50 border-2 border-green-200 rounded-xl">
-                  <div className="flex items-center justify-center space-x-2 mb-2">
-                    <span className="text-green-600 text-xl">✅</span>
-                    <p className="text-green-700 font-bold">Cart Generated Successfully!</p>
+              {/* Interactive Cart */}
+              {showInteractiveCart && !confirmedCart && (
+                <div className="mt-6 p-6 bg-white border-2 border-blue-200 rounded-2xl shadow-lg">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-xl font-bold text-gray-800">🛒 Interactive Shopping Cart</h3>
+                    <button
+                      onClick={resetCart}
+                      className="text-gray-500 hover:text-gray-700 text-sm"
+                    >
+                      ✕ Reset
+                    </button>
                   </div>
-                  <p className="text-sm text-green-600 text-center">
-                    Your personalized shopping cart is ready below. All ingredients have been found and priced for you!
-                  </p>
+                  
+                  <div className="space-y-3 mb-6 max-h-96 overflow-y-auto">
+                    {cartItems.map((item, index) => (
+                      <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-200">
+                        <div className="flex-1">
+                          <h4 className="font-medium text-gray-800 text-sm">{item.name}</h4>
+                          <p className="text-xs text-gray-500 mt-1">ID: {item.product_id}</p>
+                        </div>
+                        
+                        <div className="flex items-center space-x-4">
+                          <div className="text-lg font-bold text-green-600">
+                            ${item.price.toFixed(2)}
+                          </div>
+                          
+                          <div className="flex items-center space-x-2">
+                            <button
+                              onClick={() => updateQuantity(index, item.quantity - 1)}
+                              disabled={item.quantity <= 1}
+                              className="w-8 h-8 bg-red-500 text-white rounded-full hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center text-sm font-bold"
+                            >
+                              -
+                            </button>
+                            
+                            <span className="w-8 text-center font-bold text-gray-800">
+                              {item.quantity}
+                            </span>
+                            
+                            <button
+                              onClick={() => updateQuantity(index, item.quantity + 1)}
+                              className="w-8 h-8 bg-green-500 text-white rounded-full hover:bg-green-600 flex items-center justify-center text-sm font-bold"
+                            >
+                              +
+                            </button>
+                          </div>
+                          
+                          <button
+                            onClick={() => removeItem(index)}
+                            className="text-red-500 hover:text-red-700 text-sm"
+                          >
+                            🗑️
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  <div className="border-t pt-4">
+                    <div className="flex justify-between items-center mb-4">
+                      <span className="text-lg font-bold text-gray-800">Total:</span>
+                      <span className="text-2xl font-bold text-green-600">
+                        ${calculateTotal().toFixed(2)}
+                      </span>
+                    </div>
+                    
+                    <button
+                      onClick={confirmCart}
+                      disabled={cartItems.length === 0}
+                      className="w-full bg-gradient-to-r from-green-500 to-blue-500 text-white font-bold py-3 px-6 rounded-xl hover:from-green-600 hover:to-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 transition-all duration-200"
+                    >
+                      ✅ Confirm Cart & Generate Affiliate Link
+                    </button>
+                  </div>
                 </div>
               )}
 
-              {/* Walmart URL Display */}
-              {walmartUrl && (
-                <div className="mt-6 p-6 bg-gradient-to-r from-blue-50 to-purple-50 border-2 border-blue-200 rounded-2xl shadow-lg">
+              {/* Confirmed Cart with Affiliate Link */}
+              {confirmedCart && finalWalmartUrl && (
+                <div className="mt-6 p-6 bg-gradient-to-r from-green-50 to-blue-50 border-2 border-green-200 rounded-2xl shadow-lg">
                   <div className="flex items-center justify-center mb-4">
-                    <span className="text-blue-700 font-bold text-xl">🛒 Your Walmart Cart is Ready!</span>
+                    <span className="text-green-700 font-bold text-xl">🎉 Cart Confirmed!</span>
                   </div>
                   
-                  {cartProducts.length > 0 && (
-                    <div className="mb-6">
-                      <h4 className="text-lg font-semibold text-gray-800 mb-4 text-center">
-                        🛍️ Cart Items ({cartProducts.length})
-                      </h4>
-                      <div className="bg-white rounded-xl p-4 shadow-sm max-h-96 overflow-y-auto">
-                        <div className="space-y-3">
-                          {cartProducts.slice(0, 8).map((product, index) => (
-                            <div key={index} className="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-green-50 rounded-xl border border-gray-200 hover:shadow-md transition-shadow">
-                              <div className="flex items-center space-x-4">
-                                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                                  <span className="text-green-600 font-bold text-sm">{index + 1}</span>
-                                </div>
-                                <div className="flex-1">
-                                  <span className="font-semibold text-gray-800 text-sm leading-tight block">
-                                    {product.name || `Product ${product.product_id}`}
-                                  </span>
-                                  <span className="text-xs text-gray-500 mt-1 block">
-                                    🏷️ ID: {product.product_id}
-                                  </span>
-                                </div>
-                              </div>
-                              <div className="text-right">
-                                <div className="bg-green-100 px-3 py-1 rounded-full">
-                                  <span className="text-xl font-bold text-green-700">
-                                    ${product.price || 'TBD'}
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                          {cartProducts.length > 8 && (
-                            <div className="text-center text-gray-500 py-3 bg-gray-100 rounded-xl">
-                              <span className="font-medium">... and {cartProducts.length - 8} more items</span>
-                              <p className="text-xs mt-1">All items will be added to your cart</p>
-                            </div>
-                          )}
-                        </div>
-                        
-                        {/* Enhanced Total Price Section */}
-                        {cartProducts.some(p => p.price) && (
-                          <div className="mt-6 p-4 bg-gradient-to-r from-green-50 to-blue-50 border-2 border-green-200 rounded-xl">
-                            <div className="flex justify-between items-center mb-2">
-                              <span className="text-lg font-bold text-gray-800">💰 Estimated Total:</span>
-                              <span className="text-2xl font-bold text-green-600">
-                                ${cartProducts.reduce((total, product) => total + (product.price || 0), 0).toFixed(2)}
-                              </span>
-                            </div>
-                            <div className="text-center">
-                              <p className="text-sm text-gray-600 mb-1">
-                                📊 Average price per item: ${(cartProducts.reduce((total, product) => total + (product.price || 0), 0) / cartProducts.filter(p => p.price).length).toFixed(2)}
-                              </p>
-                              <p className="text-xs text-gray-500">
-                                * Prices are estimates and may vary at checkout
-                              </p>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Enhanced URL Display with Visual Emphasis */}
                   <div className="mb-4">
-                    <div className="bg-gradient-to-r from-yellow-100 to-orange-100 border-3 border-yellow-300 rounded-2xl p-6 shadow-lg">
-                      <div className="flex items-center justify-center mb-4">
-                        <span className="text-yellow-800 font-bold text-xl">🔗 Copy & Paste This URL</span>
-                      </div>
-                      <div className="flex space-x-3">
-                        <input
-                          type="text"
-                          value={walmartUrl}
-                          readOnly
-                          className="flex-1 p-4 border-2 border-yellow-400 rounded-xl bg-white text-sm font-mono shadow-inner focus:outline-none focus:ring-2 focus:ring-yellow-500 select-all"
-                          onClick={(e) => e.target.select()}
-                          style={{ userSelect: 'all' }}
-                        />
+                    <h4 className="text-lg font-semibold text-gray-800 mb-3 text-center">
+                      📋 Your Walmart Affiliate Link
+                    </h4>
+                    <div className="bg-yellow-50 border-2 border-yellow-300 rounded-xl p-4">
+                      <textarea
+                        value={finalWalmartUrl}
+                        readOnly
+                        className="w-full h-24 p-3 border border-yellow-400 rounded-lg bg-white text-sm font-mono resize-none"
+                        onClick={(e) => e.target.select()}
+                      />
+                      <div className="flex space-x-2 mt-3">
                         <button
                           onClick={copyUrlToClipboard}
-                          className="px-6 py-4 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-xl hover:from-yellow-600 hover:to-orange-600 transition-all duration-200 text-sm font-bold shadow-lg transform hover:scale-105 active:scale-95 flex items-center space-x-2"
+                          className="flex-1 bg-gradient-to-r from-yellow-500 to-orange-500 text-white font-bold py-2 px-4 rounded-lg hover:from-yellow-600 hover:to-orange-600 transition-all duration-200"
                         >
-                          <span>📋</span>
-                          <span>Copy</span>
+                          📋 Copy Link
                         </button>
-                      </div>
-                      <div className="mt-4 text-center">
-                        <p className="text-yellow-700 font-medium">
-                          🚀 This link will instantly add all items to your Walmart cart!
-                        </p>
+                        <button
+                          onClick={resetCart}
+                          className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-all duration-200"
+                        >
+                          🔄 New Cart
+                        </button>
                       </div>
                     </div>
                   </div>
-
-                  {/* Enhanced Instructions with Visual Steps */}
-                  <div className="bg-gradient-to-r from-blue-100 to-purple-100 border-2 border-blue-200 rounded-2xl p-6">
-                    <h5 className="font-bold text-blue-800 mb-4 text-center text-lg">📋 How to Complete Your Order</h5>
-                    <div className="space-y-3">
-                      <div className="flex items-start space-x-3">
-                        <div className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold text-sm">1</div>
-                        <p className="text-blue-700 font-medium">Click the "📋 Copy" button above</p>
-                      </div>
-                      <div className="flex items-start space-x-3">
-                        <div className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold text-sm">2</div>
-                        <p className="text-blue-700 font-medium">Open a new browser tab (Ctrl/Cmd + T)</p>
-                      </div>
-                      <div className="flex items-start space-x-3">
-                        <div className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold text-sm">3</div>
-                        <p className="text-blue-700 font-medium">Paste the URL in the address bar (Ctrl/Cmd + V)</p>
-                      </div>
-                      <div className="flex items-start space-x-3">
-                        <div className="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center font-bold text-sm">✓</div>
-                        <p className="text-green-700 font-bold">Items will be automatically added to your Walmart cart!</p>
-                      </div>
-                    </div>
-                    <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-xl">
-                      <p className="text-sm text-yellow-800 text-center">
-                        💡 <strong>Pro Tip:</strong> Make sure you're logged into your Walmart account for the best experience!
-                      </p>
-                    </div>
+                  
+                  <div className="text-center">
+                    <p className="text-sm text-gray-600 mb-2">
+                      Total Items: {cartItems.reduce((total, item) => total + item.quantity, 0)} | 
+                      Total Cost: ${calculateTotal().toFixed(2)}
+                    </p>
+                    <p className="text-xs text-green-600">
+                      ✅ This affiliate link includes all your selected quantities
+                    </p>
                   </div>
                 </div>
               )}
