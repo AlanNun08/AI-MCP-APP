@@ -149,6 +149,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "Tested the updated Walmart API integration with the new credentials and signature method. Created a test recipe with common ingredients (pasta, tomatoes, garlic) and successfully called the /api/grocery/cart-options endpoint. Verified that we are now getting real Walmart product IDs (found 15 real product IDs and 0 mock product IDs) instead of mock data. The signature generation is working correctly as evidenced by successful API calls to the Walmart API. The backend logs show successful Walmart API calls with proper response data. The custom cart endpoint correctly generates a Walmart affiliate URL with all product IDs and calculates the total price accurately. The Walmart API integration is now fully functional with real product data."
+      - working: true
+        agent: "testing"
+        comment: "Tested the improved ingredient parsing logic with the specific ingredients mentioned by the user: '1 can chickpeas, drained and rinsed', '1/2 cup BBQ sauce', '1 cup cooked quinoa', '1 cup mixed vegetables (bell peppers, zucchini, onions)', '1 avocado, sliced', '2 tbsp olive oil', and 'Salt and pepper to taste'. The _extract_core_ingredient function correctly extracts the core ingredients: 'chickpeas', 'barbecue sauce', 'quinoa', 'frozen mixed vegetables', 'avocado', 'olive oil', and 'salt pepper'. The function successfully handles all test cases, removing quantities, measurements, and preparation instructions to extract the core ingredient names. This improved parsing logic ensures that the Walmart API can find relevant product options for each ingredient, even when they are specified with detailed preparation instructions."
   
   - task: "User Management & Recipe Saving"
     implemented: true
