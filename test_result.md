@@ -348,7 +348,10 @@ test_plan:
     - "Walmart API Integration"
     - "Recipe Generation"
     - "Recipe History Loading"
+    - "User Registration & Authentication"
   stuck_tasks:
+    - "Walmart API Integration"
+    - "User Registration & Authentication"
   test_all: false
   test_priority: "stuck_first"
 
