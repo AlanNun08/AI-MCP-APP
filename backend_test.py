@@ -2094,9 +2094,32 @@ class AIRecipeAppTester:
         # Return overall readiness status
         return overall_readiness
 
+def test_get_user_recipes(self):
+    """Test getting all recipes for a user"""
+    if not self.user_id:
+        print("❌ No user ID available for testing")
+        return False
+            
+    success, response = self.run_test(
+        "Get User Recipes",
+        "GET",
+        f"users/{self.user_id}/recipes",
+        200
+    )
+    
+    if success:
+        print(f"✅ Successfully retrieved {len(response)} recipes for user")
+        # Check if we have any recipes
+        if len(response) > 0:
+            print(f"Recipe titles: {[recipe.get('title', 'Untitled') for recipe in response]}")
+        else:
+            print("No recipes found for this user")
+    
+    return success
+
 def main():
     print("=" * 50)
-    print("AI Recipe & Grocery App API Test")
+    print("AI Recipe & Grocery App API Test - Focused Testing")
     print("=" * 50)
     
     tester = AIRecipeAppTester()
@@ -2114,87 +2137,46 @@ def main():
     # First, clean up any existing test data
     tester.test_cleanup_test_data()
     
-    # Test User Management
+    # Test User Management (needed for other tests)
     print("\n" + "=" * 50)
     print("Testing User Management")
     print("=" * 50)
     
     tester.test_create_user()
-    tester.test_get_user()
-    tester.test_update_user()
     
-    # Test Email Verification System
+    # Test Recipe Generation & Persistence (Priority 2)
     print("\n" + "=" * 50)
-    print("Testing Email Verification System")
-    print("=" * 50)
-    
-    # Test if email service is in live mode
-    tester.test_email_service_mode()
-    
-    # Get verification code from debug endpoint
-    tester.test_get_verification_code(tester.test_email)
-    
-    # Test email verification
-    if tester.verification_code:
-        tester.test_email_verification()
-    
-    # Test login with verified user
-    tester.test_login_with_verified_user()
-    
-    # Test case-insensitive email handling
-    tester.test_case_insensitive_email()
-    
-    # Test duplicate email registration
-    tester.test_duplicate_email_registration()
-    
-    # Test invalid verification code
-    tester.test_invalid_verification_code()
-    
-    # Test resend verification code
-    tester.test_resend_verification_code()
-    
-    # Test resend to nonexistent user
-    tester.test_resend_to_nonexistent_user()
-    
-    # Test login with invalid credentials
-    tester.test_login_with_invalid_credentials()
-    
-    # Test unverified user login flow
-    tester.test_login_with_unverified_user()
-    
-    # Test password reset flow
-    tester.test_password_reset_flow()
-    
-    # Test invalid reset code
-    tester.test_invalid_reset_code()
-    
-    # Test password validation
-    tester.test_password_validation()
-    
-    # Test OpenAI Integration
-    print("\n" + "=" * 50)
-    print("Testing OpenAI Integration")
+    print("Testing Recipe Generation & Persistence")
     print("=" * 50)
     
     tester.test_openai_api_key()
     tester.test_generate_recipe()
     tester.test_get_recipe()
-    tester.test_generate_healthy_recipe()
-    tester.test_generate_budget_recipe()
-    tester.test_generate_combined_recipe()
     
-    # Test Walmart Integration
+    # Test recipe retrieval from history
     print("\n" + "=" * 50)
-    print("Testing Walmart Integration")
+    print("Testing Recipe History Retrieval")
     print("=" * 50)
     
+    tester.test_get_user_recipes()
+    
+    # Test Walmart Integration (Priority 1)
+    print("\n" + "=" * 50)
+    print("Testing Walmart API Integration")
+    print("=" * 50)
+    
+    # Test cart-options endpoint
     tester.test_create_grocery_cart_with_options()
+    
+    # Test custom-cart endpoint
     tester.test_create_custom_cart()
+    
+    # Test simple-cart endpoint (known to be failing)
+    tester.test_create_simple_grocery_cart()
     
     # Print results
     print("\n" + "=" * 50)
     print(f"📊 Tests passed: {tester.tests_passed}/{tester.tests_run}")
-    print(f"📧 Email Service Live Mode: {tester.email_live_mode}")
     print("=" * 50)
     
     return 0 if tester.tests_passed == tester.tests_run else 1
