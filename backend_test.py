@@ -2131,43 +2131,63 @@ def test_get_user_recipes(self):
     return success
 
 def main():
-    print("=" * 50)
-    print("AI Recipe & Grocery App API Test - Focused Testing")
-    print("=" * 50)
+    print("=" * 80)
+    print("AI Recipe & Grocery App - Enhanced Interactive Walmart Cart Testing")
+    print("=" * 80)
     
     tester = AIRecipeAppTester()
     
     # Test API root
     tester.test_api_root()
     
-    # First, clean up any existing test data
-    tester.test_cleanup_test_data()
-    
-    # Test Recipe History Retrieval using an existing user
+    # Test user creation and verification
     print("\n" + "=" * 50)
-    print("Testing Recipe History Retrieval with Existing User")
+    print("Testing User Creation and Verification")
     print("=" * 50)
+    user_created = tester.test_create_user()
     
-    # Use a known working user ID from previous tests
-    tester.user_id = "f51f7a0b-c0f6-481c-addb-8d388449ef55"
+    if not user_created:
+        print("❌ Failed to create and verify user - cannot continue testing")
+        return 1
+    
+    # Test recipe generation
+    print("\n" + "=" * 50)
+    print("Testing Recipe Generation")
+    print("=" * 50)
+    recipe_generated = tester.test_generate_recipe()
+    
+    if not recipe_generated:
+        print("❌ Failed to generate recipe - cannot continue testing")
+        return 1
+    
+    # Test getting recipe
+    tester.test_get_recipe()
+    
+    # Test cart options endpoint
+    print("\n" + "=" * 50)
+    print("Testing Cart Options Endpoint")
+    print("=" * 50)
+    tester.test_cart_options_endpoint()
+    
+    # Test error handling
+    print("\n" + "=" * 50)
+    print("Testing Error Handling")
+    print("=" * 50)
+    tester.test_cart_options_missing_recipe_id()
+    tester.test_cart_options_invalid_user_id()
+    
+    # Test custom cart creation
+    print("\n" + "=" * 50)
+    print("Testing Custom Cart Creation")
+    print("=" * 50)
+    tester.test_custom_cart_creation()
+    tester.test_custom_cart_missing_fields()
+    
+    # Test recipe retrieval
+    print("\n" + "=" * 50)
+    print("Testing Recipe Retrieval")
+    print("=" * 50)
     tester.test_get_user_recipes()
-    
-    # Test Walmart Integration with existing recipe
-    print("\n" + "=" * 50)
-    print("Testing Walmart API Integration with Existing Recipe")
-    print("=" * 50)
-    
-    # Use a known working recipe ID from previous tests
-    tester.recipe_id = "45f7532d-91cf-40c5-9b3d-b1a216dda265"
-    
-    # Test cart-options endpoint
-    tester.test_create_grocery_cart_with_options()
-    
-    # Test custom-cart endpoint
-    tester.test_create_custom_cart()
-    
-    # Test simple-cart endpoint (known to be failing)
-    tester.test_create_simple_grocery_cart()
     
     # Print results
     print("\n" + "=" * 50)
