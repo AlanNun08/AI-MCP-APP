@@ -1208,109 +1208,45 @@ function App() {
 
   // Recipe Detail Screen Component
   const RecipeDetailScreen = ({ recipe, showBackButton = false }) => {
-    const [generatingCart, setGeneratingCart] = useState(false);
     const [cartItems, setCartItems] = useState([]);
-    const [showInteractiveCart, setShowInteractiveCart] = useState(false);
     const [confirmedCart, setConfirmedCart] = useState(false);
     const [finalWalmartUrl, setFinalWalmartUrl] = useState(null);
 
-    const generateGroceryCart = async () => {
-      console.log('🔍 generateGroceryCart called');
-      console.log('🔍 Recipe:', recipe);
-      console.log('🔍 User:', user);
-      
-      if (!recipe) {
-        console.log('❌ No recipe found');
-        showNotification('❌ No recipe found. Please generate a recipe first.', 'error');
-        return;
-      }
-      
-      if (!user?.id) {
-        console.log('❌ No user ID found');
-        showNotification('❌ User not found. Please login again.', 'error');
-        return;
-      }
-      
-      console.log('🔍 Starting cart generation...');
-      setGeneratingCart(true);
-      
-      try {
-        console.log('🔍 Making API call to:', `${API}/api/grocery/cart-options?recipe_id=${recipe.id}&user_id=${user.id}`);
-        const response = await axios.post(`${API}/api/grocery/cart-options?recipe_id=${recipe.id}&user_id=${user.id}`);
-        console.log('🔍 API Response:', response.data);
-        
-        if (response.data && response.data.ingredient_options) {
-          console.log('🔍 Found ingredient_options in response');
-          // Extract products with IDs from the response
-          const products = response.data.ingredient_options
-            .flatMap(ing => ing.options || [])
-            .filter(opt => opt.product_id)
-            .slice(0, 12); // Limit to 12 products for better UX
-          
-          console.log('🔍 Extracted products:', products.length);
-          
-          // If no products found, create a demo cart for demonstration
-          if (products.length === 0) {
-            console.log('🔍 No products found, using demo cart');
-            const demoProducts = [
-              { product_id: "556677889", name: "Great Value Chicken Breast 2.5lb", price: 8.99, quantity: 1 },
-              { product_id: "456789123", name: "Great Value Shredded Cheddar Cheese 8oz", price: 2.84, quantity: 1 },
-              { product_id: "445566778", name: "Mission Corn Tortillas 30ct", price: 2.98, quantity: 1 },
-              { product_id: "334455667", name: "Old El Paso Enchilada Sauce 10oz", price: 1.18, quantity: 1 },
-              { product_id: "789123456", name: "Fresh Garlic Bulb 3oz", price: 0.98, quantity: 1 },
-              { product_id: "321654987", name: "Extra Virgin Olive Oil 16.9oz", price: 6.99, quantity: 1 }
-            ];
-            setCartItems(demoProducts);
-            console.log('🔍 Demo cart items set:', demoProducts.length);
-          } else {
-            // Add quantity property to each product
-            const productsWithQuantity = products.map(product => ({
-              ...product,
-              quantity: 1
-            }));
-            setCartItems(productsWithQuantity);
-            console.log('🔍 Real cart items set:', productsWithQuantity.length);
-          }
-          
-          console.log('🔍 Setting showInteractiveCart to true');
-          setShowInteractiveCart(true);
-          setConfirmedCart(false);
-          setFinalWalmartUrl(null);
-          showNotification('🛒 Interactive cart loaded! Adjust quantities and confirm.', 'success');
-        } else {
-          console.log('🔍 No ingredient_options found, using demo cart');
-          // Create demo cart when API doesn't return expected data
-          const demoProducts = [
-            { product_id: "556677889", name: "Great Value Chicken Breast 2.5lb", price: 8.99, quantity: 1 },
-            { product_id: "456789123", name: "Great Value Shredded Cheddar Cheese 8oz", price: 2.84, quantity: 1 },
-            { product_id: "445566778", name: "Mission Corn Tortillas 30ct", price: 2.98, quantity: 1 },
-            { product_id: "334455667", name: "Old El Paso Enchilada Sauce 10oz", price: 1.18, quantity: 1 }
-          ];
-          setCartItems(demoProducts);
-          setShowInteractiveCart(true);
-          setConfirmedCart(false);
-          setFinalWalmartUrl(null);
-          showNotification('🛒 Interactive cart loaded! Adjust quantities and confirm.', 'success');
-        }
-      } catch (error) {
-        console.log('🔍 Error in API call:', error);
-        // Create demo cart when there's an error to ensure functionality
-        const demoProducts = [
-          { product_id: "556677889", name: "Great Value Chicken Breast 2.5lb", price: 8.99, quantity: 1 },
-          { product_id: "456789123", name: "Great Value Shredded Cheddar Cheese 8oz", price: 2.84, quantity: 1 },
-          { product_id: "445566778", name: "Mission Corn Tortillas 30ct", price: 2.98, quantity: 1 },
-          { product_id: "334455667", name: "Old El Paso Enchilada Sauce 10oz", price: 1.18, quantity: 1 }
-        ];
-        setCartItems(demoProducts);
-        setShowInteractiveCart(true);
-        setConfirmedCart(false);
-        setFinalWalmartUrl(null);
-        showNotification('🛒 Interactive cart loaded! Adjust quantities and confirm.', 'info');
-      } finally {
-        console.log('🔍 Setting generatingCart to false');
-        setGeneratingCart(false);
-      }
+    // Mock price generator function
+    const mockPriceGenerator = (index) => {
+      const basePrices = [2.99, 4.49, 1.89, 3.99, 5.99, 2.49, 6.99, 1.99, 4.99, 3.49];
+      return basePrices[index % basePrices.length];
     };
+
+    // Auto-generate cart when recipe loads
+    useEffect(() => {
+      console.log('🔍 useEffect triggered, recipe:', recipe);
+      if (recipe?.ingredients && recipe.ingredients.length > 0) {
+        console.log('🔍 Auto-generating cart from ingredients:', recipe.ingredients);
+        
+        const autoGeneratedCartItems = recipe.ingredients.map((ingredient, index) => ({
+          name: ingredient,
+          price: mockPriceGenerator(index),
+          quantity: 1,
+          product_id: `mock-id-${index + 1}`
+        }));
+
+        console.log('🔍 Auto-generated cart items:', autoGeneratedCartItems);
+        setCartItems(autoGeneratedCartItems);
+
+        const itemIds = autoGeneratedCartItems.flatMap(item =>
+          Array(item.quantity).fill(item.product_id)
+        );
+
+        const affiliateUrl = `https://affil.walmart.com/cart/addToCart?items=${itemIds.join(',')}`;
+        console.log('🔍 Auto-generated affiliate URL:', affiliateUrl);
+        
+        setFinalWalmartUrl(affiliateUrl);
+        setConfirmedCart(true);
+        
+        showNotification('🛒 Cart automatically generated from recipe ingredients!', 'success');
+      }
+    }, [recipe]);
 
     const updateQuantity = (index, newQuantity) => {
       if (newQuantity < 1) return; // Prevent negative quantities
@@ -1319,44 +1255,29 @@ function App() {
         i === index ? { ...item, quantity: newQuantity } : item
       );
       setCartItems(updatedItems);
+      
+      // Update affiliate URL with new quantities
+      const itemIds = updatedItems.flatMap(item =>
+        Array(item.quantity).fill(item.product_id)
+      );
+      const affiliateUrl = `https://affil.walmart.com/cart/addToCart?items=${itemIds.join(',')}`;
+      setFinalWalmartUrl(affiliateUrl);
     };
 
     const removeItem = (index) => {
       const updatedItems = cartItems.filter((_, i) => i !== index);
       setCartItems(updatedItems);
+      
+      // Update affiliate URL after removal
+      const itemIds = updatedItems.flatMap(item =>
+        Array(item.quantity).fill(item.product_id)
+      );
+      const affiliateUrl = `https://affil.walmart.com/cart/addToCart?items=${itemIds.join(',')}`;
+      setFinalWalmartUrl(affiliateUrl);
     };
 
     const calculateTotal = () => {
       return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
-    };
-
-    const confirmCart = () => {
-      console.log('🔍 confirmCart called');
-      console.log('🔍 cartItems:', cartItems);
-      console.log('🔍 cartItems.length:', cartItems.length);
-      
-      // Generate the affiliate link with quantities
-      const itemsWithQuantity = cartItems
-        .filter(item => item.quantity > 0)
-        .map(item => {
-          // For quantities > 1, repeat the product_id
-          return Array(item.quantity).fill(item.product_id);
-        })
-        .flat();
-      
-      console.log('🔍 itemsWithQuantity:', itemsWithQuantity);
-      
-      const affiliateUrl = `https://affil.walmart.com/cart/addToCart?items=${itemsWithQuantity.join(',')}`;
-      
-      console.log('🔍 Affiliate URL:', affiliateUrl);
-      
-      setFinalWalmartUrl(affiliateUrl);
-      console.log('🔍 setFinalWalmartUrl called with:', affiliateUrl);
-      
-      setConfirmedCart(true);
-      console.log('🔍 Confirmed cart:', true);
-      
-      showNotification('✅ Cart confirmed! Your affiliate link is ready.', 'success');
     };
 
     const copyUrlToClipboard = async () => {
@@ -1369,10 +1290,27 @@ function App() {
     };
 
     const resetCart = () => {
-      setShowInteractiveCart(false);
-      setConfirmedCart(false);
-      setFinalWalmartUrl(null);
-      setCartItems([]);
+      // Regenerate cart from original recipe
+      if (recipe?.ingredients && recipe.ingredients.length > 0) {
+        const autoGeneratedCartItems = recipe.ingredients.map((ingredient, index) => ({
+          name: ingredient,
+          price: mockPriceGenerator(index),
+          quantity: 1,
+          product_id: `mock-id-${index + 1}`
+        }));
+
+        setCartItems(autoGeneratedCartItems);
+
+        const itemIds = autoGeneratedCartItems.flatMap(item =>
+          Array(item.quantity).fill(item.product_id)
+        );
+
+        const affiliateUrl = `https://affil.walmart.com/cart/addToCart?items=${itemIds.join(',')}`;
+        setFinalWalmartUrl(affiliateUrl);
+        setConfirmedCart(true);
+        
+        showNotification('🔄 Cart reset to original recipe ingredients!', 'info');
+      }
     };
 
     if (!recipe) {
