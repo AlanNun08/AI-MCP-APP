@@ -258,9 +258,9 @@ frontend:
   
   - task: "Recipe Generation"
     implemented: true
-    working: true
+    working: false
     file: "App.js"
-    stuck_count: 1
+    stuck_count: 2
     priority: "high"
     needs_retesting: false
     status_history:
@@ -282,6 +282,9 @@ frontend:
       - working: true
         agent: "testing"
         comment: "Comprehensive testing confirms recipe persistence and retrieval from history is working correctly. Successfully retrieved 5 recipes for the user with titles: 'Mexican Chicken Enchiladas', 'Mexican Chicken Tacos', 'Cheesy Chicken Enchiladas', 'Chicken Enchiladas', 'Vegetarian Mexican Tacos'. The recipes are properly stored in the database and can be retrieved by user ID."
+      - working: false
+        agent: "testing"
+        comment: "Unable to test recipe generation functionality due to login issues. Could not access the recipe generation page as login attempts with multiple test accounts failed. Backend API testing shows the recipe history endpoint returns an empty array (status 200) when queried with a test user ID."
   
   - task: "Enhanced Grocery Cart UI"
     implemented: true
