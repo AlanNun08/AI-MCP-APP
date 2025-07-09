@@ -806,7 +806,25 @@ async def _get_walmart_product_options(ingredient: str, max_options: int = 3) ->
         # Create sample products based on ingredient type
         ingredient_lower = clean_ingredient.lower()
         
-        if any(word in ingredient_lower for word in ['pasta', 'spaghetti', 'penne', 'noodle']):
+        if any(word in ingredient_lower for word in ['chicken']):
+            mock_products = [
+                WalmartProduct(product_id="556677889", name="Great Value Chicken Breast 2.5lb", price=8.99, thumbnail_image="", availability="Available"),
+                WalmartProduct(product_id="556677890", name="Tyson Grilled Chicken Strips 9oz", price=5.48, thumbnail_image="", availability="Available"),
+                WalmartProduct(product_id="556677891", name="Rotisserie Chicken Whole", price=4.98, thumbnail_image="", availability="Available")
+            ]
+        elif any(word in ingredient_lower for word in ['tortilla', 'tortillas']):
+            mock_products = [
+                WalmartProduct(product_id="445566778", name="Mission Corn Tortillas 30ct", price=2.98, thumbnail_image="", availability="Available"),
+                WalmartProduct(product_id="445566779", name="Great Value Corn Tortillas 20ct", price=1.84, thumbnail_image="", availability="Available"),
+                WalmartProduct(product_id="445566780", name="La Banderita Corn Tortillas 24ct", price=2.24, thumbnail_image="", availability="Available")
+            ]
+        elif any(word in ingredient_lower for word in ['enchilada', 'sauce']):
+            mock_products = [
+                WalmartProduct(product_id="334455667", name="Old El Paso Enchilada Sauce 10oz", price=1.18, thumbnail_image="", availability="Available"),
+                WalmartProduct(product_id="334455668", name="Las Palmas Red Enchilada Sauce 14oz", price=1.28, thumbnail_image="", availability="Available"),
+                WalmartProduct(product_id="334455669", name="Hatch Green Enchilada Sauce 15oz", price=2.47, thumbnail_image="", availability="Available")
+            ]
+        elif any(word in ingredient_lower for word in ['pasta', 'spaghetti', 'penne', 'noodle']):
             mock_products = [
                 WalmartProduct(product_id="123456789", name="Barilla Pasta Penne 16oz", price=1.99, thumbnail_image="", availability="Available"),
                 WalmartProduct(product_id="123456790", name="Great Value Spaghetti 1lb", price=1.28, thumbnail_image="", availability="Available"),
@@ -818,11 +836,11 @@ async def _get_walmart_product_options(ingredient: str, max_options: int = 3) ->
                 WalmartProduct(product_id="987654322", name="Canned Diced Tomatoes 14.5oz", price=1.18, thumbnail_image="", availability="Available"),
                 WalmartProduct(product_id="987654323", name="Cherry Tomatoes 1lb", price=2.97, thumbnail_image="", availability="Available")
             ]
-        elif any(word in ingredient_lower for word in ['cheese', 'mozzarella', 'parmesan']):
+        elif any(word in ingredient_lower for word in ['cheese', 'mozzarella', 'parmesan', 'cheddar']):
             mock_products = [
-                WalmartProduct(product_id="456789123", name="Fresh Mozzarella Cheese 8oz", price=4.99, thumbnail_image="", availability="Available"),
-                WalmartProduct(product_id="456789124", name="Kraft Parmesan Cheese 8oz", price=4.48, thumbnail_image="", availability="Available"),
-                WalmartProduct(product_id="456789125", name="Sargento Mozzarella Shredded 8oz", price=3.98, thumbnail_image="", availability="Available")
+                WalmartProduct(product_id="456789123", name="Great Value Shredded Cheddar Cheese 8oz", price=2.84, thumbnail_image="", availability="Available"),
+                WalmartProduct(product_id="456789124", name="Kraft Mexican Style Shredded Cheese 8oz", price=3.97, thumbnail_image="", availability="Available"),
+                WalmartProduct(product_id="456789125", name="Sargento Shredded Monterey Jack 8oz", price=4.48, thumbnail_image="", availability="Available")
             ]
         elif any(word in ingredient_lower for word in ['garlic']):
             mock_products = [
