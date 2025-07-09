@@ -1121,7 +1121,8 @@ The shopping_list should be a separate bullet-pointed shopping list that include
             difficulty=request.difficulty,
             calories_per_serving=recipe_data.get('calories_per_serving'),
             is_healthy=request.is_healthy,
-            user_id=request.user_id
+            user_id=request.user_id,
+            shopping_list=recipe_data.get('shopping_list', [])
         )
         
         # Save to database
