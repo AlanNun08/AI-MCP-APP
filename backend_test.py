@@ -16,7 +16,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 class AIRecipeAppTester:
-    def __init__(self, base_url="https://62ac5b1c-d5c6-473e-8cca-bd7a2d5568f2.preview.emergentagent.com"):
+    def __init__(self, base_url="https://2f8e0430-6917-47db-8b81-c217b1e799eb.preview.emergentagent.com"):
         self.base_url = f"{base_url}/api"
         self.tests_run = 0
         self.tests_passed = 0

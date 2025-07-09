@@ -5,7 +5,7 @@ import time
 import sys
 
 def run_test(name, method, endpoint, expected_status, data=None, params=None, timeout=30):
-    base_url = "https://62ac5b1c-d5c6-473e-8cca-bd7a2d5568f2.preview.emergentagent.com/api"
+    base_url = "https://2f8e0430-6917-47db-8b81-c217b1e799eb.preview.emergentagent.com/api"
     url = f"{base_url}/{endpoint}"
     headers = {'Content-Type': 'application/json'}
     
