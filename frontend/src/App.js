@@ -1373,9 +1373,9 @@ function App() {
     const copyUrlToClipboard = async () => {
       try {
         await navigator.clipboard.writeText(finalWalmartUrl);
-        showNotification('🎉 Walmart link copied! Open new tab and paste to shop.', 'success');
+        showNotification('🎉 Walmart link copied! Open new tab and paste to shop. Your selections are saved - you can continue making changes.', 'success');
       } catch (err) {
-        showNotification('❌ Failed to copy. Please copy manually.', 'error');
+        showNotification('❌ Failed to copy. Please copy manually from the text box above.', 'error');
       }
     };
 
