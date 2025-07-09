@@ -891,7 +891,7 @@ async def get_user_recipes(user_id: str):
     try:
         recipes = []
         async for recipe in db.recipes.find({"user_id": user_id}).sort("created_at", -1):
-            recipes.append(recipe)
+            recipes.append(mongo_to_dict(recipe))
         
         return recipes
     except Exception as e:
