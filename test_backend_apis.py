@@ -378,4 +378,14 @@ def main():
     return 0 if tester.tests_passed == tester.tests_run else 1
 
 if __name__ == "__main__":
-    sys.exit(main())
+    # Redirect stdout to a file
+    import sys
+    original_stdout = sys.stdout
+    with open('/app/test_results.txt', 'w') as f:
+        sys.stdout = f
+        result = main()
+    # Restore stdout
+    sys.stdout = original_stdout
+    # Print a summary to console
+    print("Test completed. Results saved to /app/test_results.txt")
+    sys.exit(result)
