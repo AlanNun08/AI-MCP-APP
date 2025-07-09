@@ -1488,41 +1488,6 @@ function App() {
         </div>
       </div>
     );
-                        >
-                          🛒 Copy & Shop at Walmart
-                        </button>
-                      </div>
-                    </div>
-                    
-                    <div className="text-center mt-4">
-                      <p className="text-sm text-gray-600 mb-2">
-                        Total Items: {cartItems.reduce((total, item) => total + item.quantity, 0)} | 
-                        Total Cost: ${calculateTotal().toFixed(2)}
-                      </p>
-                      <p className="text-xs text-green-600">
-                        ✅ Click "Copy & Shop" to open Walmart with your cart
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Show message when no recipe */}
-              {!recipe && (
-                <div className="mt-4 p-4 bg-gray-100 border border-gray-200 rounded-xl">
-                  <div className="flex items-center justify-center space-x-2">
-                    <span className="text-gray-500">💡</span>
-                    <p className="text-sm text-gray-600">
-                      Generate a recipe first to see your shopping cart!
-                    </p>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
   };
 
   // Recipe History Screen Component  
