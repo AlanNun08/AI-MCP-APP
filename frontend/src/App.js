@@ -1660,7 +1660,7 @@ function App() {
                     disabled={!finalWalmartUrl}
                     className="w-full bg-yellow-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-yellow-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    📋 Copy & Shop at Walmart
+                    📋 Copy Link & Continue Shopping
                   </button>
                 </div>
 
