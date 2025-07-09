@@ -255,11 +255,11 @@ frontend:
   
   - task: "Recipe Generation"
     implemented: true
-    working: true
+    working: false
     file: "App.js"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: false
         agent: "testing"
@@ -273,6 +273,9 @@ frontend:
       - working: true
         agent: "main"
         comment: "Backend testing confirmed recipe generation is working perfectly. OpenAI integration responds in 2-5 seconds with no timeout issues. Ready for frontend testing."
+      - working: false
+        agent: "main"
+        comment: "User reports recipes not loading from history properly - need to investigate recipe persistence and retrieval from history"
   
   - task: "Enhanced Grocery Cart UI"
     implemented: true
