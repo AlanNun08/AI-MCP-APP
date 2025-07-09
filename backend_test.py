@@ -843,6 +843,37 @@ class AIRecipeAppTester:
                 return False
         
         return success
+        
+    def test_login_with_verified_user(self):
+        """Test login with verified user"""
+        if not self.test_email:
+            print("❌ No test email available")
+            return False
+            
+        # Try to login with verified user
+        login_data = {
+            "email": self.test_email,
+            "password": self.test_password
+        }
+        
+        success, response = self.run_test(
+            "Login with Verified User",
+            "POST",
+            "auth/login",
+            200,
+            data=login_data
+        )
+        
+        # Check if the login was successful
+        if success and 'status' in response:
+            if response['status'] == 'success':
+                print("✅ Verified user login successful")
+                return True
+            else:
+                print(f"❌ Unexpected response for verified user: {response}")
+                return False
+        
+        return success
     def test_openai_api_key(self):
         """Test if the OpenAI API key is working correctly"""
         print("\n🔍 Testing OpenAI API Key...")
