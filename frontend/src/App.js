@@ -1208,11 +1208,13 @@ function App() {
 
   // Recipe Detail Screen Component - COMPLETELY NEW DESIGN
   const RecipeDetailScreen = ({ recipe, showBackButton = false }) => {
+    const [productOptions, setProductOptions] = useState({}); // Store all product options per ingredient
+    const [selectedProducts, setSelectedProducts] = useState({}); // Store user selections
     const [cartItems, setCartItems] = useState([]);
     const [finalWalmartUrl, setFinalWalmartUrl] = useState(null);
     const [loadingCart, setLoadingCart] = useState(false);
 
-    // Auto-generate cart when recipe loads using real Walmart API
+    // Auto-generate product options when recipe loads using real Walmart API
     useEffect(() => {
       if (recipe?.id && recipe?.ingredients?.length > 0) {
         setLoadingCart(true);
@@ -1228,40 +1230,44 @@ function App() {
           console.log('✅ Cart options response:', response.data);
           
           if (response.data && response.data.ingredient_options) {
-            // Convert API response to cart items format
-            const newCartItems = response.data.ingredient_options.map((ingredientOption, index) => {
-              // Use the first product option for each ingredient
-              const firstProduct = ingredientOption.options && ingredientOption.options[0];
+            // Store all product options per ingredient
+            const options = {};
+            const defaultSelections = {};
+            const newCartItems = [];
+            
+            response.data.ingredient_options.forEach((ingredientOption, index) => {
+              const ingredientName = ingredientOption.ingredient_name || ingredientOption.original_ingredient;
               
-              if (firstProduct) {
-                return {
-                  name: firstProduct.name || ingredientOption.ingredient_name,
+              if (ingredientOption.options && ingredientOption.options.length > 0) {
+                // Store all options for this ingredient
+                options[ingredientName] = ingredientOption.options;
+                
+                // Default to first option
+                const firstProduct = ingredientOption.options[0];
+                defaultSelections[ingredientName] = firstProduct.product_id;
+                
+                // Add to cart with first option
+                newCartItems.push({
+                  name: firstProduct.name || ingredientName,
                   price: parseFloat(firstProduct.price) || 2.99,
                   quantity: 1,
-                  product_id: firstProduct.product_id || `walmart-${index + 1000}`,
-                  ingredient_name: ingredientOption.ingredient_name
-                };
-              } else {
-                // Fallback to mock data if no product found
-                return {
-                  name: ingredientOption.ingredient_name,
-                  price: 2.99,
-                  quantity: 1,
-                  product_id: `walmart-${index + 1000}`,
-                  ingredient_name: ingredientOption.ingredient_name
-                };
+                  product_id: firstProduct.product_id,
+                  ingredient_name: ingredientName
+                });
               }
             });
             
+            setProductOptions(options);
+            setSelectedProducts(defaultSelections);
             setCartItems(newCartItems);
             
-            // Generate affiliate URL with real product IDs
+            // Generate affiliate URL with default selections
             const itemIds = newCartItems.flatMap(item => 
               Array(item.quantity).fill(item.product_id)
             );
             setFinalWalmartUrl(`https://affil.walmart.com/cart/addToCart?items=${itemIds.join(',')}`);
             
-            console.log('✅ Cart generated with real product IDs:', itemIds);
+            console.log('✅ Product options loaded:', Object.keys(options).length, 'ingredients');
           } else {
             // Fallback to mock data if API response is invalid
             console.log('⚠️ Invalid API response, using mock data');
@@ -1278,6 +1284,39 @@ function App() {
         });
       }
     }, [recipe, user]);
+
+    // Handle product selection change
+    const handleProductSelection = (ingredientName, productId) => {
+      const selectedProduct = productOptions[ingredientName]?.find(p => p.product_id === productId);
+      if (!selectedProduct) return;
+
+      // Update selected products
+      const newSelections = { ...selectedProducts, [ingredientName]: productId };
+      setSelectedProducts(newSelections);
+
+      // Update cart items with new selection
+      const updatedCartItems = cartItems.map(item => {
+        if (item.ingredient_name === ingredientName) {
+          return {
+            ...item,
+            name: selectedProduct.name,
+            price: parseFloat(selectedProduct.price),
+            product_id: selectedProduct.product_id
+          };
+        }
+        return item;
+      });
+
+      setCartItems(updatedCartItems);
+
+      // Regenerate affiliate URL
+      const itemIds = updatedCartItems.flatMap(item => 
+        Array(item.quantity).fill(item.product_id)
+      );
+      setFinalWalmartUrl(`https://affil.walmart.com/cart/addToCart?items=${itemIds.join(',')}`);
+
+      console.log('✅ Product selection updated for', ingredientName, ':', selectedProduct.name);
+    };
 
     // Fallback function to generate mock cart
     const generateMockCart = () => {
