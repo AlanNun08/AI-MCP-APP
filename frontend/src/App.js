@@ -1354,122 +1354,140 @@ function App() {
                     <div className="font-bold text-gray-800">${calculateTotal().toFixed(2)}</div>
                   </div>
                 </div>
-                </span>
-                <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full">
-                  🍽️ {recipe.servings} servings
-                </span>
-                {recipe.calories_per_serving && (
-                  <span className="bg-orange-100 text-orange-800 px-3 py-1 rounded-full">
-                    🔥 {recipe.calories_per_serving} cal
-                  </span>
-                )}
-              </div>
-            </div>
 
-            {/* Ingredients */}
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-3">🥘 Ingredients</h3>
-              <ul className="space-y-2">
-                {recipe.ingredients?.map((ingredient, index) => (
-                  <li key={index} className="flex items-start space-x-2">
-                    <span className="text-green-500 mt-1">•</span>
-                    <span className="text-gray-700">{ingredient}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Instructions */}
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-3">👨‍🍳 Instructions</h3>
-              <ol className="space-y-3">
-                {recipe.instructions?.map((instruction, index) => (
-                  <li key={index} className="flex items-start space-x-3">
-                    <span className="bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-medium flex-shrink-0 mt-0.5">
-                      {index + 1}
-                    </span>
-                    <span className="text-gray-700">{instruction}</span>
-                  </li>
-                ))}
-              </ol>
-            </div>
-
-            {/* Enhanced Grocery Cart Button */}
-            <div className="border-t pt-6">
-              {/* Shopping Cart */}
-              {recipe && cartItems.length > 0 && (
-                <div className="mt-6 p-6 bg-white border-2 border-blue-200 rounded-2xl shadow-lg">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-xl font-bold text-gray-800">🛒 Your Walmart Shopping Cart</h3>
-                  </div>
-                  
-                  <div className="space-y-3 mb-6 max-h-96 overflow-y-auto">
-                    {cartItems.map((item, index) => (
-                      <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-200">
-                        <div className="flex-1">
-                          <h4 className="font-medium text-gray-800 text-sm">{item.name}</h4>
-                          <p className="text-xs text-gray-500 mt-1">ID: {item.product_id}</p>
-                        </div>
-                        
-                        <div className="flex items-center space-x-4">
-                          <div className="text-lg font-bold text-green-600">
-                            ${item.price.toFixed(2)}
-                          </div>
-                          
-                          <div className="flex items-center space-x-2">
-                            <button
-                              onClick={() => updateQuantity(index, item.quantity - 1)}
-                              disabled={item.quantity <= 1}
-                              className="w-8 h-8 bg-red-500 text-white rounded-full hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center text-sm font-bold"
-                            >
-                              -
-                            </button>
-                            
-                            <span className="w-8 text-center font-bold text-gray-800">
-                              {item.quantity}
-                            </span>
-                            
-                            <button
-                              onClick={() => updateQuantity(index, item.quantity + 1)}
-                              className="w-8 h-8 bg-green-500 text-white rounded-full hover:bg-green-600 flex items-center justify-center text-sm font-bold"
-                            >
-                              +
-                            </button>
-                          </div>
-                          
-                          <button
-                            onClick={() => removeItem(index)}
-                            className="text-red-500 hover:text-red-700 text-sm"
-                          >
-                            🗑️
-                          </button>
-                        </div>
+                {/* Ingredients Section */}
+                <div className="mb-8">
+                  <h3 className="text-2xl font-bold text-gray-800 mb-4 flex items-center">
+                    <span className="mr-2">🥘</span>
+                    Ingredients
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {recipe.ingredients && recipe.ingredients.map((ingredient, index) => (
+                      <div key={index} className="flex items-center p-3 bg-gray-50 rounded-lg">
+                        <span className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center text-orange-600 font-bold text-sm mr-3">
+                          {index + 1}
+                        </span>
+                        <span className="text-gray-800">{ingredient}</span>
                       </div>
                     ))}
                   </div>
-                  
-                  <div className="border-t pt-4">
-                    <div className="flex justify-between items-center mb-4">
-                      <span className="text-lg font-bold text-gray-800">Total:</span>
-                      <span className="text-2xl font-bold text-green-600">
-                        ${calculateTotal().toFixed(2)}
-                      </span>
-                    </div>
-                    
-                    <div className="mt-4 p-4 bg-gradient-to-r from-yellow-100 to-orange-100 border-2 border-yellow-300 rounded-xl">
-                      <div className="flex items-center justify-center mb-3">
-                        <h4 className="text-lg font-semibold text-gray-800">🛒 Shop at Walmart</h4>
+                </div>
+
+                {/* Instructions Section */}
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-800 mb-4 flex items-center">
+                    <span className="mr-2">📋</span>
+                    Instructions
+                  </h3>
+                  <div className="space-y-4">
+                    {recipe.instructions && recipe.instructions.map((instruction, index) => (
+                      <div key={index} className="flex items-start p-4 bg-gray-50 rounded-lg">
+                        <span className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold text-sm mr-4 mt-0.5">
+                          {index + 1}
+                        </span>
+                        <p className="text-gray-800 leading-relaxed">{instruction}</p>
                       </div>
-                      <textarea
-                        value={finalWalmartUrl}
-                        readOnly
-                        className="w-full h-20 p-3 border border-yellow-400 rounded-lg bg-white text-xs font-mono resize-none mb-3"
-                        onClick={(e) => e.target.select()}
-                      />
-                      <div className="flex space-x-2">
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Shopping Cart Card */}
+            <div className="lg:col-span-1">
+              <div className="bg-white rounded-2xl shadow-lg p-6 sticky top-4">
+                
+                {/* Cart Header */}
+                <div className="text-center mb-6">
+                  <h3 className="text-2xl font-bold text-gray-800 mb-2">🛒 Shopping Cart</h3>
+                  <p className="text-sm text-gray-600">Ready to order from Walmart</p>
+                </div>
+
+                {/* Cart Items */}
+                <div className="space-y-3 mb-6 max-h-64 overflow-y-auto">
+                  {cartItems.map((item, index) => (
+                    <div key={index} className="p-3 bg-gray-50 rounded-lg">
+                      <div className="flex justify-between items-start mb-2">
+                        <h4 className="font-medium text-gray-800 text-sm leading-tight">{item.name}</h4>
                         <button
-                          onClick={copyUrlToClipboard}
-                          className="flex-1 bg-gradient-to-r from-yellow-500 to-orange-500 text-white font-bold py-2 px-4 rounded-lg hover:from-yellow-600 hover:to-orange-600 transition-all duration-200"
+                          onClick={() => removeItem(index)}
+                          className="text-red-500 hover:text-red-700 text-xs"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                      
+                      <div className="flex justify-between items-center">
+                        <div className="flex items-center space-x-2">
+                          <button
+                            onClick={() => updateQuantity(index, item.quantity - 1)}
+                            disabled={item.quantity <= 1}
+                            className="w-6 h-6 bg-red-500 text-white rounded-full hover:bg-red-600 disabled:opacity-50 flex items-center justify-center text-xs"
+                          >
+                            -
+                          </button>
+                          <span className="w-8 text-center font-bold text-sm">{item.quantity}</span>
+                          <button
+                            onClick={() => updateQuantity(index, item.quantity + 1)}
+                            className="w-6 h-6 bg-green-500 text-white rounded-full hover:bg-green-600 flex items-center justify-center text-xs"
+                          >
+                            +
+                          </button>
+                        </div>
+                        <div className="text-right">
+                          <div className="font-bold text-green-600">${(item.price * item.quantity).toFixed(2)}</div>
+                          <div className="text-xs text-gray-500">${item.price.toFixed(2)} each</div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Cart Summary */}
+                <div className="border-t pt-4 mb-6">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm text-gray-600">Total Items:</span>
+                    <span className="font-bold">{cartItems.reduce((total, item) => total + item.quantity, 0)}</span>
+                  </div>
+                  <div className="flex justify-between items-center mb-4">
+                    <span className="text-lg font-bold text-gray-800">Total:</span>
+                    <span className="text-2xl font-bold text-green-600">${calculateTotal().toFixed(2)}</span>
+                  </div>
+                </div>
+
+                {/* Walmart Link Section */}
+                <div className="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-4 mb-4">
+                  <h4 className="font-bold text-yellow-800 mb-2 text-center">🔗 Walmart Affiliate Link</h4>
+                  <textarea
+                    value={finalWalmartUrl}
+                    readOnly
+                    className="w-full h-16 p-2 border border-yellow-300 rounded-lg bg-white text-xs resize-none mb-3"
+                    onClick={(e) => e.target.select()}
+                  />
+                  <button
+                    onClick={copyUrlToClipboard}
+                    className="w-full bg-yellow-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-yellow-600 transition-colors"
+                  >
+                    📋 Copy & Shop at Walmart
+                  </button>
+                </div>
+
+                {/* Instructions */}
+                <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                  <h4 className="font-bold text-blue-800 mb-2 text-sm">How to Order:</h4>
+                  <ol className="text-xs text-blue-700 space-y-1">
+                    <li>1. Click "Copy & Shop at Walmart"</li>
+                    <li>2. Open new tab and paste the link</li>
+                    <li>3. All items auto-added to cart</li>
+                    <li>4. Proceed to checkout</li>
+                  </ol>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
                         >
                           🛒 Copy & Shop at Walmart
                         </button>
