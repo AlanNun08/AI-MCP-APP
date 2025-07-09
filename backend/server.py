@@ -463,6 +463,30 @@ async def login_user(login_data: UserLogin):
         logging.error(f"Login error for {login_data.email}: {str(e)}")
         raise HTTPException(status_code=500, detail="Login failed")
 
+@api_router.get("/debug/user/{email}")
+async def get_user_debug(email: str):
+    """Debug endpoint to get user record structure"""
+    try:
+        # Only allow in development/test mode
+        if os.getenv('NODE_ENV') == 'production':
+            raise HTTPException(status_code=404, detail="Not found")
+        
+        email_lower = email.lower().strip()
+        user = await db.users.find_one({"email": {"$regex": f"^{email_lower}$", "$options": "i"}})
+        
+        if not user:
+            return {"error": "User not found"}
+        
+        # Remove sensitive data for debugging
+        user_copy = user.copy()
+        if 'password_hash' in user_copy:
+            user_copy['password_hash'] = "***HIDDEN***"
+        
+        return {"user": mongo_to_dict(user_copy)}
+        
+    except Exception as e:
+        return {"error": str(e)}
+
 @api_router.get("/debug/verification-codes/{email}")
 async def get_verification_codes_debug(email: str):
     """Debug endpoint to get verification codes for testing"""
