@@ -330,10 +330,14 @@ metadata:
 
 test_plan:
   current_focus:
-    - "DEPLOYMENT READY - All Systems Operational"
-  stuck_tasks: []
-  test_all: true
-  test_priority: "high_first"
+    - "Walmart API Integration"
+    - "Recipe Generation"
+    - "Recipe History Loading"
+  stuck_tasks:
+    - "Walmart API Integration" 
+    - "Recipe Generation"
+  test_all: false
+  test_priority: "stuck_first"
 
 agent_communication:
   - agent: "main"
