@@ -38,9 +38,22 @@ db = client[os.environ.get('DB_NAME', 'test_database')]
 # Custom JSON encoder for MongoDB documents
 def mongo_to_dict(obj):
     """Convert MongoDB document to dict, handling _id field"""
-    if '_id' in obj:
-        # Don't include the MongoDB _id in the response
-        obj.pop('_id', None)
+    if isinstance(obj, dict):
+        result = {}
+        for key, value in obj.items():
+            if key == '_id':
+                # Skip MongoDB _id field
+                continue
+            elif hasattr(value, '__iter__') and not isinstance(value, (str, bytes, dict)):
+                # Handle iterables (like lists)
+                result[key] = [mongo_to_dict(item) for item in value]
+            elif isinstance(value, dict):
+                # Handle nested dictionaries
+                result[key] = mongo_to_dict(value)
+            else:
+                # Handle primitive values
+                result[key] = value
+        return result
     return obj
 
 # OpenAI setup
