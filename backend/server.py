@@ -879,7 +879,8 @@ async def get_recipe(recipe_id: str):
         if not recipe:
             raise HTTPException(status_code=404, detail="Recipe not found")
         
-        return recipe
+        # Convert MongoDB document to dict, handling _id field
+        return mongo_to_dict(recipe)
     except Exception as e:
         logging.error(f"Error fetching recipe: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to fetch recipe")
