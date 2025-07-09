@@ -2,6 +2,7 @@ import requests
 import json
 import logging
 import sys
+import uuid
 
 # Configure logging
 logging.basicConfig(
@@ -47,27 +48,65 @@ def test_frontend_backend_integration():
     
     # Test the grocery cart options endpoint with sample data
     try:
-        # Create a test user
+        # Create a test user with authentication
+        test_email = f"test_{uuid.uuid4()}@example.com"
+        test_password = "SecureP@ssw0rd123"
+        
         user_data = {
-            "name": "Test User",
-            "email": "test_user@example.com",
-            "dietary_preferences": [],
-            "allergies": [],
-            "favorite_cuisines": []
+            "first_name": "Test",
+            "last_name": "User",
+            "email": test_email,
+            "password": test_password,
+            "dietary_preferences": ["vegetarian"],
+            "allergies": ["nuts"],
+            "favorite_cuisines": ["italian", "mexican"]
         }
         
-        user_response = requests.post(f"{backend_url}/api/users", json=user_data, timeout=5)
+        user_response = requests.post(f"{backend_url}/api/auth/register", json=user_data, timeout=5)
         if user_response.status_code != 200:
-            logger.error(f"Failed to create test user: {user_response.status_code}")
+            logger.error(f"Failed to register test user: {user_response.status_code}")
             logger.error(f"Response: {user_response.text}")
             return False
         
-        user_id = user_response.json().get('id')
+        user_id = user_response.json().get('user_id')
         if not user_id:
-            logger.error("No user ID returned from user creation")
+            logger.error("No user ID returned from user registration")
             return False
         
-        logger.info(f"Created test user with ID: {user_id}")
+        logger.info(f"Registered test user with ID: {user_id}")
+        
+        # Get verification code
+        code_response = requests.get(f"{backend_url}/api/debug/verification-codes/{test_email}", timeout=5)
+        if code_response.status_code != 200:
+            logger.error(f"Failed to get verification code: {code_response.status_code}")
+            logger.error(f"Response: {code_response.text}")
+            return False
+        
+        verification_code = None
+        if 'codes' in code_response.json() and len(code_response.json()['codes']) > 0:
+            verification_code = code_response.json()['codes'][0]['code']
+        elif 'last_test_code' in code_response.json() and code_response.json()['last_test_code']:
+            verification_code = code_response.json()['last_test_code']
+        
+        if not verification_code:
+            logger.error("No verification code found")
+            return False
+        
+        logger.info(f"Retrieved verification code: {verification_code}")
+        
+        # Verify the user
+        verify_data = {
+            "email": test_email,
+            "code": verification_code
+        }
+        
+        verify_response = requests.post(f"{backend_url}/api/auth/verify", json=verify_data, timeout=5)
+        if verify_response.status_code != 200:
+            logger.error(f"Failed to verify user: {verify_response.status_code}")
+            logger.error(f"Response: {verify_response.text}")
+            return False
+        
+        logger.info("User verified successfully")
         
         # Create a test recipe
         recipe_request = {
