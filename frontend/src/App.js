@@ -1482,8 +1482,10 @@ function App() {
               <div className="mt-4 p-2 bg-gray-100 rounded text-xs">
                 <p>Debug: showInteractiveCart = {showInteractiveCart.toString()}</p>
                 <p>Debug: confirmedCart = {confirmedCart.toString()}</p>
+                <p>Debug: finalWalmartUrl = {finalWalmartUrl ? `"${finalWalmartUrl.substring(0, 50)}..."` : 'null'}</p>
                 <p>Debug: cartItems.length = {cartItems.length}</p>
                 <p>Debug: generatingCart = {generatingCart.toString()}</p>
+                <p>Debug: Affiliate block should show = {(confirmedCart && finalWalmartUrl).toString()}</p>
               </div>
 
               {!showInteractiveCart && !confirmedCart && (
