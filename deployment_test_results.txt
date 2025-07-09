@@ -11,7 +11,7 @@ AI Recipe & Grocery App API Test
 ==================================================
 
 🔍 Testing API Root...
-2025-07-09 00:10:04,562 - __main__ - INFO - Testing API Root - GET https://1896460c-1fcb-418f-bf8d-0da71d07a349.preview.emergentagent.com/api/
+2025-07-09 00:10:04,562 - __main__ - INFO - Testing API Root - GET https://62ac5b1c-d5c6-473e-8cca-bd7a2d5568f2.preview.emergentagent.com/api/
 ⏱️ Request completed in 0.06 seconds
 2025-07-09 00:10:04,625 - __main__ - INFO - Request completed in 0.06 seconds
 ✅ Passed - Status: 200
@@ -47,56 +47,56 @@ Core API Health: ✅ PASSED
 ==================================================
 
 🔍 Testing User Registration (Deployment)...
-2025-07-09 00:10:04,808 - __main__ - INFO - Testing User Registration (Deployment) - POST https://1896460c-1fcb-418f-bf8d-0da71d07a349.preview.emergentagent.com/api/auth/register
+2025-07-09 00:10:04,808 - __main__ - INFO - Testing User Registration (Deployment) - POST https://62ac5b1c-d5c6-473e-8cca-bd7a2d5568f2.preview.emergentagent.com/api/auth/register
 ⏱️ Request completed in 0.76 seconds
 2025-07-09 00:10:05,566 - __main__ - INFO - Request completed in 0.76 seconds
 ✅ Passed - Status: 200
 ✅ User registration successful
 
 🔍 Testing Get Verification Code (Deployment)...
-2025-07-09 00:10:05,566 - __main__ - INFO - Testing Get Verification Code (Deployment) - GET https://1896460c-1fcb-418f-bf8d-0da71d07a349.preview.emergentagent.com/api/debug/verification-codes/deploy_test_cb24d06e-0e60-4369-8576-03248f48c616@example.com
+2025-07-09 00:10:05,566 - __main__ - INFO - Testing Get Verification Code (Deployment) - GET https://62ac5b1c-d5c6-473e-8cca-bd7a2d5568f2.preview.emergentagent.com/api/debug/verification-codes/deploy_test_cb24d06e-0e60-4369-8576-03248f48c616@example.com
 ⏱️ Request completed in 0.03 seconds
 2025-07-09 00:10:05,597 - __main__ - INFO - Request completed in 0.03 seconds
 ✅ Passed - Status: 200
 ✅ Retrieved verification code: 127138
 
 🔍 Testing Email Verification (Deployment)...
-2025-07-09 00:10:05,599 - __main__ - INFO - Testing Email Verification (Deployment) - POST https://1896460c-1fcb-418f-bf8d-0da71d07a349.preview.emergentagent.com/api/auth/verify
+2025-07-09 00:10:05,599 - __main__ - INFO - Testing Email Verification (Deployment) - POST https://62ac5b1c-d5c6-473e-8cca-bd7a2d5568f2.preview.emergentagent.com/api/auth/verify
 ⏱️ Request completed in 0.05 seconds
 2025-07-09 00:10:05,649 - __main__ - INFO - Request completed in 0.05 seconds
 ✅ Passed - Status: 200
 ✅ Email verification successful
 
 🔍 Testing Login (Deployment)...
-2025-07-09 00:10:05,650 - __main__ - INFO - Testing Login (Deployment) - POST https://1896460c-1fcb-418f-bf8d-0da71d07a349.preview.emergentagent.com/api/auth/login
+2025-07-09 00:10:05,650 - __main__ - INFO - Testing Login (Deployment) - POST https://62ac5b1c-d5c6-473e-8cca-bd7a2d5568f2.preview.emergentagent.com/api/auth/login
 ⏱️ Request completed in 0.46 seconds
 2025-07-09 00:10:06,112 - __main__ - INFO - Request completed in 0.46 seconds
 ✅ Passed - Status: 200
 ✅ Login successful
 
 🔍 Testing Request Password Reset (Deployment)...
-2025-07-09 00:10:06,113 - __main__ - INFO - Testing Request Password Reset (Deployment) - POST https://1896460c-1fcb-418f-bf8d-0da71d07a349.preview.emergentagent.com/api/auth/forgot-password
+2025-07-09 00:10:06,113 - __main__ - INFO - Testing Request Password Reset (Deployment) - POST https://62ac5b1c-d5c6-473e-8cca-bd7a2d5568f2.preview.emergentagent.com/api/auth/forgot-password
 ⏱️ Request completed in 0.36 seconds
 2025-07-09 00:10:06,471 - __main__ - INFO - Request completed in 0.36 seconds
 ✅ Passed - Status: 200
 ✅ Password reset request successful
 
 🔍 Testing Get Reset Code (Deployment)...
-2025-07-09 00:10:06,473 - __main__ - INFO - Testing Get Reset Code (Deployment) - GET https://1896460c-1fcb-418f-bf8d-0da71d07a349.preview.emergentagent.com/api/debug/verification-codes/deploy_test_cb24d06e-0e60-4369-8576-03248f48c616@example.com
+2025-07-09 00:10:06,473 - __main__ - INFO - Testing Get Reset Code (Deployment) - GET https://62ac5b1c-d5c6-473e-8cca-bd7a2d5568f2.preview.emergentagent.com/api/debug/verification-codes/deploy_test_cb24d06e-0e60-4369-8576-03248f48c616@example.com
 ⏱️ Request completed in 0.03 seconds
 2025-07-09 00:10:06,506 - __main__ - INFO - Request completed in 0.03 seconds
 ✅ Passed - Status: 200
 ✅ Retrieved last test reset code: 015024
 
 🔍 Testing Reset Password (Deployment)...
-2025-07-09 00:10:06,508 - __main__ - INFO - Testing Reset Password (Deployment) - POST https://1896460c-1fcb-418f-bf8d-0da71d07a349.preview.emergentagent.com/api/auth/reset-password
+2025-07-09 00:10:06,508 - __main__ - INFO - Testing Reset Password (Deployment) - POST https://62ac5b1c-d5c6-473e-8cca-bd7a2d5568f2.preview.emergentagent.com/api/auth/reset-password
 ⏱️ Request completed in 0.47 seconds
 2025-07-09 00:10:06,981 - __main__ - INFO - Request completed in 0.47 seconds
 ✅ Passed - Status: 200
 ✅ Password reset successful
 
 🔍 Testing Login with New Password (Deployment)...
-2025-07-09 00:10:06,982 - __main__ - INFO - Testing Login with New Password (Deployment) - POST https://1896460c-1fcb-418f-bf8d-0da71d07a349.preview.emergentagent.com/api/auth/login
+2025-07-09 00:10:06,982 - __main__ - INFO - Testing Login with New Password (Deployment) - POST https://62ac5b1c-d5c6-473e-8cca-bd7a2d5568f2.preview.emergentagent.com/api/auth/login
 ⏱️ Request completed in 0.49 seconds
 2025-07-09 00:10:07,470 - __main__ - INFO - Request completed in 0.49 seconds
 ✅ Passed - Status: 200
@@ -109,7 +109,7 @@ Authentication System: ✅ PASSED
 ==================================================
 
 🔍 Testing Create User for Recipe Testing...
-2025-07-09 00:10:07,479 - __main__ - INFO - Testing Create User for Recipe Testing - POST https://1896460c-1fcb-418f-bf8d-0da71d07a349.preview.emergentagent.com/api/users
+2025-07-09 00:10:07,479 - __main__ - INFO - Testing Create User for Recipe Testing - POST https://62ac5b1c-d5c6-473e-8cca-bd7a2d5568f2.preview.emergentagent.com/api/users
 ⏱️ Request completed in 0.05 seconds
 2025-07-09 00:10:07,530 - __main__ - INFO - Request completed in 0.05 seconds
 ❌ Failed - Expected 200, got 500
@@ -133,7 +133,7 @@ Testing Email Service Mode
 ==================================================
 
 🔍 Testing Register User for Live Email Test...
-2025-07-09 00:10:07,530 - __main__ - INFO - Testing Register User for Live Email Test - POST https://1896460c-1fcb-418f-bf8d-0da71d07a349.preview.emergentagent.com/api/auth/register
+2025-07-09 00:10:07,530 - __main__ - INFO - Testing Register User for Live Email Test - POST https://62ac5b1c-d5c6-473e-8cca-bd7a2d5568f2.preview.emergentagent.com/api/auth/register
 ⏱️ Request completed in 0.05 seconds
 2025-07-09 00:10:07,579 - __main__ - INFO - Request completed in 0.05 seconds
 ❌ Failed - Expected 200, got 400
@@ -148,7 +148,7 @@ Email Service: ❌ FAILED
 ==================================================
 
 🔍 Testing Create User...
-2025-07-09 00:10:07,580 - __main__ - INFO - Testing Create User - POST https://1896460c-1fcb-418f-bf8d-0da71d07a349.preview.emergentagent.com/api/users
+2025-07-09 00:10:07,580 - __main__ - INFO - Testing Create User - POST https://62ac5b1c-d5c6-473e-8cca-bd7a2d5568f2.preview.emergentagent.com/api/users
 ⏱️ Request completed in 0.03 seconds
 2025-07-09 00:10:07,607 - __main__ - INFO - Request completed in 0.03 seconds
 ❌ Failed - Expected 200, got 500
@@ -161,19 +161,19 @@ Database Operations: ❌ FAILED
 ==================================================
 
 🔍 Testing Invalid Verification Code Error Handling...
-2025-07-09 00:10:07,607 - __main__ - INFO - Testing Invalid Verification Code Error Handling - POST https://1896460c-1fcb-418f-bf8d-0da71d07a349.preview.emergentagent.com/api/auth/verify
+2025-07-09 00:10:07,607 - __main__ - INFO - Testing Invalid Verification Code Error Handling - POST https://62ac5b1c-d5c6-473e-8cca-bd7a2d5568f2.preview.emergentagent.com/api/auth/verify
 ⏱️ Request completed in 0.03 seconds
 2025-07-09 00:10:07,637 - __main__ - INFO - Request completed in 0.03 seconds
 ✅ Passed - Status: 400
 
 🔍 Testing Invalid Login Credentials Error Handling...
-2025-07-09 00:10:07,637 - __main__ - INFO - Testing Invalid Login Credentials Error Handling - POST https://1896460c-1fcb-418f-bf8d-0da71d07a349.preview.emergentagent.com/api/auth/login
+2025-07-09 00:10:07,637 - __main__ - INFO - Testing Invalid Login Credentials Error Handling - POST https://62ac5b1c-d5c6-473e-8cca-bd7a2d5568f2.preview.emergentagent.com/api/auth/login
 ⏱️ Request completed in 0.03 seconds
 2025-07-09 00:10:07,663 - __main__ - INFO - Request completed in 0.03 seconds
 ✅ Passed - Status: 401
 
 🔍 Testing Short Password Validation Error Handling...
-2025-07-09 00:10:07,664 - __main__ - INFO - Testing Short Password Validation Error Handling - POST https://1896460c-1fcb-418f-bf8d-0da71d07a349.preview.emergentagent.com/api/auth/register
+2025-07-09 00:10:07,664 - __main__ - INFO - Testing Short Password Validation Error Handling - POST https://62ac5b1c-d5c6-473e-8cca-bd7a2d5568f2.preview.emergentagent.com/api/auth/register
 ⏱️ Request completed in 0.03 seconds
 2025-07-09 00:10:07,690 - __main__ - INFO - Request completed in 0.03 seconds
 ✅ Passed - Status: 400
