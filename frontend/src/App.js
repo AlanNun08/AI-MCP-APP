@@ -1213,148 +1213,62 @@ function App() {
     const [cartProducts, setCartProducts] = useState([]);
 
     const generateGroceryCart = async () => {
-      console.log('🖱️ Generate Walmart Shopping Cart button clicked!');
-      console.log('📊 Initial checks:');
-      console.log('- Recipe exists?', !!recipe);
-      console.log('- Recipe object:', recipe);
-      console.log('- User exists?', !!user);
-      console.log('- User object:', user);
-      console.log('- User ID exists?', !!user?.id);
-      
       if (!recipe) {
-        console.error('❌ No recipe found - stopping execution');
         showNotification('❌ No recipe found. Please generate a recipe first.', 'error');
         return;
       }
       
       if (!user?.id) {
-        console.error('❌ No user ID found - stopping execution');
-        console.log('User object details:', user);
         showNotification('❌ User not found. Please login again.', 'error');
         return;
       }
       
-      console.log('✅ All checks passed, starting grocery cart generation...');
-      console.log('🆔 Recipe ID:', recipe.id);
-      console.log('🆔 User ID:', user.id);
-      console.log('🔗 API Base URL:', API);
-      
       setGeneratingCart(true);
-      console.log('🔄 GeneratingCart state set to true');
-      
       try {
-        const requestUrl = `${API}/api/grocery/cart-options?recipe_id=${recipe.id}&user_id=${user.id}`;
-        console.log('🔗 Making API request to:', requestUrl);
-        console.log('📤 Request method: POST');
-        console.log('📤 Request headers: Content-Type: application/json');
-        
-        const startTime = Date.now();
-        console.log('⏰ Request started at:', new Date(startTime).toISOString());
-        
-        const response = await axios.post(requestUrl);
-        
-        const endTime = Date.now();
-        const duration = endTime - startTime;
-        console.log('⏰ Request completed in:', duration, 'ms');
-        console.log('📦 Response status:', response.status);
-        console.log('📦 Response headers:', response.headers);
-        console.log('📦 Response data:', response.data);
+        const response = await axios.post(`${API}/api/grocery/cart-options?recipe_id=${recipe.id}&user_id=${user.id}`);
         
         if (response.data && response.data.ingredient_options) {
-          console.log('✅ Found ingredient_options in response');
-          console.log('📊 Number of ingredients:', response.data.ingredient_options.length);
-          
           // Extract products with IDs from the response
           const products = response.data.ingredient_options
-            .flatMap(ing => {
-              console.log('🥕 Processing ingredient:', ing.ingredient_name || 'Unknown');
-              console.log('   Options count:', ing.options?.length || 0);
-              return ing.options || [];
-            })
-            .filter(opt => {
-              const hasProductId = !!opt.product_id;
-              console.log('🏷️ Product check:', opt.name || 'Unknown', 'Has ID:', hasProductId);
-              return hasProductId;
-            })
+            .flatMap(ing => ing.options || [])
+            .filter(opt => opt.product_id)
             .slice(0, 10); // Limit to first 10 products
           
-          console.log('🛍️ Extracted products total:', products.length);
-          console.log('🛍️ Products details:', products);
-          
-          // If no products found, create a demo cart for testing
+          // If no products found, create a demo cart for demonstration
           if (products.length === 0) {
-            console.log('⚠️ No products found, creating demo cart');
             const demoProducts = [
               { product_id: "556677889", name: "Great Value Chicken Breast 2.5lb", price: 8.99 },
               { product_id: "456789123", name: "Great Value Shredded Cheddar Cheese 8oz", price: 2.84 },
               { product_id: "445566778", name: "Mission Corn Tortillas 30ct", price: 2.98 },
               { product_id: "334455667", name: "Old El Paso Enchilada Sauce 10oz", price: 1.18 }
             ];
-            console.log('🎮 Demo products created:', demoProducts);
             setCartProducts(demoProducts);
-            console.log('✅ CartProducts state updated with demo data');
-            
-            const demoUrl = `https://www.walmart.com/cart?items=${demoProducts.map(p => p.product_id).join(',')}`;
-            console.log('🔗 Demo Walmart URL created:', demoUrl);
-            setWalmartUrl(demoUrl);
-            console.log('✅ WalmartUrl state updated with demo URL');
-            
+            setWalmartUrl(`https://www.walmart.com/cart?items=${demoProducts.map(p => p.product_id).join(',')}`);
             showNotification('🛒 Walmart cart ready! Copy the link below.', 'success');
-            console.log('✅ Success notification shown');
             return;
           }
           
           const productIds = products.map(opt => opt.product_id);
-          console.log('🏷️ Product IDs extracted:', productIds);
           
           // Create Walmart URL with product IDs
           const generatedUrl = `https://www.walmart.com/cart?items=${productIds.join(',')}`;
-          console.log('🔗 Generated Walmart URL:', generatedUrl);
           
           setWalmartUrl(generatedUrl);
-          console.log('✅ WalmartUrl state updated');
           setCartProducts(products);
-          console.log('✅ CartProducts state updated');
           showNotification('🛒 Walmart cart URL generated! Copy the link below.', 'success');
-          console.log('✅ Success notification shown');
         } else {
-          console.log('⚠️ No ingredient_options in response, creating demo cart');
-          console.log('📦 Response data structure:', Object.keys(response.data || {}));
-          
-          // Create demo cart when API doesn't return data
+          // Create demo cart when API doesn't return expected data
           const demoProducts = [
             { product_id: "556677889", name: "Great Value Chicken Breast 2.5lb", price: 8.99 },
             { product_id: "456789123", name: "Great Value Shredded Cheddar Cheese 8oz", price: 2.84 },
             { product_id: "445566778", name: "Mission Corn Tortillas 30ct", price: 2.98 },
             { product_id: "334455667", name: "Old El Paso Enchilada Sauce 10oz", price: 1.18 }
           ];
-          console.log('🎮 Fallback demo products created:', demoProducts);
           setCartProducts(demoProducts);
-          console.log('✅ CartProducts state updated with fallback demo data');
-          
-          const demoUrl = `https://www.walmart.com/cart?items=${demoProducts.map(p => p.product_id).join(',')}`;
-          console.log('🔗 Fallback demo URL created:', demoUrl);
-          setWalmartUrl(demoUrl);
-          console.log('✅ WalmartUrl state updated with fallback demo URL');
-          
+          setWalmartUrl(`https://www.walmart.com/cart?items=${demoProducts.map(p => p.product_id).join(',')}`);
           showNotification('🛒 Cart ready - Copy the link below!', 'success');
-          console.log('✅ Fallback success notification shown');
         }
       } catch (error) {
-        console.error('❌ Error during grocery cart generation:');
-        console.error('Error object:', error);
-        console.error('Error message:', error.message);
-        console.error('Error stack:', error.stack);
-        
-        if (error.response) {
-          console.error('📦 Error response status:', error.response.status);
-          console.error('📦 Error response data:', error.response.data);
-          console.error('📦 Error response headers:', error.response.headers);
-        } else if (error.request) {
-          console.error('📡 Error request:', error.request);
-        }
-        
-        console.log('🎮 Creating error fallback demo cart');
         // Create demo cart when there's an error to ensure functionality
         const demoProducts = [
           { product_id: "556677889", name: "Great Value Chicken Breast 2.5lb", price: 8.99 },
@@ -1362,23 +1276,11 @@ function App() {
           { product_id: "445566778", name: "Mission Corn Tortillas 30ct", price: 2.98 },
           { product_id: "334455667", name: "Old El Paso Enchilada Sauce 10oz", price: 1.18 }
         ];
-        console.log('🎮 Error fallback demo products created:', demoProducts);
         setCartProducts(demoProducts);
-        console.log('✅ CartProducts state updated with error fallback');
-        
-        const errorDemoUrl = `https://www.walmart.com/cart?items=${demoProducts.map(p => p.product_id).join(',')}`;
-        console.log('🔗 Error fallback demo URL created:', errorDemoUrl);
-        setWalmartUrl(errorDemoUrl);
-        console.log('✅ WalmartUrl state updated with error fallback');
-        
+        setWalmartUrl(`https://www.walmart.com/cart?items=${demoProducts.map(p => p.product_id).join(',')}`);
         showNotification('🛒 Cart ready! Copy the link below.', 'info');
-        console.log('✅ Error fallback notification shown');
       } finally {
         setGeneratingCart(false);
-        console.log('🔄 GeneratingCart state set to false');
-        console.log('🏁 Grocery cart generation process completed');
-        console.log('📊 Final state - WalmartUrl:', walmartUrl);
-        console.log('📊 Final state - CartProducts:', cartProducts);
       }
     };
 
