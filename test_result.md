@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "User initially reported 'I am clicking on the preview and nothing shows up' and 'nothing shows up' indicating a blank page issue. However, current investigation shows the app is working correctly."
+user_problem_statement: "User is experiencing persistent issues: 1) 'I am clicking on the preview and nothing shows up' - though screenshot shows app is loading correctly, 2) Walmart cart generation not working, 3) Recipes not loading from history properly. Previous investigation showed app working, but user continues to report these specific functionality issues."
 
 backend:
   - task: "AI Recipe Generation with OpenAI"
