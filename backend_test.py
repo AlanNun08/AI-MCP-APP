@@ -2199,5 +2199,176 @@ def main():
     
     return 0 if tester.tests_passed == tester.tests_run else 1
 
+def test_objectid_serialization_fix():
+    """Test if the MongoDB ObjectId serialization issue has been resolved"""
+    print("\n" + "=" * 80)
+    print("🔍 TESTING MONGODB OBJECTID SERIALIZATION FIX 🔍")
+    print("=" * 80)
+    
+    tester = AIRecipeAppTester()
+    
+    # Track test results for final report
+    serialization_tests = {
+        "User Registration": False,
+        "Recipe Generation": False,
+        "Recipe Retrieval": False,
+        "Cart Operations": False
+    }
+    
+    # 1. Test User Registration
+    print("\n" + "=" * 50)
+    print("1. Testing User Registration")
+    print("=" * 50)
+    
+    timestamp = int(time.time())
+    test_email = f"test_{timestamp}@example.com"
+    
+    user_data = {
+        "first_name": "ObjectId",
+        "last_name": "Test",
+        "email": test_email,
+        "password": "SecureP@ssw0rd123",
+        "dietary_preferences": ["vegetarian"],
+        "allergies": ["nuts"],
+        "favorite_cuisines": ["italian", "mexican"]
+    }
+    
+    register_success, register_response = tester.run_test(
+        "User Registration (ObjectId Test)",
+        "POST",
+        "auth/register",
+        200,
+        data=user_data
+    )
+    
+    if register_success and 'user_id' in register_response:
+        user_id = register_response['user_id']
+        print(f"✅ User registration successful with ID: {user_id}")
+        serialization_tests["User Registration"] = True
+        
+        # Get verification code
+        code_success, code_response = tester.run_test(
+            "Get Verification Code",
+            "GET",
+            f"debug/verification-codes/{test_email}",
+            200
+        )
+        
+        verification_code = None
+        if code_success:
+            if 'codes' in code_response and len(code_response['codes']) > 0:
+                verification_code = code_response['codes'][0]['code']
+                print(f"✅ Retrieved verification code: {verification_code}")
+            elif 'last_test_code' in code_response and code_response['last_test_code']:
+                verification_code = code_response['last_test_code']
+                print(f"✅ Retrieved last test verification code: {verification_code}")
+        
+        if verification_code:
+            # Verify email
+            verify_data = {
+                "email": test_email,
+                "code": verification_code
+            }
+            
+            verify_success, _ = tester.run_test(
+                "Email Verification",
+                "POST",
+                "auth/verify",
+                200,
+                data=verify_data
+            )
+            
+            if verify_success:
+                print("✅ Email verification successful")
+                
+                # 2. Test Recipe Generation
+                print("\n" + "=" * 50)
+                print("2. Testing Recipe Generation")
+                print("=" * 50)
+                
+                recipe_request = {
+                    "user_id": user_id,
+                    "cuisine_type": "italian",
+                    "dietary_preferences": ["vegetarian"],
+                    "ingredients_on_hand": ["pasta", "tomatoes", "garlic"],
+                    "prep_time_max": 30,
+                    "servings": 2,
+                    "difficulty": "easy"
+                }
+                
+                recipe_success, recipe_response = tester.run_test(
+                    "Generate Recipe (ObjectId Test)",
+                    "POST",
+                    "recipes/generate",
+                    200,
+                    data=recipe_request,
+                    timeout=60
+                )
+                
+                if recipe_success and 'id' in recipe_response:
+                    recipe_id = recipe_response['id']
+                    print(f"✅ Recipe generation successful with ID: {recipe_id}")
+                    serialization_tests["Recipe Generation"] = True
+                    
+                    # 3. Test Recipe Retrieval
+                    print("\n" + "=" * 50)
+                    print("3. Testing Recipe Retrieval")
+                    print("=" * 50)
+                    
+                    get_recipe_success, _ = tester.run_test(
+                        "Get Recipe (ObjectId Test)",
+                        "GET",
+                        f"recipes/{recipe_id}",
+                        200
+                    )
+                    
+                    if get_recipe_success:
+                        print(f"✅ Recipe retrieval successful for ID: {recipe_id}")
+                        serialization_tests["Recipe Retrieval"] = True
+                    
+                    # 4. Test Cart Operations
+                    print("\n" + "=" * 50)
+                    print("4. Testing Cart Operations")
+                    print("=" * 50)
+                    
+                    cart_success, cart_response = tester.run_test(
+                        "Create Grocery Cart with Options (ObjectId Test)",
+                        "POST",
+                        "grocery/cart-options",
+                        200,
+                        params={"recipe_id": recipe_id, "user_id": user_id}
+                    )
+                    
+                    if cart_success and 'id' in cart_response:
+                        cart_id = cart_response['id']
+                        print(f"✅ Cart operations successful with ID: {cart_id}")
+                        serialization_tests["Cart Operations"] = True
+    
+    # Print summary
+    print("\n" + "=" * 80)
+    print("📊 MONGODB OBJECTID SERIALIZATION FIX RESULTS 📊")
+    print("=" * 80)
+    
+    all_passed = True
+    for test_name, passed in serialization_tests.items():
+        status = "✅ PASSED" if passed else "❌ FAILED"
+        print(f"{test_name}: {status}")
+        if not passed:
+            all_passed = False
+    
+    print("\n" + "=" * 80)
+    if all_passed:
+        print("🎉 SUCCESS: MongoDB ObjectId serialization issue has been resolved!")
+        print("All tests passed successfully. The application is working properly for deployment.")
+    else:
+        print("❌ FAILURE: MongoDB ObjectId serialization issue is still present.")
+        print("Some tests failed. The application is not ready for deployment.")
+    print("=" * 80)
+    
+    return all_passed
+
 if __name__ == "__main__":
-    sys.exit(main())
+    if len(sys.argv) > 1 and sys.argv[1] == "--test-objectid-fix":
+        sys.exit(0 if test_objectid_serialization_fix() else 1)
+    else:
+        sys.exit(main())
