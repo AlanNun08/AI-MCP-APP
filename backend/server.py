@@ -677,7 +677,7 @@ async def get_user(user_id: str):
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
         
-        return user
+        return mongo_to_dict(user)
     except Exception as e:
         logging.error(f"Error fetching user: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to fetch user")
