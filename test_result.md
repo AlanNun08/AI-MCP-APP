@@ -342,15 +342,12 @@ metadata:
 
 test_plan:
   current_focus:
+    - "Enhanced Interactive Walmart Cart UI"
     - "Walmart API Integration"
-    - "Recipe Generation"
-    - "Recipe History Loading"
-    - "User Registration & Authentication"
   stuck_tasks:
     - "Walmart API Integration"
-    - "User Registration & Authentication"
   test_all: false
-  test_priority: "stuck_first"
+  test_priority: "high_first"
 
 agent_communication:
   - agent: "main"
