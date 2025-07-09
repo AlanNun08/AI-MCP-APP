@@ -122,11 +122,11 @@ backend:
   
   - task: "Walmart API Integration"
     implemented: true
-    working: true
+    working: false
     file: "server.py"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: true
         agent: "main"
@@ -134,6 +134,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "Successfully tested grocery cart with options endpoint (/api/grocery/cart-options) and custom cart endpoint (/api/grocery/custom-cart). Both work correctly. The simple cart endpoint (/api/grocery/simple-cart) has an issue with MongoDB ObjectId serialization and returns a 500 error."
+      - working: false
+        agent: "main"
+        comment: "User reports Walmart cart generation not working - need to investigate and test grocery cart functionality"
   
   - task: "User Management & Recipe Saving"
     implemented: true
