@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 def test_email_verification():
     """Test the email verification system with real email sending"""
-    base_url = "https://f9226bc9-6b3b-4560-ad33-733ee68266c4.preview.emergentagent.com/api"
+    base_url = "https://1896460c-1fcb-418f-bf8d-0da71d07a349.preview.emergentagent.com/api"
     
     # Clean up test data
     print("\n" + "=" * 50)
