@@ -1392,61 +1392,16 @@ function App() {
 
             {/* Enhanced Grocery Cart Button */}
             <div className="border-t pt-6">
-              <div className="text-center mb-4">
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">🛒 Ready to Shop?</h3>
-                <p className="text-sm text-gray-600">Generate your personalized Walmart shopping cart with all recipe ingredients</p>
-              </div>
-              
-              <button
-                onClick={generateGroceryCart}
-                disabled={generatingCart}
-                className="w-full bg-gradient-to-r from-blue-500 via-purple-500 to-green-500 text-white font-bold py-5 px-6 rounded-2xl shadow-xl hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none active:scale-95"
-              >
-                {generatingCart ? (
-                  <div className="flex items-center justify-center space-x-3">
-                    <div className="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
-                    <span className="text-lg">🤖 AI is building your cart...</span>
-                  </div>
-                ) : (
-                  <div className="flex items-center justify-center space-x-3">
-                    <span className="text-xl">🛒</span>
-                    <span className="text-lg">Generate Walmart Shopping Cart</span>
-                    <span className="text-xl">✨</span>
-                  </div>
-                )}
-              </button>
-              
-              {/* Debug Info */}
-              <div className="mt-4 p-2 bg-gray-100 rounded text-xs">
-                <p>Debug: showInteractiveCart = {showInteractiveCart.toString()}</p>
-                <p>Debug: confirmedCart = {confirmedCart.toString()}</p>
-                <p>Debug: finalWalmartUrl = {finalWalmartUrl ? `"${finalWalmartUrl.substring(0, 50)}..."` : 'null'}</p>
-                <p>Debug: cartItems.length = {cartItems.length}</p>
-                <p>Debug: generatingCart = {generatingCart.toString()}</p>
-                <p>Debug: Affiliate block should show = {(confirmedCart && finalWalmartUrl).toString()}</p>
-              </div>
-
-              {!showInteractiveCart && !confirmedCart && (
-                <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-xl">
-                  <div className="flex items-center justify-center space-x-2">
-                    <span className="text-blue-600">💡</span>
-                    <p className="text-sm text-blue-700 font-medium">
-                      Click above to build your interactive Walmart shopping cart!
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              {/* Interactive Cart */}
-              {showInteractiveCart && !confirmedCart && (
+              {/* Always show cart when recipe exists */}
+              {recipe && cartItems.length > 0 && confirmedCart && (
                 <div className="mt-6 p-6 bg-white border-2 border-blue-200 rounded-2xl shadow-lg">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-xl font-bold text-gray-800">🛒 Interactive Shopping Cart</h3>
+                    <h3 className="text-xl font-bold text-gray-800">🛒 Your Walmart Shopping Cart</h3>
                     <button
                       onClick={resetCart}
-                      className="text-gray-500 hover:text-gray-700 text-sm"
+                      className="text-gray-500 hover:text-gray-700 text-sm px-3 py-1 border border-gray-300 rounded-lg"
                     >
-                      ✕ Reset
+                      🔄 Reset Cart
                     </button>
                   </div>
                   
@@ -1503,59 +1458,46 @@ function App() {
                       </span>
                     </div>
                     
-                    <button
-                      onClick={confirmCart}
-                      disabled={cartItems.length === 0}
-                      className="w-full bg-gradient-to-r from-green-500 to-blue-500 text-white font-bold py-3 px-6 rounded-xl hover:from-green-600 hover:to-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 transition-all duration-200"
-                    >
-                      ✅ Confirm Cart & Generate Affiliate Link
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {/* Confirmed Cart with Affiliate Link */}
-              {confirmedCart && finalWalmartUrl && (
-                <div className="mt-6 p-6 bg-gradient-to-r from-green-50 to-blue-50 border-2 border-green-200 rounded-2xl shadow-lg">
-                  <div className="flex items-center justify-center mb-4">
-                    <span className="text-green-700 font-bold text-xl">🎉 Cart Confirmed!</span>
-                  </div>
-                  
-                  <div className="mb-4">
-                    <h4 className="text-lg font-semibold text-gray-800 mb-3 text-center">
-                      📋 Your Walmart Affiliate Link
-                    </h4>
-                    <div className="bg-yellow-50 border-2 border-yellow-300 rounded-xl p-4">
+                    <div className="mt-4 p-4 bg-gradient-to-r from-yellow-100 to-orange-100 border-2 border-yellow-300 rounded-xl">
+                      <div className="flex items-center justify-center mb-3">
+                        <h4 className="text-lg font-semibold text-gray-800">📋 Your Walmart Affiliate Link</h4>
+                      </div>
                       <textarea
                         value={finalWalmartUrl}
                         readOnly
-                        className="w-full h-24 p-3 border border-yellow-400 rounded-lg bg-white text-sm font-mono resize-none"
+                        className="w-full h-20 p-3 border border-yellow-400 rounded-lg bg-white text-xs font-mono resize-none mb-3"
                         onClick={(e) => e.target.select()}
                       />
-                      <div className="flex space-x-2 mt-3">
+                      <div className="flex space-x-2">
                         <button
                           onClick={copyUrlToClipboard}
                           className="flex-1 bg-gradient-to-r from-yellow-500 to-orange-500 text-white font-bold py-2 px-4 rounded-lg hover:from-yellow-600 hover:to-orange-600 transition-all duration-200"
                         >
                           📋 Copy Link
                         </button>
-                        <button
-                          onClick={resetCart}
-                          className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-all duration-200"
-                        >
-                          🔄 New Cart
-                        </button>
                       </div>
                     </div>
+                    
+                    <div className="text-center mt-4">
+                      <p className="text-sm text-gray-600 mb-2">
+                        Total Items: {cartItems.reduce((total, item) => total + item.quantity, 0)} | 
+                        Total Cost: ${calculateTotal().toFixed(2)}
+                      </p>
+                      <p className="text-xs text-green-600">
+                        ✅ This affiliate link includes all your selected quantities
+                      </p>
+                    </div>
                   </div>
-                  
-                  <div className="text-center">
-                    <p className="text-sm text-gray-600 mb-2">
-                      Total Items: {cartItems.reduce((total, item) => total + item.quantity, 0)} | 
-                      Total Cost: ${calculateTotal().toFixed(2)}
-                    </p>
-                    <p className="text-xs text-green-600">
-                      ✅ This affiliate link includes all your selected quantities
+                </div>
+              )}
+
+              {/* Show message when no recipe */}
+              {!recipe && (
+                <div className="mt-4 p-4 bg-gray-100 border border-gray-200 rounded-xl">
+                  <div className="flex items-center justify-center space-x-2">
+                    <span className="text-gray-500">💡</span>
+                    <p className="text-sm text-gray-600">
+                      Generate a recipe first to see your automatic shopping cart!
                     </p>
                   </div>
                 </div>
