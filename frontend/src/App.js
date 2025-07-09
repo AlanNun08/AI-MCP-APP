@@ -1212,12 +1212,6 @@ function App() {
     const [walmartUrl, setWalmartUrl] = useState(null);
     const [cartProducts, setCartProducts] = useState([]);
 
-    // Debug logging
-    console.log('📄 RecipeDetailScreen rendered with:');
-    console.log('Recipe:', recipe);
-    console.log('User:', user);
-    console.log('Current Screen:', currentScreen);
-
     const generateGroceryCart = async () => {
       if (!recipe) {
         showNotification('❌ No recipe found. Please generate a recipe first.', 'error');
