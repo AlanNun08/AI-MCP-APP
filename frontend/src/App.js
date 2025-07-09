@@ -1558,9 +1558,15 @@ function App() {
                   <ol className="text-xs text-blue-700 space-y-1">
                     <li>1. Click "Copy & Shop at Walmart"</li>
                     <li>2. Open new tab and paste the link</li>
-                    <li>3. All items auto-added to cart</li>
+                    <li>3. Items will be added to your cart</li>
                     <li>4. Proceed to checkout</li>
                   </ol>
+                  <div className="mt-3 p-2 bg-blue-100 rounded-lg">
+                    <p className="text-xs text-blue-600">
+                      <strong>Note:</strong> Currently using enhanced demo products with realistic IDs. 
+                      The URL format is correct and ready for production use.
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
