@@ -1563,11 +1563,16 @@ function App() {
 
     useEffect(() => {
       const fetchRecipes = async () => {
+        console.log('🔍 Fetching recipes for user:', user);
+        console.log('🔍 User ID:', user?.id);
+        console.log('🔍 API URL:', `${API}/api/users/${user.id}/recipes`);
+        
         try {
           const response = await axios.get(`${API}/api/users/${user.id}/recipes`);
+          console.log('✅ Recipes fetched successfully:', response.data);
           setRecipes(response.data);
         } catch (error) {
-          console.error('Failed to fetch recipes:', error);
+          console.error('❌ Failed to fetch recipes:', error);
           showNotification('❌ Failed to load recipes', 'error');
         } finally {
           setLoading(false);
@@ -1576,6 +1581,9 @@ function App() {
 
       if (user?.id) {
         fetchRecipes();
+      } else {
+        console.log('⚠️ No user ID available, not fetching recipes');
+        setLoading(false);
       }
     }, [user]);
 
