@@ -1278,15 +1278,13 @@ function App() {
 
     if (!recipe) {
       return (
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-800 mb-4">No Recipe Found</h1>
-            <button
-              onClick={() => setCurrentScreen('dashboard')}
-              className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600"
-            >
-              Back to Dashboard
-            </button>
+        <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 p-4">
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center py-20">
+              <div className="text-6xl mb-4">🍳</div>
+              <h2 className="text-2xl font-bold text-gray-800 mb-2">No Recipe Found</h2>
+              <p className="text-gray-600">Please generate a recipe first to see the details.</p>
+            </div>
           </div>
         </div>
       );
