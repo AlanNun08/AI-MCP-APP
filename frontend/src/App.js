@@ -1342,9 +1342,61 @@ function App() {
                     <span>Generating Cart...</span>
                   </div>
                 ) : (
-                  '🛒 Order Groceries from Walmart'
+                  '🛒 Generate Walmart Shopping Cart'
                 )}
               </button>
+
+              {/* Walmart URL Display */}
+              {walmartUrl && (
+                <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-xl">
+                  <div className="flex items-center mb-3">
+                    <span className="text-blue-600 font-semibold text-lg">🛒 Your Walmart Cart is Ready!</span>
+                  </div>
+                  
+                  {cartProducts.length > 0 && (
+                    <div className="mb-3">
+                      <p className="text-sm text-gray-600 mb-2">Items found ({cartProducts.length}):</p>
+                      <div className="text-xs text-gray-500 space-y-1">
+                        {cartProducts.slice(0, 5).map((product, index) => (
+                          <div key={index} className="flex justify-between">
+                            <span className="truncate">{product.name || `Product ${product.product_id}`}</span>
+                            <span className="text-green-600 font-medium">${product.price || 'Price TBD'}</span>
+                          </div>
+                        ))}
+                        {cartProducts.length > 5 && (
+                          <div className="text-gray-400 text-center">... and {cartProducts.length - 5} more items</div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="mb-3">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Copy this URL and paste it in your browser:
+                    </label>
+                    <div className="flex space-x-2">
+                      <input
+                        type="text"
+                        value={walmartUrl}
+                        readOnly
+                        className="flex-1 p-3 border border-gray-300 rounded-lg bg-white text-sm font-mono"
+                        onClick={(e) => e.target.select()}
+                      />
+                      <button
+                        onClick={copyUrlToClipboard}
+                        className="px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm font-medium"
+                      >
+                        📋 Copy
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="text-xs text-gray-500 space-y-1">
+                    <p>🔗 This URL contains product IDs: {cartProducts.map(p => p.product_id).join(', ')}</p>
+                    <p>💡 Tip: Open this URL in a new tab to add items to your Walmart cart</p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
