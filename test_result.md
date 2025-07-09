@@ -340,8 +340,6 @@ test_plan:
     - "Recipe Generation"
     - "Recipe History Loading"
   stuck_tasks:
-    - "Walmart API Integration" 
-    - "Recipe Generation"
   test_all: false
   test_priority: "stuck_first"
 
