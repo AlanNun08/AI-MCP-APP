@@ -778,8 +778,8 @@ async def update_user(user_id: str, user_update: UserCreate):
         raise HTTPException(status_code=500, detail="Failed to update user")
 
 # Recipe generation functions and routes (keeping all existing functionality)
-def _get_walmart_signature(url: str, request_type: str = "GET", body: str = "") -> str:
-    """Generate Walmart API signature"""
+def _get_walmart_signature() -> tuple:
+    """Generate Walmart API signature and timestamp"""
     try:
         # Parse private key
         private_key = serialization.load_pem_private_key(
@@ -787,20 +787,23 @@ def _get_walmart_signature(url: str, request_type: str = "GET", body: str = "") 
             password=None
         )
         
-        # Create canonical string
-        canonical_string = f"{request_type}\n{url}\n{body}"
+        # Generate timestamp
+        timestamp = str(int(time.time() * 1000))
         
-        # Sign the canonical string
+        # Create message in the correct format: CONSUMER_ID\nTIMESTAMP\nKEY_VERSION\n
+        message = f"{WALMART_CONSUMER_ID}\n{timestamp}\n{WALMART_KEY_VERSION}\n".encode("utf-8")
+        
+        # Sign the message
         signature = private_key.sign(
-            canonical_string.encode(),
+            message,
             padding.PKCS1v15(),
             hashes.SHA256()
         )
         
         # Base64 encode the signature
-        encoded_signature = base64.b64encode(signature).decode()
+        signature_b64 = base64.b64encode(signature).decode("utf-8")
         
-        return encoded_signature
+        return timestamp, signature_b64
         
     except Exception as e:
         logging.error(f"Error generating Walmart signature: {str(e)}")
