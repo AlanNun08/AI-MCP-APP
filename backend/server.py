@@ -487,6 +487,45 @@ async def get_user_debug(email: str):
     except Exception as e:
         return {"error": str(e)}
 
+@api_router.delete("/debug/clear-users")
+async def clear_all_users():
+    """Debug endpoint to clear all users and related data"""
+    try:
+        # Only allow in development/test mode
+        if os.getenv('NODE_ENV') == 'production':
+            raise HTTPException(status_code=404, detail="Not found")
+        
+        # Clear all users
+        users_result = await db.users.delete_many({})
+        
+        # Clear verification codes
+        codes_result = await db.verification_codes.delete_many({})
+        
+        # Clear password reset codes
+        reset_result = await db.password_reset_codes.delete_many({})
+        
+        # Clear recipes
+        recipes_result = await db.recipes.delete_many({})
+        
+        # Clear grocery carts
+        carts_result = await db.grocery_carts.delete_many({})
+        cart_options_result = await db.grocery_cart_options.delete_many({})
+        
+        return {
+            "message": "Database cleared successfully",
+            "deleted": {
+                "users": users_result.deleted_count,
+                "verification_codes": codes_result.deleted_count,
+                "password_reset_codes": reset_result.deleted_count,
+                "recipes": recipes_result.deleted_count,
+                "grocery_carts": carts_result.deleted_count,
+                "grocery_cart_options": cart_options_result.deleted_count
+            }
+        }
+        
+    except Exception as e:
+        return {"error": str(e)}
+
 @api_router.get("/debug/verification-codes/{email}")
 async def get_verification_codes_debug(email: str):
     """Debug endpoint to get verification codes for testing"""
