@@ -14,15 +14,20 @@ logger = logging.getLogger(__name__)
 
 class EmailService:
     def __init__(self):
-        # Hardcode credentials for testing
-        self.api_key = "5c7ca7fe01cf13886b5ce84fd3a1aff9"
-        self.secret_key = "da58d6dc87b3f527734077d6131d664f"
-        self.sender_email = "Alan.nunez0310@icloud.com"
+        # Load from environment variables
+        self.api_key = os.environ.get('MAILJET_API_KEY')
+        self.secret_key = os.environ.get('MAILJET_SECRET_KEY')
+        self.sender_email = os.environ.get('SENDER_EMAIL')
         self.test_mode = False  # Always use live mode
         self.last_verification_code = None  # Store for testing
-        self.initialized = True
         
-        logger.info(f"EmailService initialized with hardcoded credentials - Live mode: True, Sender: {self.sender_email}")
+        # Check if all required environment variables are set
+        if not all([self.api_key, self.secret_key, self.sender_email]):
+            logger.error("Missing required Mailjet environment variables")
+            self.initialized = False
+        else:
+            self.initialized = True
+            logger.info(f"EmailService initialized with environment variables - Live mode: True, Sender: {self.sender_email}")
     
     def generate_verification_code(self) -> str:
         """Generate a 6-digit verification code"""
