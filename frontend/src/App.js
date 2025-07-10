@@ -1442,9 +1442,12 @@ function App() {
 
     // Fallback function to generate mock cart
     const generateMockCart = () => {
-      if (recipe?.ingredients?.length > 0) {
+      // Use shopping_list if available, otherwise fall back to ingredients
+      const itemsToUse = recipe?.shopping_list?.length > 0 ? recipe.shopping_list : recipe?.ingredients || [];
+      
+      if (itemsToUse.length > 0) {
         const mockPrices = [3.99, 2.49, 5.99, 1.89, 4.49, 2.99, 6.99, 3.49, 1.99, 4.99, 2.79, 5.49];
-        const newCartItems = recipe.ingredients.map((ingredient, index) => ({
+        const newCartItems = itemsToUse.map((ingredient, index) => ({
           name: ingredient,
           price: mockPrices[index % mockPrices.length],
           quantity: 1,
@@ -1458,6 +1461,23 @@ function App() {
           Array(item.quantity).fill(item.product_id)
         );
         setFinalWalmartUrl(`https://affil.walmart.com/cart/addToCart?items=${itemIds.join(',')}`);
+        
+        // Also populate productOptions for the UI to work correctly
+        const mockOptions = {};
+        itemsToUse.forEach(ingredient => {
+          mockOptions[ingredient] = [
+            { name: `${ingredient} - Premium Brand`, price: mockPrices[0], product_id: `walmart-${ingredient}-1` },
+            { name: `${ingredient} - Store Brand`, price: mockPrices[1], product_id: `walmart-${ingredient}-2` },
+            { name: `${ingredient} - Organic`, price: mockPrices[2], product_id: `walmart-${ingredient}-3` }
+          ];
+        });
+        setProductOptions(mockOptions);
+        
+        const mockSelections = {};
+        itemsToUse.forEach(ingredient => {
+          mockSelections[ingredient] = `walmart-${ingredient}-1`;
+        });
+        setSelectedProducts(mockSelections);
       }
     };
 
