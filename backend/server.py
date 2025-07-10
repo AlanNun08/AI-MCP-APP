@@ -1167,19 +1167,24 @@ SNACKS: Focus on healthy and refreshing snack options such as:
 - Fruit lemon slices chili (fresh fruits, lemon juice, chili powder, lime, Mexican spices)
 - Frozen yogurt berry bites (Greek yogurt, mixed berries, natural sweeteners, bite-sized treats)
 
-BEVERAGES: Focus on detailed "secret recipes" with exact measurements and professional techniques:
-- Coffee (specialty espresso drinks, cold brews, gourmet preparations with exact measurements)
-- Boba tea (brown sugar boba, fruit boba with cooking instructions, syrup preparation)
-- Thai tea (authentic orange tea with traditional preparation methods)
-- Special lemonades (unique fruit combinations, natural sweeteners, fresh herbs, gourmet touches)
+BEVERAGES: Generate 4 unique and original beverage recipes with Instagram-worthy presentation:
 
-For BEVERAGES, create detailed "secret recipes" with:
-- Title of the drink
-- Brief description (1–2 sentences)
-- List of ingredients with exact quantities and units (cups, tablespoons, ounces)
-- Detailed step-by-step instructions including brewing, mixing, and serving techniques
-- Optional tips or substitutions for customization
-- Professional techniques (shaking, layering, temperature control)
+1. COFFEE-BASED DRINK: Specialty espresso drinks, cold brews, or gourmet preparations with elements like cold foam, whipped crème, flavored syrups, or layered toppings like caramel drizzle
+
+2. LEMONADE-BASED DRINK: Refreshing, fruity, or herbal lemonades perfect for summer with unique fruit combinations, natural sweeteners, and fresh herbs
+
+3. THAI TEA-BASED DRINK: Authentic Thai tea layered or infused with other flavors (fruit, spices, milk alternatives, or syrups) with traditional preparation methods
+
+4. BOBA DRINK: Milk-based or fruit-based bubble tea using tapioca, popping boba, or creative textures with authentic bubble tea shop quality
+
+For each of the 4 beverages, include:
+🧋 Creative, original drink name
+✨ Brief flavor description (1–2 sentences that describe taste and style)
+🧾 List of ingredients with exact quantities and units (cups, tablespoons, ounces)
+🍳 Step-by-step instructions including brewing, mixing, and serving techniques
+💡 Optional tips or variations (e.g., vegan swap, flavor twist, serving method)
+
+Make each drink visually Instagram-worthy with professional techniques (shaking, layering, temperature control).
 
 Example beverage ingredients format:
 - "2 shots espresso" instead of "espresso"
