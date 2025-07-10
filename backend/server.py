@@ -925,8 +925,20 @@ async def _get_walmart_product_options(ingredient: str, max_options: int = 3) ->
                         logging.info(f"Found {len(data['items'])} items from Walmart API for '{clean_ingredient}'")
                         for item in data['items'][:max_options]:
                             if 'itemId' in item:
+                                product_id = str(item.get('itemId', ''))
+                                
+                                # Validate that this is a real Walmart product ID
+                                # Filter out any mock or test product IDs
+                                if (not product_id.isdigit() or 
+                                    len(product_id) < 6 or
+                                    product_id.startswith('10315') or  # Common mock pattern
+                                    product_id.startswith('walmart-') or
+                                    product_id.startswith('mock-')):
+                                    logging.warning(f"Skipping invalid/mock product ID: {product_id} for '{clean_ingredient}'")
+                                    continue
+                                
                                 product = WalmartProduct(
-                                    product_id=str(item.get('itemId', '')),
+                                    product_id=product_id,
                                     name=item.get('name', clean_ingredient),
                                     price=float(item.get('salePrice', 0.0)),
                                     thumbnail_image=item.get('thumbnailImage', ''),
