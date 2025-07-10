@@ -105,7 +105,17 @@
 user_problem_statement: "User (Alan.nunez0310@icloud.com) reports that the new recipe detail UI with instructions, ingredients, and Walmart cart is not showing up. The user wants to ensure the new modern two-column UI is being used and any old code is permanently deleted. The recipe page should show instructions, ingredients, Walmart URL, prices, and total price in a clean modern design. The issue appears to be a caching problem preventing the user from seeing the updated UI."
 
 backend:
-  - task: "Final Beverage Shopping List Fix"
+  - task: "Beverage Type Selection Fix"
+    implemented: true
+    working: "needs_testing"
+    file: "server.py"
+    stuck_count: 0
+    priority: "critical"
+    needs_retesting: true
+    status_history:
+      - working: "needs_testing"
+        agent: "main"
+        comment: "Recently modified backend to generate only the user-selected beverage type instead of all four types. User wants app deployment-ready, so this critical fix needs verification to ensure it's working correctly."
     implemented: true
     working: true
     file: "server.py, App.js"
