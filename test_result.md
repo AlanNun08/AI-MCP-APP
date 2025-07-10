@@ -433,12 +433,11 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Recipe Generation"
-    - "Walmart API Integration"
+    - "Beverage Type Selection Fix"
   stuck_tasks:
-    - "Walmart API Integration"
+    - "Beverage Type Selection Fix"
   test_all: false
-  test_priority: "high_first"
+  test_priority: "critical_first"
 
 agent_communication:
   - agent: "main"
