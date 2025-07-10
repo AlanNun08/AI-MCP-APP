@@ -136,6 +136,7 @@ class UserCreate(BaseModel):
 
 class RecipeGenRequest(BaseModel):
     user_id: str
+    recipe_category: Optional[str] = None  # 'cuisine', 'snack', 'beverage'
     cuisine_type: Optional[str] = None
     dietary_preferences: List[str] = []
     ingredients_on_hand: List[str] = []
