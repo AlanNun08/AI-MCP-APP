@@ -1051,35 +1051,23 @@ async def generate_recipe(request: RecipeGenRequest):
         
         if recipe_category == "snack":
             if recipe_type == "acai bowls":
-                prompt_parts.append(f"Create a delicious acai bowl recipe for {request.servings} people. Focus on healthy superfoods, frozen acai, fresh toppings, and nutritious ingredients.")
-            elif recipe_type == "smoothie bowls":
-                prompt_parts.append(f"Create a nutritious smoothie bowl recipe for {request.servings} people. Include frozen fruits, healthy toppings, and superfood ingredients.")
-            elif recipe_type == "brownies":
-                prompt_parts.append(f"Create a decadent brownie recipe for {request.servings} people. Focus on rich chocolate flavors and perfect texture.")
-            elif recipe_type == "cookies":
-                prompt_parts.append(f"Create a delicious cookie recipe for {request.servings} people. Include classic or creative flavors with perfect texture.")
-            elif recipe_type == "energy bites":
-                prompt_parts.append(f"Create healthy energy bite recipe for {request.servings} people. Use nuts, dates, seeds, and superfoods for nutritious snacking.")
+                prompt_parts.append(f"Create a delicious and nutritious acai bowl recipe for {request.servings} people. Focus on frozen acai puree, healthy superfoods, fresh toppings, granola, and colorful presentation. Include preparation techniques for the perfect consistency.")
+            elif recipe_type == "fruit lemon slices chili":
+                prompt_parts.append(f"Create a spicy and refreshing fruit lemon slices with chili recipe for {request.servings} people. Focus on fresh fruits, lemon juice, chili powder, lime, and traditional Mexican-style seasoning. Include cutting techniques and spice combinations.")
+            elif recipe_type == "frozen yogurt berry bites":
+                prompt_parts.append(f"Create healthy frozen yogurt berry bites recipe for {request.servings} people. Focus on Greek yogurt, mixed berries, natural sweeteners, and bite-sized frozen treats. Include freezing techniques and presentation.")
             else:
                 prompt_parts.append(f"Create a {recipe_type} snack recipe for {request.servings} people. Focus on tasty, satisfying snacks that are perfect for any time of day.")
         
         elif recipe_category == "beverage":
-            if recipe_type == "coffee drinks":
-                prompt_parts.append(f"Create a detailed secret recipe for a specialty coffee drink for {request.servings} people. Include Starbucks-style copycat recipes like Iced Brown Sugar Oatmilk Shaken Espresso, Caramel Macchiato, or Pumpkin Spice Latte. Provide exact measurements, brewing instructions, and professional barista techniques.")
+            if recipe_type == "coffee":
+                prompt_parts.append(f"Create a detailed specialty coffee recipe for {request.servings} people. Include exact measurements, brewing methods, and professional techniques. Focus on espresso-based drinks, cold brews, or gourmet coffee preparations with precise instructions.")
             elif recipe_type == "boba tea":
-                prompt_parts.append(f"Create a detailed brown sugar boba milk tea or fruit boba tea recipe for {request.servings} people. Include boba cooking instructions, brown sugar syrup preparation, tea brewing methods, and assembly techniques. Make it taste like authentic bubble tea shop quality.")
+                prompt_parts.append(f"Create a detailed brown sugar boba tea or fruit boba tea recipe for {request.servings} people. Include tapioca pearl cooking instructions, tea brewing methods, syrup preparation, and assembly techniques. Make it authentic bubble tea shop quality.")
             elif recipe_type == "thai tea":
-                prompt_parts.append(f"Create an authentic Thai tea recipe for {request.servings} people. Include traditional orange tea preparation, condensed milk ratios, and the signature layered presentation technique.")
-            elif recipe_type == "smoothies":
-                prompt_parts.append(f"Create a tropical or superfood smoothie recipe for {request.servings} people. Include exact fruit ratios, liquid measurements, and blending techniques for the perfect consistency.")
-            elif recipe_type == "matcha drinks":
-                prompt_parts.append(f"Create a detailed matcha drink recipe for {request.servings} people. Include proper matcha whisking techniques, temperature guidelines, and authentic Japanese preparation methods.")
-            elif recipe_type == "fresh juices":
-                prompt_parts.append(f"Create a fresh juice or agua fresca recipe for {request.servings} people. Include fruit preparation, straining techniques, and natural sweetening methods.")
-            elif recipe_type == "iced teas":
-                prompt_parts.append(f"Create a flavored iced tea or sweet tea recipe for {request.servings} people. Include brewing strength, sweetening techniques, and flavor infusion methods.")
-            elif recipe_type == "hot chocolate":
-                prompt_parts.append(f"Create a gourmet hot chocolate recipe for {request.servings} people. Include melting techniques, milk ratios, and optional toppings like whipped cream or marshmallows.")
+                prompt_parts.append(f"Create an authentic Thai tea recipe for {request.servings} people. Include traditional orange tea preparation, condensed milk ratios, spice blending, and the signature layered presentation technique.")
+            elif recipe_type == "special lemonades":
+                prompt_parts.append(f"Create a special flavored lemonade recipe for {request.servings} people. Include unique fruit combinations, natural sweeteners, fresh herbs, and creative presentation. Focus on refreshing summer drinks with gourmet touches.")
             else:
                 prompt_parts.append(f"Create a detailed {recipe_type} beverage recipe for {request.servings} people. Focus on refreshing, flavorful drinks with exact measurements and professional techniques.")
         
