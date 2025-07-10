@@ -1308,16 +1308,13 @@ async def create_custom_cart(cart_data: Dict[str, Any]):
             product_id = product_data['product_id']
             
             # Validate that product ID is from real Walmart API (not mock data)
-            # Real Walmart product IDs are typically 8-9 digit numbers
-            if not product_id.isdigit() or len(product_id) < 6:
-                logging.warning(f"Skipping invalid product ID: {product_id} for {product_data.get('ingredient_name', 'unknown')}")
-                continue
-                
-            # Skip mock product IDs that start with common patterns
-            if (product_id.startswith('walmart-') or 
-                product_id.startswith('10315') or  # Common mock ID pattern
+            # Real Walmart product IDs are numeric and at least 6 digits
+            if (not product_id.isdigit() or 
+                len(product_id) < 6 or
+                product_id.startswith('10315') or  # Common mock ID pattern from old data
+                product_id.startswith('walmart-') or 
                 product_id.startswith('mock-')):
-                logging.warning(f"Skipping mock product ID: {product_id} for {product_data.get('ingredient_name', 'unknown')}")
+                logging.warning(f"Skipping invalid/mock product ID: {product_id} for {product_data.get('ingredient_name', 'unknown')}")
                 continue
             
             cart_product = GroceryCartProduct(
