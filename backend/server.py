@@ -1065,17 +1065,23 @@ async def generate_recipe(request: RecipeGenRequest):
         
         elif recipe_category == "beverage":
             if recipe_type == "coffee drinks":
-                prompt_parts.append(f"Create a specialty coffee drink recipe for {request.servings} people. Include Starbucks-style drinks like lattes, frappuccinos, or creative coffee combinations.")
+                prompt_parts.append(f"Create a detailed secret recipe for a specialty coffee drink for {request.servings} people. Include Starbucks-style copycat recipes like Iced Brown Sugar Oatmilk Shaken Espresso, Caramel Macchiato, or Pumpkin Spice Latte. Provide exact measurements, brewing instructions, and professional barista techniques.")
             elif recipe_type == "boba tea":
-                prompt_parts.append(f"Create a delicious boba tea recipe for {request.servings} people. Include tea base, flavoring, and tapioca pearls with authentic Asian flavors.")
+                prompt_parts.append(f"Create a detailed brown sugar boba milk tea or fruit boba tea recipe for {request.servings} people. Include boba cooking instructions, brown sugar syrup preparation, tea brewing methods, and assembly techniques. Make it taste like authentic bubble tea shop quality.")
             elif recipe_type == "thai tea":
-                prompt_parts.append(f"Create an authentic Thai tea recipe for {request.servings} people. Focus on traditional orange tea with condensed milk and spices.")
+                prompt_parts.append(f"Create an authentic Thai tea recipe for {request.servings} people. Include traditional orange tea preparation, condensed milk ratios, and the signature layered presentation technique.")
             elif recipe_type == "smoothies":
-                prompt_parts.append(f"Create a healthy smoothie recipe for {request.servings} people. Include fresh fruits, vegetables, and nutritious add-ins.")
+                prompt_parts.append(f"Create a tropical or superfood smoothie recipe for {request.servings} people. Include exact fruit ratios, liquid measurements, and blending techniques for the perfect consistency.")
             elif recipe_type == "matcha drinks":
-                prompt_parts.append(f"Create a matcha drink recipe for {request.servings} people. Focus on high-quality matcha with traditional or modern preparations.")
+                prompt_parts.append(f"Create a detailed matcha drink recipe for {request.servings} people. Include proper matcha whisking techniques, temperature guidelines, and authentic Japanese preparation methods.")
+            elif recipe_type == "fresh juices":
+                prompt_parts.append(f"Create a fresh juice or agua fresca recipe for {request.servings} people. Include fruit preparation, straining techniques, and natural sweetening methods.")
+            elif recipe_type == "iced teas":
+                prompt_parts.append(f"Create a flavored iced tea or sweet tea recipe for {request.servings} people. Include brewing strength, sweetening techniques, and flavor infusion methods.")
+            elif recipe_type == "hot chocolate":
+                prompt_parts.append(f"Create a gourmet hot chocolate recipe for {request.servings} people. Include melting techniques, milk ratios, and optional toppings like whipped cream or marshmallows.")
             else:
-                prompt_parts.append(f"Create a {recipe_type} beverage recipe for {request.servings} people. Focus on refreshing, flavorful drinks perfect for any occasion.")
+                prompt_parts.append(f"Create a detailed {recipe_type} beverage recipe for {request.servings} people. Focus on refreshing, flavorful drinks with exact measurements and professional techniques.")
         
         else:  # cuisine category
             if recipe_type == "snacks & bowls":
