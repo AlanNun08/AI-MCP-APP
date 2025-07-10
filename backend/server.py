@@ -1042,10 +1042,15 @@ async def generate_recipe(request: RecipeGenRequest):
     """Generate a recipe using OpenAI"""
     try:
         # Build the prompt
-        prompt_parts = [
-            f"Create a {request.cuisine_type or 'delicious'} recipe for {request.servings} people.",
-            f"Difficulty level: {request.difficulty}."
-        ]
+        prompt_parts = []
+        
+        # Special handling for snacks & bowls cuisine
+        if request.cuisine_type == "snacks & bowls":
+            prompt_parts.append(f"Create a healthy snack or bowl recipe for {request.servings} people. Focus on nutritious snacks, smoothie bowls, acai bowls, poke bowls, grain bowls, or energy bites.")
+        else:
+            prompt_parts.append(f"Create a {request.cuisine_type or 'delicious'} recipe for {request.servings} people.")
+        
+        prompt_parts.append(f"Difficulty level: {request.difficulty}.")
         
         if request.dietary_preferences:
             prompt_parts.append(f"Dietary preferences: {', '.join(request.dietary_preferences)}.")
