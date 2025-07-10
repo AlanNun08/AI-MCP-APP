@@ -1440,47 +1440,6 @@ function App() {
       console.log('✅ Product selection updated for', ingredientName, ':', selectedProduct.name);
     };
 
-    // Fallback function to generate mock cart
-    const generateMockCart = () => {
-      // Use shopping_list if available, otherwise fall back to ingredients
-      const itemsToUse = recipe?.shopping_list?.length > 0 ? recipe.shopping_list : recipe?.ingredients || [];
-      
-      if (itemsToUse.length > 0) {
-        const mockPrices = [3.99, 2.49, 5.99, 1.89, 4.49, 2.99, 6.99, 3.49, 1.99, 4.99, 2.79, 5.49];
-        const newCartItems = itemsToUse.map((ingredient, index) => ({
-          name: ingredient,
-          price: mockPrices[index % mockPrices.length],
-          quantity: 1,
-          product_id: `walmart-${index + 1000}`,
-          ingredient_name: ingredient
-        }));
-        setCartItems(newCartItems);
-        
-        // Generate affiliate URL with mock IDs
-        const itemIds = newCartItems.flatMap(item => 
-          Array(item.quantity).fill(item.product_id)
-        );
-        setFinalWalmartUrl(`https://affil.walmart.com/cart/addToCart?items=${itemIds.join(',')}`);
-        
-        // Also populate productOptions for the UI to work correctly
-        const mockOptions = {};
-        itemsToUse.forEach(ingredient => {
-          mockOptions[ingredient] = [
-            { name: `${ingredient} - Premium Brand`, price: mockPrices[0], product_id: `walmart-${ingredient}-1` },
-            { name: `${ingredient} - Store Brand`, price: mockPrices[1], product_id: `walmart-${ingredient}-2` },
-            { name: `${ingredient} - Organic`, price: mockPrices[2], product_id: `walmart-${ingredient}-3` }
-          ];
-        });
-        setProductOptions(mockOptions);
-        
-        const mockSelections = {};
-        itemsToUse.forEach(ingredient => {
-          mockSelections[ingredient] = `walmart-${ingredient}-1`;
-        });
-        setSelectedProducts(mockSelections);
-      }
-    };
-
     // Update quantity and regenerate URL
     const updateQuantity = (index, newQuantity) => {
       if (newQuantity < 1) return;
