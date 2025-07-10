@@ -1042,14 +1042,46 @@ async def _get_walmart_product_options(ingredient: str, max_options: int = 3) ->
 async def generate_recipe(request: RecipeGenRequest):
     """Generate a recipe using OpenAI"""
     try:
-        # Build the prompt
+        # Build the prompt based on recipe category
         prompt_parts = []
         
-        # Special handling for snacks & bowls cuisine
-        if request.cuisine_type == "snacks & bowls":
-            prompt_parts.append(f"Create a healthy snack or bowl recipe for {request.servings} people. Focus on nutritious snacks, smoothie bowls, acai bowls, poke bowls, grain bowls, or energy bites.")
-        else:
-            prompt_parts.append(f"Create a {request.cuisine_type or 'delicious'} recipe for {request.servings} people.")
+        # Determine recipe category and build appropriate prompt
+        recipe_category = request.recipe_category or 'cuisine'
+        recipe_type = request.cuisine_type or 'general'
+        
+        if recipe_category == "snack":
+            if recipe_type == "acai bowls":
+                prompt_parts.append(f"Create a delicious acai bowl recipe for {request.servings} people. Focus on healthy superfoods, frozen acai, fresh toppings, and nutritious ingredients.")
+            elif recipe_type == "smoothie bowls":
+                prompt_parts.append(f"Create a nutritious smoothie bowl recipe for {request.servings} people. Include frozen fruits, healthy toppings, and superfood ingredients.")
+            elif recipe_type == "brownies":
+                prompt_parts.append(f"Create a decadent brownie recipe for {request.servings} people. Focus on rich chocolate flavors and perfect texture.")
+            elif recipe_type == "cookies":
+                prompt_parts.append(f"Create a delicious cookie recipe for {request.servings} people. Include classic or creative flavors with perfect texture.")
+            elif recipe_type == "energy bites":
+                prompt_parts.append(f"Create healthy energy bite recipe for {request.servings} people. Use nuts, dates, seeds, and superfoods for nutritious snacking.")
+            else:
+                prompt_parts.append(f"Create a {recipe_type} snack recipe for {request.servings} people. Focus on tasty, satisfying snacks that are perfect for any time of day.")
+        
+        elif recipe_category == "beverage":
+            if recipe_type == "coffee drinks":
+                prompt_parts.append(f"Create a specialty coffee drink recipe for {request.servings} people. Include Starbucks-style drinks like lattes, frappuccinos, or creative coffee combinations.")
+            elif recipe_type == "boba tea":
+                prompt_parts.append(f"Create a delicious boba tea recipe for {request.servings} people. Include tea base, flavoring, and tapioca pearls with authentic Asian flavors.")
+            elif recipe_type == "thai tea":
+                prompt_parts.append(f"Create an authentic Thai tea recipe for {request.servings} people. Focus on traditional orange tea with condensed milk and spices.")
+            elif recipe_type == "smoothies":
+                prompt_parts.append(f"Create a healthy smoothie recipe for {request.servings} people. Include fresh fruits, vegetables, and nutritious add-ins.")
+            elif recipe_type == "matcha drinks":
+                prompt_parts.append(f"Create a matcha drink recipe for {request.servings} people. Focus on high-quality matcha with traditional or modern preparations.")
+            else:
+                prompt_parts.append(f"Create a {recipe_type} beverage recipe for {request.servings} people. Focus on refreshing, flavorful drinks perfect for any occasion.")
+        
+        else:  # cuisine category
+            if recipe_type == "snacks & bowls":
+                prompt_parts.append(f"Create a healthy snack or bowl recipe for {request.servings} people. Focus on nutritious snacks, smoothie bowls, acai bowls, poke bowls, grain bowls, or energy bites.")
+            else:
+                prompt_parts.append(f"Create a {recipe_type or 'delicious'} recipe for {request.servings} people.")
         
         prompt_parts.append(f"Difficulty level: {request.difficulty}.")
         
