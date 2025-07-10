@@ -1162,7 +1162,7 @@ SNACKS: Focus on healthy and refreshing snack options such as:
 - Fruit lemon slices chili (fresh fruits, lemon juice, chili powder, lime, Mexican spices)
 - Frozen yogurt berry bites (Greek yogurt, mixed berries, natural sweeteners, bite-sized treats)
 
-BEVERAGES: Generate 4 unique and original beverage recipes with Instagram-worthy presentation:
+BEVERAGES: Generate specific beverage recipes based on user selection:
 
 1. COFFEE-BASED DRINK: Specialty espresso drinks, cold brews, or gourmet preparations with elements like cold foam, whipped crème, flavored syrups, or layered toppings like caramel drizzle
 
@@ -1172,7 +1172,7 @@ BEVERAGES: Generate 4 unique and original beverage recipes with Instagram-worthy
 
 4. BOBA DRINK: Milk-based or fruit-based bubble tea using tapioca, popping boba, or creative textures with authentic bubble tea shop quality
 
-For each of the 4 beverages, include:
+For each beverage, include:
 🧋 Creative, original drink name
 ✨ Brief flavor description (1–2 sentences that describe taste and style)
 🧾 List of ingredients with exact quantities and units (cups, tablespoons, ounces)
@@ -1181,12 +1181,11 @@ For each of the 4 beverages, include:
 
 Make each drink visually Instagram-worthy with professional techniques (shaking, layering, temperature control).
 
-CRITICAL FOR BEVERAGE SHOPPING LIST: The shopping_list must contain ONLY clean ingredient names without any quantities, measurements, or preparation instructions. For beverages specifically:
-- If ingredients include "4 lemons" and "1/2 cup pineapple chunks", the shopping_list should be ["lemons", "pineapple"]
+CRITICAL FOR BEVERAGE SHOPPING LIST: The shopping_list must contain ONLY clean ingredient names without any quantities, measurements, or preparation instructions. For beverage specifically:
 - If ingredients include "2 shots espresso" and "1/2 cup brown sugar syrup", the shopping_list should be ["espresso beans", "brown sugar"]
 - If ingredients include "1/4 cup fresh mint leaves" and "ice cubes", the shopping_list should be ["mint", "ice"]
 - If ingredients include "1 cup oat milk" and "3/4 cup cooked tapioca pearls", the shopping_list should be ["oat milk", "tapioca pearls"]
-- Remove ALL quantities (4, 1/2 cup, 2 shots, 1/4 cup, etc.) and measurements (cups, tablespoons, ounces)
+- Remove ALL quantities (2 shots, 1/2 cup, 1/4 cup, etc.) and measurements (cups, tablespoons, ounces)
 - Remove ALL preparation words (fresh, cooked, diced, chopped, etc.)
 - Use clean, searchable ingredient names suitable for Walmart product search
 
