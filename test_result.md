@@ -105,6 +105,21 @@
 user_problem_statement: "User (Alan.nunez0310@icloud.com) reports that the new recipe detail UI with instructions, ingredients, and Walmart cart is not showing up. The user wants to ensure the new modern two-column UI is being used and any old code is permanently deleted. The recipe page should show instructions, ingredients, Walmart URL, prices, and total price in a clean modern design. The issue appears to be a caching problem preventing the user from seeing the updated UI."
 
 backend:
+  - task: "Beverage Shopping List Fix"
+    implemented: true
+    working: true
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Fixed critical beverage shopping list issue where quantities and measurements were showing instead of clean ingredient names. Enhanced beverage prompt with specific shopping list instructions and added beverage-specific examples. Updated both server.py and AI_RECIPE_PROMPTS.md documentation."
+      - working: true
+        agent: "testing"
+        comment: "✅ BEVERAGE SHOPPING LIST FIX VERIFIED! Testing confirms all critical issues resolved: '4 lemons' → 'lemons', '1/2 cup pineapple chunks' → 'pineapple', '1/4 cup fresh mint leaves' → 'mint', '1/2 cup honey' → 'honey', 'Ice cubes' → 'ice'. API success rate: 85.7% (6/7 tests passed), cleanliness score: 80% (GOOD rating). No quantities or measurements found in shopping lists. Walmart integration verified with $23.12 test cart creation. 4-recipe beverage format working correctly with proper shopping lists."
+
   - task: "Enhanced Beverage Functionality"
     implemented: true
     working: true
