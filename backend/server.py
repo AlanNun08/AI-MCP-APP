@@ -1341,12 +1341,9 @@ async def create_grocery_cart_options(recipe_id: str, user_id: str):
         for index, ingredient in enumerate(ingredients_to_search):
             products = await _get_walmart_product_options(ingredient, max_options=3)
             
-            # Use the original ingredient description for display if we have both
-            original_ingredient = recipe['ingredients'][index] if index < len(recipe['ingredients']) else ingredient
-            
             ingredient_option = IngredientOption(
-                ingredient_name=ingredient,  # Clean ingredient name for searching
-                original_ingredient=original_ingredient,  # Full ingredient description for display
+                ingredient_name=ingredient,  # Clean ingredient name for searching and display
+                original_ingredient=ingredient,  # Use clean name for both fields
                 options=products
             )
             ingredient_options.append(ingredient_option)
