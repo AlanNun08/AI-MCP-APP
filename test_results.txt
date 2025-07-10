@@ -1,7 +1,7 @@
 ================================================================================
 AI Recipe & Grocery App - Backend API Testing
 ================================================================================
-Using backend URL from frontend/.env: https://3de015a9-d2f3-4c69-92f0-7a535d17381f.preview.emergentagent.com
+Using backend URL from frontend/.env: https://c988d9d7-9d97-4304-9bbb-57f48034c134.preview.emergentagent.com
 
 🔍 Testing API Root...
 ⏱️ Request completed in 0.09 seconds
