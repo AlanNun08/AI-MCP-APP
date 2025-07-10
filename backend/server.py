@@ -1115,15 +1115,25 @@ Return ONLY a valid JSON object with this exact structure:
     "shopping_list": ["ingredient_name_1", "ingredient_name_2"]
 }
 
-For "snacks & bowls" cuisine, focus on healthy snack recipes such as:
-- Acai bowls with toppings (frozen acai, granola, fresh berries, honey)
+Recipe Category Guidelines:
+
+SNACKS: Focus on treats and healthy snacks such as:
+- Acai bowls (frozen acai, granola, fresh berries, honey)
 - Smoothie bowls (frozen fruits, protein powder, nuts, seeds)
-- Poke bowls (fresh fish, rice, vegetables, sauces)
-- Grain bowls (quinoa, roasted vegetables, proteins, dressings)
+- Brownies (chocolate, flour, eggs, butter, sugar)
+- Cookies (flour, butter, sugar, chocolate chips, vanilla)
 - Energy bites (dates, nuts, seeds, superfoods)
-- Avocado toast variations
-- Chia pudding bowls
-- Greek yogurt parfait bowls
+- Granola bars (oats, honey, nuts, dried fruits)
+
+BEVERAGES: Focus on drinks and specialty beverages such as:
+- Coffee drinks (espresso, milk, syrups, whipped cream)
+- Boba tea (tea, tapioca pearls, milk, flavoring)
+- Thai tea (black tea, condensed milk, sugar, spices)
+- Smoothies (fruits, yogurt, milk, protein powder)
+- Matcha drinks (matcha powder, milk, sweetener)
+- Fresh juices (fruits, vegetables, natural sweeteners)
+
+CUISINE: Traditional dishes from specific cultures and regions with authentic ingredients and cooking methods.
 
 The shopping_list should be a separate bullet-pointed shopping list that includes only the names of the ingredients (no amounts, no measurements). For example:
 - If ingredients include "1 cup diced tomatoes" and "2 tbsp olive oil", the shopping_list should be ["tomatoes", "olive oil"]
