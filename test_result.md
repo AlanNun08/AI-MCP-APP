@@ -105,6 +105,18 @@
 user_problem_statement: "User (Alan.nunez0310@icloud.com) reports that the new recipe detail UI with instructions, ingredients, and Walmart cart is not showing up. The user wants to ensure the new modern two-column UI is being used and any old code is permanently deleted. The recipe page should show instructions, ingredients, Walmart URL, prices, and total price in a clean modern design. The issue appears to be a caching problem preventing the user from seeing the updated UI."
 
 backend:
+  - task: "Beverage Walmart Integration Fix"
+    implemented: false
+    working: false
+    file: "server.py"
+    stuck_count: 0
+    priority: "critical"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "main"
+        comment: "User reports Walmart link generation not working specifically for beverages. Issues: 1) Walmart cart not adding item IDs correctly from search products, 2) Shopping list prompt may not be generating clean product names suitable for Walmart catalog search. Need to investigate and fix these critical issues."
+
   - task: "Beverage Type Selection Fix"
     implemented: true
     working: true
