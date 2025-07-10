@@ -481,9 +481,9 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Beverage Type Selection Fix"
+    - "Walmart Integration Mock Data Removal"
   stuck_tasks: 
-    - "Beverage Type Selection Fix"
+    - "Walmart Integration Mock Data Removal"
   test_all: false
   test_priority: "critical_first"
 
