@@ -1158,7 +1158,14 @@ CUISINE: Traditional dishes from specific cultures and regions with authentic in
 The shopping_list should be a separate bullet-pointed shopping list that includes only the names of the ingredients (no amounts, no measurements). For example:
 - If ingredients include "1 cup diced tomatoes" and "2 tbsp olive oil", the shopping_list should be ["tomatoes", "olive oil"]
 - If ingredients include "1 can chickpeas, drained" and "1/2 cup BBQ sauce", the shopping_list should be ["chickpeas", "BBQ sauce"]
+- If beverage ingredients include "2 shots espresso" and "1/2 cup brown sugar syrup", the shopping_list should be ["espresso beans", "brown sugar"]
 - Clean ingredient names without quantities, measurements, or preparation instructions
+
+BEVERAGE EXAMPLES for reference:
+- Starbucks Copycat Iced Brown Sugar Oatmilk Shaken Espresso: espresso, brown sugar, oat milk, cinnamon, ice
+- Brown Sugar Boba Milk Tea: black tea, tapioca pearls, brown sugar, milk, ice
+- Guava Lemonade: guava nectar, fresh lemons, sugar, water, ice
+- Fresas con Crema Milkshake: strawberries, vanilla ice cream, condensed milk, cinnamon, whipped cream
 
 IMPORTANT FOR SPICES: If the recipe uses spices, list each spice individually in the shopping_list instead of using generic terms like "spices" or "seasoning". For example:
 - If ingredients include "2 tsp mixed spices (turmeric, cumin, coriander)", the shopping_list should include ["turmeric", "cumin", "coriander"]
