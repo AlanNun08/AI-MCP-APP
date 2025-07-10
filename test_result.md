@@ -455,7 +455,8 @@ metadata:
 test_plan:
   current_focus:
     - "Beverage Type Selection Fix"
-  stuck_tasks: []
+  stuck_tasks: 
+    - "User Registration & Authentication"
   test_all: false
   test_priority: "critical_first"
 
