@@ -967,7 +967,7 @@ function App() {
     });
     const [isGenerating, setIsGenerating] = useState(false);
 
-    const cuisineOptions = ['italian', 'mexican', 'chinese', 'indian', 'mediterranean', 'american', 'thai', 'japanese'];
+    const cuisineOptions = ['italian', 'mexican', 'chinese', 'indian', 'mediterranean', 'american', 'thai', 'japanese', 'snacks & bowls'];
     const dietaryOptions = ['vegetarian', 'vegan', 'gluten-free', 'dairy-free', 'keto', 'paleo'];
     const difficultyOptions = ['easy', 'medium', 'hard'];
 
