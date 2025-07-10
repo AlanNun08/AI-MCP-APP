@@ -1192,6 +1192,15 @@ For each of the 4 beverages, include:
 
 Make each drink visually Instagram-worthy with professional techniques (shaking, layering, temperature control).
 
+CRITICAL FOR BEVERAGE SHOPPING LIST: The shopping_list must contain ONLY clean ingredient names without any quantities, measurements, or preparation instructions. For beverages specifically:
+- If ingredients include "4 lemons" and "1/2 cup pineapple chunks", the shopping_list should be ["lemons", "pineapple"]
+- If ingredients include "2 shots espresso" and "1/2 cup brown sugar syrup", the shopping_list should be ["espresso beans", "brown sugar"]
+- If ingredients include "1/4 cup fresh mint leaves" and "ice cubes", the shopping_list should be ["mint", "ice"]
+- If ingredients include "1 cup oat milk" and "3/4 cup cooked tapioca pearls", the shopping_list should be ["oat milk", "tapioca pearls"]
+- Remove ALL quantities (4, 1/2 cup, 2 shots, 1/4 cup, etc.) and measurements (cups, tablespoons, ounces)
+- Remove ALL preparation words (fresh, cooked, diced, chopped, etc.)
+- Use clean, searchable ingredient names suitable for Walmart product search
+
 Example beverage ingredients format:
 - "2 shots espresso" instead of "espresso"
 - "1/2 cup brown sugar syrup" instead of "brown sugar"
