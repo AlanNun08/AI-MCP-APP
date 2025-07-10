@@ -1060,35 +1060,61 @@ async def generate_recipe(request: RecipeGenRequest):
                 prompt_parts.append(f"Create a {recipe_type} snack recipe for {request.servings} people. Focus on tasty, satisfying snacks that are perfect for any time of day.")
         
         elif recipe_category == "beverage":
-            # Enhanced beverage prompt to generate 4 unique and original beverage recipes
-            prompt_parts.append(f"""Generate 4 unique and original beverage recipes for {request.servings} people, one for each of the following types:
+            # Generate specific beverage type based on user selection
+            if recipe_type == "coffee":
+                prompt_parts.append(f"""Create a detailed specialty coffee recipe for {request.servings} people. Include exact measurements, brewing methods, and professional techniques. Focus on espresso-based drinks, cold brews, or gourmet coffee preparations.
 
-1. Coffee-based drink
-   - May include elements like cold foam, whipped crème, flavored syrups, or layered toppings like caramel drizzle — but only if it enhances the concept.
+🧋 Creative, original drink name
+✨ Brief flavor description (1–2 sentences that describe taste and style)
+🧾 List of ingredients with exact quantities and units
+🍳 Step-by-step instructions including brewing, mixing, and serving techniques
+💡 Optional tips or variations (e.g., vegan swap, flavor twist, serving method)
 
-2. Lemonade-based drink  
-   - Refreshing, fruity, or herbal — perfect for summer.
+May include elements like cold foam, whipped crème, flavored syrups, or layered toppings like caramel drizzle — but only if it enhances the concept. Make the drink visually Instagram-worthy with professional techniques (shaking, layering, temperature control).""")
 
-3. Thai tea-based drink
-   - Layered or infused with other flavors (like fruit, spices, milk alternatives, or syrups).
+            elif recipe_type == "boba tea":
+                prompt_parts.append(f"""Create a detailed brown sugar boba tea or fruit boba tea recipe for {request.servings} people. Include tapioca pearl cooking instructions, tea brewing methods, syrup preparation, and assembly techniques. Make it authentic bubble tea shop quality.
 
-4. Boba drink (bubble tea)
-   - Can be milk-based or fruit-based, and use tapioca, popping boba, or creative textures.
+🧋 Creative, original drink name
+✨ Brief flavor description (1–2 sentences that describe taste and style)
+🧾 List of ingredients with exact quantities and units
+🍳 Step-by-step instructions including pearl cooking, tea brewing, and assembly
+💡 Optional tips or variations (e.g., vegan swap, flavor twist, serving method)
 
-For each drink, include the following:
+Can be milk-based or fruit-based, and use tapioca, popping boba, or creative textures. Make the drink visually Instagram-worthy with professional techniques.""")
+
+            elif recipe_type == "thai tea":
+                prompt_parts.append(f"""Create an authentic Thai tea recipe for {request.servings} people. Include traditional orange tea preparation, condensed milk ratios, spice blending, and the signature layered presentation technique.
+
+🧋 Creative, original drink name
+✨ Brief flavor description (1–2 sentences that describe taste and style)
+🧾 List of ingredients with exact quantities and units
+🍳 Step-by-step instructions including tea brewing, spice mixing, and layering
+💡 Optional tips or variations (e.g., vegan swap, flavor twist, serving method)
+
+Layered or infused with other flavors (like fruit, spices, milk alternatives, or syrups) with traditional preparation methods. Make the drink visually Instagram-worthy.""")
+
+            elif recipe_type == "special lemonades":
+                prompt_parts.append(f"""Create a special flavored lemonade recipe for {request.servings} people. Include unique fruit combinations, natural sweeteners, fresh herbs, and creative presentation. Focus on refreshing summer drinks with gourmet touches.
+
+🧋 Creative, original drink name
+✨ Brief flavor description (1–2 sentences that describe taste and style)
+🧾 List of ingredients with exact quantities and units
+🍳 Step-by-step instructions including preparation and presentation
+💡 Optional tips or variations (e.g., vegan swap, flavor twist, serving method)
+
+Refreshing, fruity, or herbal — perfect for summer with unique fruit combinations, natural sweeteners, and fresh herbs. Make the drink visually Instagram-worthy.""")
+
+            else:
+                prompt_parts.append(f"""Create a detailed {recipe_type} beverage recipe for {request.servings} people. Focus on refreshing, flavorful drinks with exact measurements and professional techniques.
+
 🧋 Creative, original drink name
 ✨ Brief flavor description (1–2 sentences that describe taste and style)
 🧾 List of ingredients with exact quantities and units
 🍳 Step-by-step instructions
 💡 Optional tips or variations (e.g., vegan swap, flavor twist, serving method)
 
-Make the drinks visually Instagram-worthy and perfect for any season.
-
-IMPORTANT FOR BEVERAGE SHOPPING LIST: After all 4 recipes, create a clean shopping_list that contains ONLY the ingredient names without quantities, measurements, or preparation instructions. For example:
-- If ingredients include "4 lemons" and "1/2 cup pineapple chunks", the shopping_list should be ["lemons", "pineapple"]
-- If ingredients include "2 shots espresso" and "1/2 cup brown sugar syrup", the shopping_list should be ["espresso beans", "brown sugar"]
-- If ingredients include "1/4 cup fresh mint leaves" and "ice cubes", the shopping_list should be ["mint", "ice"]
-- Clean ingredient names suitable for Walmart product search.""")
+Make the drink visually Instagram-worthy and perfect for any season.""")
         
         else:  # cuisine category
             if recipe_type == "snacks & bowls":
