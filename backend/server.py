@@ -945,94 +945,9 @@ async def _get_walmart_product_options(ingredient: str, max_options: int = 3) ->
         except Exception as api_error:
             logging.error(f"Walmart API call failed for '{clean_ingredient}': {str(api_error)}")
         
-        # Fallback to enhanced mock data if API fails
-        logging.info(f"Using enhanced mock data for '{clean_ingredient}'")
-        mock_products = []
-        
-        # Create realistic sample products based on cleaned ingredient type
-        ingredient_lower = clean_ingredient.lower()
-        
-        if any(word in ingredient_lower for word in ['chicken']):
-            mock_products = [
-                WalmartProduct(product_id="10452697", name="Great Value Chicken Breast 2.5lb", price=8.99, thumbnail_image="", availability="Available"),
-                WalmartProduct(product_id="10315162", name="Tyson Grilled Chicken Strips 9oz", price=5.48, thumbnail_image="", availability="Available"),
-                WalmartProduct(product_id="10452855", name="Rotisserie Chicken Whole", price=4.98, thumbnail_image="", availability="Available")
-            ]
-        elif any(word in ingredient_lower for word in ['chickpeas', 'garbanzo']):
-            mock_products = [
-                WalmartProduct(product_id="10315201", name="Bush's Chickpeas 15.5oz Can", price=1.18, thumbnail_image="", availability="Available"),
-                WalmartProduct(product_id="10315202", name="Great Value Chickpeas 15oz", price=0.98, thumbnail_image="", availability="Available"),
-                WalmartProduct(product_id="10315203", name="Goya Chickpeas 15.5oz", price=1.28, thumbnail_image="", availability="Available")
-            ]
-        elif any(word in ingredient_lower for word in ['bbq', 'barbecue']):
-            mock_products = [
-                WalmartProduct(product_id="10315204", name="Sweet Baby Ray's BBQ Sauce 18oz", price=1.98, thumbnail_image="", availability="Available"),
-                WalmartProduct(product_id="10315205", name="KC Masterpiece BBQ Sauce 18oz", price=2.28, thumbnail_image="", availability="Available"),
-                WalmartProduct(product_id="10315206", name="Great Value BBQ Sauce 18oz", price=1.48, thumbnail_image="", availability="Available")
-            ]
-        elif any(word in ingredient_lower for word in ['quinoa']):
-            mock_products = [
-                WalmartProduct(product_id="10315207", name="Ancient Harvest Quinoa 12oz", price=4.98, thumbnail_image="", availability="Available"),
-                WalmartProduct(product_id="10315208", name="Great Value Organic Quinoa 16oz", price=3.98, thumbnail_image="", availability="Available"),
-                WalmartProduct(product_id="10315209", name="Bob's Red Mill Quinoa 18oz", price=5.99, thumbnail_image="", availability="Available")
-            ]
-        elif any(word in ingredient_lower for word in ['mixed vegetables', 'frozen vegetables']):
-            mock_products = [
-                WalmartProduct(product_id="10315210", name="Great Value Frozen Mixed Vegetables 12oz", price=1.24, thumbnail_image="", availability="Available"),
-                WalmartProduct(product_id="10315211", name="Birds Eye Mixed Vegetables 10oz", price=1.98, thumbnail_image="", availability="Available"),
-                WalmartProduct(product_id="10315212", name="Green Giant Mixed Vegetables 12oz", price=2.18, thumbnail_image="", availability="Available")
-            ]
-        elif any(word in ingredient_lower for word in ['avocado']):
-            mock_products = [
-                WalmartProduct(product_id="10315213", name="Fresh Avocados 4 count", price=3.98, thumbnail_image="", availability="Available"),
-                WalmartProduct(product_id="10315214", name="Organic Avocados 4 count", price=5.98, thumbnail_image="", availability="Available"),
-                WalmartProduct(product_id="10315215", name="Large Avocados 3 count", price=4.48, thumbnail_image="", availability="Available")
-            ]
-        elif any(word in ingredient_lower for word in ['olive oil']):
-            mock_products = [
-                WalmartProduct(product_id="10315216", name="Bertolli Extra Virgin Olive Oil 16.9oz", price=6.99, thumbnail_image="", availability="Available"),
-                WalmartProduct(product_id="10315217", name="Great Value Olive Oil 17oz", price=4.97, thumbnail_image="", availability="Available"),
-                WalmartProduct(product_id="10315218", name="Pompeian Extra Virgin Olive Oil 16oz", price=5.48, thumbnail_image="", availability="Available")
-            ]
-        elif any(word in ingredient_lower for word in ['salt', 'pepper']):
-            mock_products = [
-                WalmartProduct(product_id="10315219", name="Morton Salt 26oz", price=1.24, thumbnail_image="", availability="Available"),
-                WalmartProduct(product_id="10315220", name="McCormick Black Pepper 3oz", price=2.68, thumbnail_image="", availability="Available"),
-                WalmartProduct(product_id="10315221", name="Great Value Salt & Pepper Set", price=1.98, thumbnail_image="", availability="Available")
-            ]
-        elif any(word in ingredient_lower for word in ['pasta', 'spaghetti', 'penne', 'noodle']):
-            mock_products = [
-                WalmartProduct(product_id="10315162", name="Barilla Pasta Penne 16oz", price=1.99, thumbnail_image="", availability="Available"),
-                WalmartProduct(product_id="10533089", name="Great Value Spaghetti 1lb", price=1.28, thumbnail_image="", availability="Available"),
-                WalmartProduct(product_id="10315264", name="Ronzoni Pasta Shells 12oz", price=1.68, thumbnail_image="", availability="Available")
-            ]
-        elif any(word in ingredient_lower for word in ['tomato', 'tomatoes']):
-            mock_products = [
-                WalmartProduct(product_id="44391492", name="Fresh Roma Tomatoes 2lb", price=2.49, thumbnail_image="", availability="Available"),
-                WalmartProduct(product_id="10315486", name="Hunt's Diced Tomatoes 14.5oz", price=1.18, thumbnail_image="", availability="Available"),
-                WalmartProduct(product_id="10315487", name="Cherry Tomatoes 1lb", price=2.97, thumbnail_image="", availability="Available")
-            ]
-        elif any(word in ingredient_lower for word in ['cheese', 'mozzarella', 'parmesan', 'cheddar']):
-            mock_products = [
-                WalmartProduct(product_id="10315488", name="Great Value Shredded Cheddar Cheese 8oz", price=2.84, thumbnail_image="", availability="Available"),
-                WalmartProduct(product_id="10315162", name="Kraft Mexican Style Shredded Cheese 8oz", price=3.97, thumbnail_image="", availability="Available"),
-                WalmartProduct(product_id="10533089", name="Sargento Shredded Monterey Jack 8oz", price=4.48, thumbnail_image="", availability="Available")
-            ]
-        elif any(word in ingredient_lower for word in ['garlic']):
-            mock_products = [
-                WalmartProduct(product_id="10315264", name="Fresh Garlic Bulb 3oz", price=0.98, thumbnail_image="", availability="Available"),
-                WalmartProduct(product_id="10315486", name="Great Value Minced Garlic 8oz", price=2.47, thumbnail_image="", availability="Available")
-            ]
-        else:
-            # Generic products for other ingredients with realistic IDs
-            base_id = abs(hash(clean_ingredient)) % 90000000 + 10000000  # Generate 8-digit realistic ID
-            mock_products = [
-                WalmartProduct(product_id=str(base_id), name=f"Great Value {clean_ingredient.title()}", price=2.99, thumbnail_image="", availability="Available"),
-                WalmartProduct(product_id=str(base_id + 1), name=f"Fresh {clean_ingredient.title()}", price=3.49, thumbnail_image="", availability="Available"),
-                WalmartProduct(product_id=str(base_id + 2), name=f"Organic {clean_ingredient.title()}", price=4.99, thumbnail_image="", availability="Available")
-            ]
-        
-        return mock_products[:max_options]
+        # Return empty list if no real Walmart products found
+        logging.warning(f"No Walmart products found for '{clean_ingredient}' - returning empty list")
+        return []
                 
     except Exception as e:
         logging.error(f"Error fetching Walmart products for '{ingredient}': {str(e)}")
