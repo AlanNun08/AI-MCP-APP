@@ -1338,7 +1338,7 @@ function App() {
 
     // Auto-generate product options when recipe loads using real Walmart API
     useEffect(() => {
-      if (recipe?.id && recipe?.ingredients?.length > 0) {
+      if (recipe?.id && (recipe?.shopping_list?.length > 0 || recipe?.ingredients?.length > 0)) {
         setLoadingCart(true);
         
         // Call the backend API to get real Walmart product options
