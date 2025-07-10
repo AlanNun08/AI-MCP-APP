@@ -437,8 +437,7 @@ metadata:
 test_plan:
   current_focus:
     - "Beverage Type Selection Fix"
-  stuck_tasks:
-    - "Beverage Type Selection Fix"
+  stuck_tasks: []
   test_all: false
   test_priority: "critical_first"
 
