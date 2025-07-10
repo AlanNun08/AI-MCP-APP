@@ -1131,13 +1131,27 @@ SNACKS: Focus on treats and healthy snacks such as:
 - Energy bites (dates, nuts, seeds, superfoods)
 - Granola bars (oats, honey, nuts, dried fruits)
 
-BEVERAGES: Focus on drinks and specialty beverages such as:
-- Coffee drinks (espresso, milk, syrups, whipped cream)
-- Boba tea (tea, tapioca pearls, milk, flavoring)
-- Thai tea (black tea, condensed milk, sugar, spices)
-- Smoothies (fruits, yogurt, milk, protein powder)
-- Matcha drinks (matcha powder, milk, sweetener)
-- Fresh juices (fruits, vegetables, natural sweeteners)
+BEVERAGES: Focus on detailed "secret recipes" with exact measurements and professional techniques:
+- Coffee drinks (Starbucks copycat recipes like Iced Brown Sugar Oatmilk Shaken Espresso, Caramel Macchiato)
+- Boba tea (brown sugar boba milk tea with cooking instructions, syrup preparation)
+- Thai tea (authentic orange tea with traditional preparation methods)
+- Smoothies (tropical smoothies with exact fruit ratios and blending techniques)
+- Matcha drinks (proper whisking techniques and authentic Japanese methods)
+- Fresh juices (agua fresca, guava lemonade with natural preparation)
+
+For BEVERAGES, create detailed "secret recipes" with:
+- Title of the drink
+- Brief description (1–2 sentences)
+- List of ingredients with exact quantities and units (cups, tablespoons, ounces)
+- Detailed step-by-step instructions including brewing, mixing, and serving techniques
+- Optional tips or substitutions for customization
+- Professional techniques (shaking, layering, temperature control)
+
+Example beverage ingredients format:
+- "2 shots espresso" instead of "espresso"
+- "1/2 cup brown sugar syrup" instead of "brown sugar"
+- "1 cup oat milk" instead of "milk"
+- "3/4 cup cooked tapioca pearls" instead of "tapioca"
 
 CUISINE: Traditional dishes from specific cultures and regions with authentic ingredients and cooking methods.
 
