@@ -1205,7 +1205,7 @@ The shopping_list should be a separate bullet-pointed shopping list that include
 - BEVERAGE SPECIFIC: If ingredients include "1 cup oat milk", "ice cubes", "1/2 cup honey", the shopping_list should be ["oat milk", "ice", "honey"]
 - Clean ingredient names without quantities, measurements, or preparation instructions
 
-BEVERAGE EXAMPLES for reference (create 4 unique recipes similar to these):
+BEVERAGE EXAMPLES for reference (create one specific recipe based on user selection):
 - Coffee: Salted Caramel Cold Foam Macchiato with vanilla syrup and sea salt
 - Lemonade: Lavender Honey Lemonade with fresh herbs and edible flowers  
 - Thai Tea: Coconut Mango Thai Tea with layered presentation and tropical fruit
