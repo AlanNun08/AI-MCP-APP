@@ -1585,9 +1585,8 @@ function App() {
                     </div>
                   ) : (
                     <div className="space-y-6">
-                      {recipe.ingredients && recipe.ingredients.map((ingredient, index) => {
-                        const ingredientOptions = productOptions[ingredient] || [];
-                        const selectedProductId = selectedProducts[ingredient];
+                      {Object.entries(productOptions).map(([ingredientName, ingredientOptions], index) => {
+                        const selectedProductId = selectedProducts[ingredientName];
                         
                         return (
                           <div key={index} className="bg-gray-50 rounded-xl p-4">
@@ -1596,7 +1595,7 @@ function App() {
                               <span className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center text-orange-600 font-bold text-sm mr-3">
                                 {index + 1}
                               </span>
-                              <h4 className="text-lg font-semibold text-gray-800">{ingredient}</h4>
+                              <h4 className="text-lg font-semibold text-gray-800">{ingredientName}</h4>
                             </div>
                             
                             {/* Product Options */}
@@ -1610,7 +1609,7 @@ function App() {
                                         ? 'border-green-500 bg-green-50'
                                         : 'border-gray-200 bg-white hover:border-green-300'
                                     }`}
-                                    onClick={() => handleProductSelection(ingredient, product.product_id)}
+                                    onClick={() => handleProductSelection(ingredientName, product.product_id)}
                                   >
                                     <div className="flex items-start justify-between mb-2">
                                       <div className="flex-1">
