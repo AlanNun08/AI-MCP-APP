@@ -465,7 +465,7 @@ test_plan:
   current_focus:
     - "Beverage Type Selection Fix"
   stuck_tasks: 
-    - "User Registration & Authentication"
+    - "Beverage Type Selection Fix"
   test_all: false
   test_priority: "critical_first"
 
