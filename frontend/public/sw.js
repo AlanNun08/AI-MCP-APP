@@ -1,5 +1,5 @@
 // Service Worker for PWA functionality with aggressive cache clearing
-const CACHE_NAME = 'ai-chef-v7-streamlined-options-2024';
+const CACHE_NAME = 'ai-chef-v8-enhanced-beverages-fixed-2024';
 const urlsToCache = [
   '/',
   '/static/js/bundle.js',
@@ -9,7 +9,7 @@ const urlsToCache = [
 
 // Install event - clear all old caches immediately
 self.addEventListener('install', (event) => {
-  console.log('Installing new service worker v7 - streamlined options...');
+  console.log('Installing new service worker v8 - enhanced beverages with shopping list fix...');
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
@@ -19,10 +19,15 @@ self.addEventListener('install', (event) => {
         })
       );
     }).then(() => {
-      console.log('All old caches cleared for streamlined options');
-      self.skipWaiting();
+      console.log('All old caches cleared, creating new cache...');
+      return caches.open(CACHE_NAME);
+    }).then(cache => {
+      console.log('New cache v8 created successfully');
+      return cache.addAll(urlsToCache);
     })
   );
+  // Force the new service worker to become active immediately
+  self.skipWaiting();
 });
 
 // Activate event - take control immediately
