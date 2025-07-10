@@ -357,7 +357,8 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Enhanced Interactive Walmart Cart UI"
+    - "OpenAI Shopping List Consistency across all Categories"
+    - "Recipe Generation"
     - "Walmart API Integration"
   stuck_tasks:
     - "Walmart API Integration"
