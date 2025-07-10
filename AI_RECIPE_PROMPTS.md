@@ -207,6 +207,8 @@ The shopping_list should be a separate bullet-pointed shopping list that include
 - If ingredients include "1 cup diced tomatoes" and "2 tbsp olive oil", the shopping_list should be ["tomatoes", "olive oil"]
 - If ingredients include "1 can chickpeas, drained" and "1/2 cup BBQ sauce", the shopping_list should be ["chickpeas", "BBQ sauce"]
 - If beverage ingredients include "2 shots espresso" and "1/2 cup brown sugar syrup", the shopping_list should be ["espresso beans", "brown sugar"]
+- **BEVERAGE SPECIFIC**: If ingredients include "4 lemons", "1/2 cup pineapple chunks", "1/4 cup fresh mint leaves", the shopping_list should be ["lemons", "pineapple", "mint"]
+- **BEVERAGE SPECIFIC**: If ingredients include "1 cup oat milk", "ice cubes", "1/2 cup honey", the shopping_list should be ["oat milk", "ice", "honey"]
 - Clean ingredient names without quantities, measurements, or preparation instructions
 
 ### Beverage Ingredients Format Examples:
