@@ -1400,8 +1400,7 @@ function App() {
         })
         .catch(error => {
           console.error('❌ Error fetching cart options:', error);
-          // Fallback to mock data if API call fails
-          generateMockCart();
+          console.log('ℹ️ No cart generated - only real Walmart products are used');
         })
         .finally(() => {
           setLoadingCart(false);
