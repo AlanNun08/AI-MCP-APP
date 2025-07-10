@@ -1287,24 +1287,43 @@ async def create_custom_cart(cart_data: Dict[str, Any]):
         if not all([user_id, recipe_id, selected_products]):
             raise HTTPException(status_code=400, detail="Missing required cart data")
         
-        # Create cart products
+        # Create cart products and validate product IDs
         cart_products = []
         total_price = 0
         product_ids = []
         
         for product_data in selected_products:
+            product_id = product_data['product_id']
+            
+            # Validate that product ID is from real Walmart API (not mock data)
+            # Real Walmart product IDs are typically 8-9 digit numbers
+            if not product_id.isdigit() or len(product_id) < 6:
+                logging.warning(f"Skipping invalid product ID: {product_id} for {product_data.get('ingredient_name', 'unknown')}")
+                continue
+                
+            # Skip mock product IDs that start with common patterns
+            if (product_id.startswith('walmart-') or 
+                product_id.startswith('10315') or  # Common mock ID pattern
+                product_id.startswith('mock-')):
+                logging.warning(f"Skipping mock product ID: {product_id} for {product_data.get('ingredient_name', 'unknown')}")
+                continue
+            
             cart_product = GroceryCartProduct(
                 ingredient_name=product_data['ingredient_name'],
-                product_id=product_data['product_id'],
+                product_id=product_id,
                 name=product_data['name'],
                 price=product_data['price'],
                 quantity=product_data.get('quantity', 1)
             )
             cart_products.append(cart_product)
             total_price += cart_product.price * cart_product.quantity
-            product_ids.append(cart_product.product_id)
+            product_ids.append(product_id)
         
-        # Generate Walmart URL
+        # Only generate Walmart URL if we have real product IDs
+        if not product_ids:
+            raise HTTPException(status_code=400, detail="No valid Walmart product IDs found. Only real Walmart products can be added to cart.")
+        
+        # Generate Walmart URL with validated product IDs
         walmart_url = f"https://affil.walmart.com/cart/addToCart?items={','.join(product_ids)}"
         
         # Create cart
