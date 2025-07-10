@@ -1393,9 +1393,8 @@ function App() {
             
             console.log('✅ Product options loaded:', Object.keys(options).length, 'ingredients');
           } else {
-            // Fallback to mock data if API response is invalid
-            console.log('⚠️ Invalid API response, using mock data');
-            generateMockCart();
+            // No valid API response
+            console.log('⚠️ Invalid API response - only real Walmart products are used');
           }
         })
         .catch(error => {
