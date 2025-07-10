@@ -11,7 +11,7 @@ import time
 from datetime import datetime
 
 class BeverageRecipeTester:
-    def __init__(self, base_url="https://c988d9d7-9d97-4304-9bbb-57f48034c134.preview.emergentagent.com"):
+    def __init__(self, base_url="http://localhost:8001"):
         self.base_url = f"{base_url}/api"
         self.user_id = None
         self.recipe_id = None
