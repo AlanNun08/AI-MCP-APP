@@ -1082,6 +1082,16 @@ Return ONLY a valid JSON object with this exact structure:
     "shopping_list": ["ingredient_name_1", "ingredient_name_2"]
 }
 
+For "snacks & bowls" cuisine, focus on healthy snack recipes such as:
+- Acai bowls with toppings (frozen acai, granola, fresh berries, honey)
+- Smoothie bowls (frozen fruits, protein powder, nuts, seeds)
+- Poke bowls (fresh fish, rice, vegetables, sauces)
+- Grain bowls (quinoa, roasted vegetables, proteins, dressings)
+- Energy bites (dates, nuts, seeds, superfoods)
+- Avocado toast variations
+- Chia pudding bowls
+- Greek yogurt parfait bowls
+
 The shopping_list should be a separate bullet-pointed shopping list that includes only the names of the ingredients (no amounts, no measurements). For example:
 - If ingredients include "1 cup diced tomatoes" and "2 tbsp olive oil", the shopping_list should be ["tomatoes", "olive oil"]
 - If ingredients include "1 can chickpeas, drained" and "1/2 cup BBQ sauce", the shopping_list should be ["chickpeas", "BBQ sauce"]
