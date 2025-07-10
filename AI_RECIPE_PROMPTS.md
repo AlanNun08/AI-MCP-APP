@@ -60,6 +60,12 @@ For each drink, include the following:
 💡 Optional tips or variations (e.g., vegan swap, flavor twist, serving method)
 
 Make the drinks visually Instagram-worthy and perfect for any season.
+
+IMPORTANT FOR BEVERAGE SHOPPING LIST: After all 4 recipes, create a clean shopping_list that contains ONLY the ingredient names without quantities, measurements, or preparation instructions. For example:
+- If ingredients include "4 lemons" and "1/2 cup pineapple chunks", the shopping_list should be ["lemons", "pineapple"]
+- If ingredients include "2 shots espresso" and "1/2 cup brown sugar syrup", the shopping_list should be ["espresso beans", "brown sugar"]
+- If ingredients include "1/4 cup fresh mint leaves" and "ice cubes", the shopping_list should be ["mint", "ice"]
+- Clean ingredient names suitable for Walmart product search.
 ```
 
 ---
