@@ -1144,43 +1144,6 @@ Make the drink visually Instagram-worthy and perfect for any season.""")
         prompt_parts.append("""
 Return ONLY a valid JSON object with this exact structure:
 
-For BEVERAGES (4-recipe format):
-{
-    "title": "4 Premium Beverage Collection",
-    "description": "Four unique and original beverage recipes featuring coffee, lemonade, Thai tea, and boba drinks",
-    "ingredients": ["combined list of all ingredients from all 4 recipes"],
-    "instructions": [
-        "🧋 COFFEE-BASED DRINK: [Creative Name]",
-        "✨ [Brief flavor description]",
-        "🧾 Ingredients: [list with exact quantities]",
-        "🍳 Instructions: [step-by-step]",
-        "💡 Tips: [optional variations]",
-        "",
-        "🧋 LEMONADE-BASED DRINK: [Creative Name]",
-        "✨ [Brief flavor description]",
-        "🧾 Ingredients: [list with exact quantities]",
-        "🍳 Instructions: [step-by-step]",
-        "💡 Tips: [optional variations]",
-        "",
-        "🧋 THAI TEA-BASED DRINK: [Creative Name]",
-        "✨ [Brief flavor description]",
-        "🧾 Ingredients: [list with exact quantities]",
-        "🍳 Instructions: [step-by-step]",
-        "💡 Tips: [optional variations]",
-        "",
-        "🧋 BOBA DRINK: [Creative Name]",
-        "✨ [Brief flavor description]",
-        "🧾 Ingredients: [list with exact quantities]",
-        "🍳 Instructions: [step-by-step]",
-        "💡 Tips: [optional variations]"
-    ],
-    "prep_time": 45,
-    "cook_time": 15,
-    "calories_per_serving": 280,
-    "shopping_list": ["ingredient_name_1", "ingredient_name_2", "ingredient_name_3"]
-}
-
-For all other categories (SNACKS, CUISINE):
 {
     "title": "Recipe Name",
     "description": "Brief description",
