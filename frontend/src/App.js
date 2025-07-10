@@ -1064,23 +1064,117 @@ function App() {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Cuisine Type */}
+              {/* Recipe Category Selection */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Cuisine Type *</label>
-                <select
-                  value={formData.cuisine_type}
-                  onChange={(e) => setFormData({...formData, cuisine_type: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                  required
-                >
-                  <option value="">Select cuisine...</option>
-                  {cuisineOptions.map(cuisine => (
-                    <option key={cuisine} value={cuisine}>
-                      {cuisine.charAt(0).toUpperCase() + cuisine.slice(1)}
-                    </option>
-                  ))}
-                </select>
+                <label className="block text-sm font-medium text-gray-700 mb-3">Recipe Category *</label>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {/* Cuisine Card */}
+                  <div 
+                    className={`border-2 rounded-xl p-4 cursor-pointer transition-all duration-200 ${
+                      formData.recipe_type === 'cuisine' 
+                        ? 'border-green-500 bg-green-50' 
+                        : 'border-gray-200 hover:border-green-300'
+                    }`}
+                    onClick={() => setFormData({...formData, recipe_type: 'cuisine', snack_type: '', beverage_type: ''})}
+                  >
+                    <div className="text-center">
+                      <div className="text-3xl mb-2">🍝</div>
+                      <h3 className="font-bold text-gray-800">Cuisine</h3>
+                      <p className="text-xs text-gray-600">Traditional dishes from around the world</p>
+                    </div>
+                  </div>
+
+                  {/* Snacks Card */}
+                  <div 
+                    className={`border-2 rounded-xl p-4 cursor-pointer transition-all duration-200 ${
+                      formData.recipe_type === 'snack' 
+                        ? 'border-green-500 bg-green-50' 
+                        : 'border-gray-200 hover:border-green-300'
+                    }`}
+                    onClick={() => setFormData({...formData, recipe_type: 'snack', cuisine_type: '', beverage_type: ''})}
+                  >
+                    <div className="text-center">
+                      <div className="text-3xl mb-2">🍪</div>
+                      <h3 className="font-bold text-gray-800">Snacks</h3>
+                      <p className="text-xs text-gray-600">Healthy bowls, treats, and bite-sized delights</p>
+                    </div>
+                  </div>
+
+                  {/* Beverages Card */}
+                  <div 
+                    className={`border-2 rounded-xl p-4 cursor-pointer transition-all duration-200 ${
+                      formData.recipe_type === 'beverage' 
+                        ? 'border-green-500 bg-green-50' 
+                        : 'border-gray-200 hover:border-green-300'
+                    }`}
+                    onClick={() => setFormData({...formData, recipe_type: 'beverage', cuisine_type: '', snack_type: ''})}
+                  >
+                    <div className="text-center">
+                      <div className="text-3xl mb-2">🧋</div>
+                      <h3 className="font-bold text-gray-800">Beverages</h3>
+                      <p className="text-xs text-gray-600">Coffee, tea, smoothies, and specialty drinks</p>
+                    </div>
+                  </div>
+                </div>
               </div>
+
+              {/* Specific Type Selection */}
+              {formData.recipe_type === 'cuisine' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Cuisine Type *</label>
+                  <select
+                    value={formData.cuisine_type}
+                    onChange={(e) => setFormData({...formData, cuisine_type: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    required
+                  >
+                    <option value="">Select cuisine...</option>
+                    {cuisineOptions.map(cuisine => (
+                      <option key={cuisine} value={cuisine}>
+                        {cuisine.charAt(0).toUpperCase() + cuisine.slice(1)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              {formData.recipe_type === 'snack' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Snack Type *</label>
+                  <select
+                    value={formData.snack_type}
+                    onChange={(e) => setFormData({...formData, snack_type: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    required
+                  >
+                    <option value="">Select snack type...</option>
+                    {snackOptions.map(snack => (
+                      <option key={snack} value={snack}>
+                        {snack.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              {formData.recipe_type === 'beverage' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Beverage Type *</label>
+                  <select
+                    value={formData.beverage_type}
+                    onChange={(e) => setFormData({...formData, beverage_type: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    required
+                  >
+                    <option value="">Select beverage type...</option>
+                    {beverageOptions.map(beverage => (
+                      <option key={beverage} value={beverage}>
+                        {beverage.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
 
               {/* Dietary Preferences */}
               <div>
