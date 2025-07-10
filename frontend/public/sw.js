@@ -9,7 +9,7 @@ const urlsToCache = [
 
 // Install event - clear all old caches immediately
 self.addEventListener('install', (event) => {
-  console.log('Installing new service worker v9 - shopping list frontend fix...');
+  console.log('Installing new service worker v14 - complete cache clear...');
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
@@ -22,7 +22,7 @@ self.addEventListener('install', (event) => {
       console.log('All old caches cleared, creating new cache...');
       return caches.open(CACHE_NAME);
     }).then(cache => {
-      console.log('New cache v9 created successfully');
+      console.log('New cache v14 created successfully');
       return cache.addAll(urlsToCache);
     })
   );
