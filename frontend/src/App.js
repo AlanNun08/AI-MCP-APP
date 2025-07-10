@@ -1107,7 +1107,7 @@ function App() {
                         ? 'border-green-500 bg-green-50' 
                         : 'border-gray-200 hover:border-green-300'
                     }`}
-                    onClick={() => setFormData({...formData, recipe_type: 'beverage', cuisine_type: '', snack_type: ''})}
+                    onClick={() => setFormData({...formData, recipe_type: 'beverage', cuisine_type: '', snack_type: '', beverage_type: ''})}
                   >
                     <div className="text-center">
                       <div className="text-3xl mb-2">🧋</div>
