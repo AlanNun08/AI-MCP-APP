@@ -1200,11 +1200,11 @@ The shopping_list should be a separate bullet-pointed shopping list that include
 - If beverage ingredients include "2 shots espresso" and "1/2 cup brown sugar syrup", the shopping_list should be ["espresso beans", "brown sugar"]
 - Clean ingredient names without quantities, measurements, or preparation instructions
 
-BEVERAGE EXAMPLES for reference:
-- Starbucks Copycat Iced Brown Sugar Oatmilk Shaken Espresso: espresso, brown sugar, oat milk, cinnamon, ice
-- Brown Sugar Boba Milk Tea: black tea, tapioca pearls, brown sugar, milk, ice
-- Guava Lemonade: guava nectar, fresh lemons, sugar, water, ice
-- Fresas con Crema Milkshake: strawberries, vanilla ice cream, condensed milk, cinnamon, whipped cream
+BEVERAGE EXAMPLES for reference (create 4 unique recipes similar to these):
+- Coffee: Salted Caramel Cold Foam Macchiato with vanilla syrup and sea salt
+- Lemonade: Lavender Honey Lemonade with fresh herbs and edible flowers  
+- Thai Tea: Coconut Mango Thai Tea with layered presentation and tropical fruit
+- Boba: Taro Coconut Milk Tea with homemade taro paste and chewy tapioca pearls
 
 IMPORTANT FOR SPICES: If the recipe uses spices, list each spice individually in the shopping_list instead of using generic terms like "spices" or "seasoning". For example:
 - If ingredients include "2 tsp mixed spices (turmeric, cumin, coriander)", the shopping_list should include ["turmeric", "cumin", "coriander"]
