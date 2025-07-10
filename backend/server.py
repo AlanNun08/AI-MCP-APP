@@ -1111,21 +1111,16 @@ Return ONLY a valid JSON object with this exact structure:
 
 Recipe Category Guidelines:
 
-SNACKS: Focus on treats and healthy snacks such as:
-- Acai bowls (frozen acai, granola, fresh berries, honey)
-- Smoothie bowls (frozen fruits, protein powder, nuts, seeds)
-- Brownies (chocolate, flour, eggs, butter, sugar)
-- Cookies (flour, butter, sugar, chocolate chips, vanilla)
-- Energy bites (dates, nuts, seeds, superfoods)
-- Granola bars (oats, honey, nuts, dried fruits)
+SNACKS: Focus on healthy and refreshing snack options such as:
+- Acai bowls (frozen acai puree, granola, fresh berries, honey, superfoods)
+- Fruit lemon slices chili (fresh fruits, lemon juice, chili powder, lime, Mexican spices)
+- Frozen yogurt berry bites (Greek yogurt, mixed berries, natural sweeteners, bite-sized treats)
 
 BEVERAGES: Focus on detailed "secret recipes" with exact measurements and professional techniques:
-- Coffee drinks (Starbucks copycat recipes like Iced Brown Sugar Oatmilk Shaken Espresso, Caramel Macchiato)
-- Boba tea (brown sugar boba milk tea with cooking instructions, syrup preparation)
+- Coffee (specialty espresso drinks, cold brews, gourmet preparations with exact measurements)
+- Boba tea (brown sugar boba, fruit boba with cooking instructions, syrup preparation)
 - Thai tea (authentic orange tea with traditional preparation methods)
-- Smoothies (tropical smoothies with exact fruit ratios and blending techniques)
-- Matcha drinks (proper whisking techniques and authentic Japanese methods)
-- Fresh juices (agua fresca, guava lemonade with natural preparation)
+- Special lemonades (unique fruit combinations, natural sweeteners, fresh herbs, gourmet touches)
 
 For BEVERAGES, create detailed "secret recipes" with:
 - Title of the drink
