@@ -971,8 +971,8 @@ function App() {
     const [isGenerating, setIsGenerating] = useState(false);
 
     const cuisineOptions = ['italian', 'mexican', 'chinese', 'indian', 'mediterranean', 'american', 'thai', 'japanese', 'french', 'korean'];
-    const snackOptions = ['acai bowls', 'smoothie bowls', 'energy bites', 'granola bars', 'brownies', 'cookies', 'muffins', 'protein bars', 'trail mix', 'fruit cups'];
-    const beverageOptions = ['coffee drinks', 'boba tea', 'thai tea', 'smoothies', 'fresh juices', 'iced teas', 'hot chocolate', 'matcha drinks', 'protein shakes', 'cocktails'];
+    const snackOptions = ['acai bowls', 'fruit lemon slices chili', 'frozen yogurt berry bites'];
+    const beverageOptions = ['boba tea', 'thai tea', 'coffee', 'special lemonades'];
     const dietaryOptions = ['vegetarian', 'vegan', 'gluten-free', 'dairy-free', 'keto', 'paleo'];
     const difficultyOptions = ['easy', 'medium', 'hard'];
 
