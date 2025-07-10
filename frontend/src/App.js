@@ -954,7 +954,10 @@ function App() {
   // Recipe Generation Screen Component
   const RecipeGenerationScreen = () => {
     const [formData, setFormData] = useState({
+      recipe_type: '', // 'cuisine', 'snack', or 'beverage'
       cuisine_type: '',
+      snack_type: '',
+      beverage_type: '',
       dietary_preferences: [],
       ingredients_on_hand: '',
       prep_time_max: '',
@@ -967,7 +970,9 @@ function App() {
     });
     const [isGenerating, setIsGenerating] = useState(false);
 
-    const cuisineOptions = ['italian', 'mexican', 'chinese', 'indian', 'mediterranean', 'american', 'thai', 'japanese', 'snacks & bowls'];
+    const cuisineOptions = ['italian', 'mexican', 'chinese', 'indian', 'mediterranean', 'american', 'thai', 'japanese', 'french', 'korean'];
+    const snackOptions = ['acai bowls', 'smoothie bowls', 'energy bites', 'granola bars', 'brownies', 'cookies', 'muffins', 'protein bars', 'trail mix', 'fruit cups'];
+    const beverageOptions = ['coffee drinks', 'boba tea', 'thai tea', 'smoothies', 'fresh juices', 'iced teas', 'hot chocolate', 'matcha drinks', 'protein shakes', 'cocktails'];
     const dietaryOptions = ['vegetarian', 'vegan', 'gluten-free', 'dairy-free', 'keto', 'paleo'];
     const difficultyOptions = ['easy', 'medium', 'hard'];
 
