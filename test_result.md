@@ -372,7 +372,6 @@ metadata:
 
 test_plan:
   current_focus:
-    - "OpenAI Shopping List Consistency across all Categories"
     - "Recipe Generation"
     - "Walmart API Integration"
   stuck_tasks:
