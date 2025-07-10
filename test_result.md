@@ -125,11 +125,11 @@ backend:
 
   - task: "Beverage Type Selection Fix"
     implemented: true
-    working: true
-    file: "server.py"
+    working: "NA"
+    file: "server.py, App.js"
     stuck_count: 0
     priority: "critical"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "needs_testing"
         agent: "main"
@@ -137,6 +137,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ BEVERAGE TYPE SELECTION FIX 100% VERIFIED! Comprehensive testing confirms the critical fix is working perfectly. Tested all 4 beverage types (Coffee, Lemonade, Thai Tea, Boba) with 4 different mode combinations each (Basic, Healthy, Budget, Healthy+Budget) for a total of 16 tests. RESULTS: 100% success rate (16/16 tests passed). ✅ SINGLE RECIPE GENERATION: Each beverage type now generates ONLY that specific beverage recipe, not all 4 types. ✅ PROPER STRUCTURE: All responses have correct single recipe format with title, description, ingredients, instructions, and shopping_list. ✅ TYPE ACCURACY: Coffee requests generate only coffee recipes, Lemonade requests generate only lemonade recipes, etc. ✅ NO CROSS-CONTAMINATION: No other beverage types appear in responses. ✅ SHOPPING LIST CLEAN: All shopping lists contain clean ingredient names without quantities/measurements. ✅ MODE COMPATIBILITY: Healthy mode (300-350 calories) and Budget mode ($10-12) work correctly with all beverage types. ✅ WALMART INTEGRATION: Cart-options endpoint working with real Walmart product IDs and prices. The beverage type selection fix is deployment-ready and users will receive exactly the beverage type they select."
+      - working: "NA"
+        agent: "testing"
+        comment: "❌ CRITICAL AUTHENTICATION BLOCKING ISSUE! Unable to test beverage dropdown functionality due to complete authentication system failure. DETAILED FINDINGS: ❌ Registration Issues: New user registration redirects to email verification, but debug endpoint '/api/debug/verification-code' returns 404 error. ❌ Login System Down: All login attempts with various test credentials return 401 Unauthorized errors. Tested credentials: test@example.com, admin@test.com, user@test.com, demo@demo.com, sarah.johnson@test.com - all failed. ❌ No Access to Recipe Generation: Cannot reach the recipe generation screen where beverage dropdown testing needs to occur. ❌ Backend API Issues: Console shows repeated 401 errors from /api/auth/login endpoint. IMPACT: Cannot verify if the beverage dropdown fix (showing Coffee, Lemonade, Thai Tea, Boba instead of Easy, Medium, Hard) is working because authentication completely blocks access to the recipe generation functionality. REQUIRES IMMEDIATE ATTENTION: Authentication system must be fixed before beverage dropdown testing can be completed. The frontend loads correctly but all authenticated features are inaccessible."
     implemented: true
     working: true
     file: "server.py, App.js"
