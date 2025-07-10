@@ -183,17 +183,7 @@ backend:
         agent: "testing"
         comment: "All API endpoints tested and working correctly except for /api/grocery/simple-cart which has a MongoDB ObjectId serialization issue."
 
-  - task: "OpenAI Shopping List Consistency"
-    implemented: true
-    working: "needs_testing"
-    file: "server.py"
-    stuck_count: 0
-    priority: "high"
-    needs_retesting: true
-    status_history:
-      - working: "needs_testing"
-        agent: "main"
-        comment: "Reviewed backend code and found the shopping_list generation is already implemented with consistent instructions for all categories. The prompt includes: 1) Basic shopping_list requirements for all categories (lines 1141-1146), 2) Specific instructions for spices (lines 1153-1158), 3) Examples for different ingredient types. Need to test this functionality to verify it works correctly across all three categories: Cuisine, Snacks, and Beverages."
+  - task: "Email Verification System"
     implemented: true
     working: true
     file: "server.py"
