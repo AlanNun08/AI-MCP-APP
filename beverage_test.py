@@ -17,30 +17,26 @@ class BeverageRecipeTester:
         self.recipe_id = None
         
     def create_test_user(self):
-        """Create a test user for recipe generation"""
-        print("🔧 Creating test user...")
+        """Use existing test user for recipe generation"""
+        print("🔧 Using existing test user...")
         
-        # Create legacy user (simpler for testing)
-        user_data = {
-            "name": f"Beverage Test User {uuid.uuid4()}",
-            "email": f"beverage_test_{uuid.uuid4()}@example.com",
-            "dietary_preferences": [],
-            "allergies": [],
-            "favorite_cuisines": ["american"]
-        }
+        # Use the existing user ID from the logs
+        self.user_id = "843712d2-2ab0-4e2a-93be-aa6824a9ffa9"
         
         try:
-            response = requests.post(f"{self.base_url}/users", json=user_data, timeout=10)
+            # Verify the user exists
+            response = requests.get(f"{self.base_url}/users/{self.user_id}", timeout=10)
             if response.status_code == 200:
-                user_response = response.json()
-                self.user_id = user_response.get('id')
-                print(f"✅ Created test user with ID: {self.user_id}")
+                user_data = response.json()
+                print(f"✅ Using existing user: {user_data.get('first_name', 'Unknown')} {user_data.get('last_name', '')}")
+                print(f"   Email: {user_data.get('email', 'Unknown')}")
+                print(f"   User ID: {self.user_id}")
                 return True
             else:
-                print(f"❌ Failed to create user: {response.status_code} - {response.text}")
+                print(f"❌ Failed to get user: {response.status_code} - {response.text}")
                 return False
         except Exception as e:
-            print(f"❌ Error creating user: {str(e)}")
+            print(f"❌ Error getting user: {str(e)}")
             return False
     
     def test_beverage_recipe_generation(self):
