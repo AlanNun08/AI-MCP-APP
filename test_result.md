@@ -105,6 +105,18 @@
 user_problem_statement: "User (Alan.nunez0310@icloud.com) reports that the new recipe detail UI with instructions, ingredients, and Walmart cart is not showing up. The user wants to ensure the new modern two-column UI is being used and any old code is permanently deleted. The recipe page should show instructions, ingredients, Walmart URL, prices, and total price in a clean modern design. The issue appears to be a caching problem preventing the user from seeing the updated UI."
 
 backend:
+  - task: "OpenAI Shopping List Consistency"
+    implemented: true
+    working: "needs_testing"
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "needs_testing"
+        agent: "main"
+        comment: "Reviewed backend code and found the shopping_list generation is already implemented with consistent instructions for all categories. The prompt includes: 1) Basic shopping_list requirements for all categories (lines 1141-1146), 2) Specific instructions for spices (lines 1153-1158), 3) Examples for different ingredient types. Need to test this functionality to verify it works correctly across all three categories: Cuisine, Snacks, and Beverages."
+
   - task: "AI Recipe Generation with OpenAI"
     implemented: true
     working: true
