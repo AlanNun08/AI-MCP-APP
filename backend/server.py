@@ -1340,7 +1340,7 @@ IMPORTANT FOR SPICES: If the recipe uses spices, list each spice individually in
         
         # Get the inserted document and return it
         if result.inserted_id:
-            inserted_recipe = await db[collection_name].find_one({"_id": result.inserted_id})
+            inserted_recipe = await db.recipes.find_one({"_id": result.inserted_id})
             return mongo_to_dict(inserted_recipe)
         
         return recipe_dict
