@@ -31,7 +31,7 @@ self.addEventListener('install', (event) => {
 
 // Activate event - IMMEDIATE CONTROL
 self.addEventListener('activate', (event) => {
-  console.log('🚀 FRESH START SERVICE WORKER - TAKING IMMEDIATE CONTROL');
+  console.log('🚀 CLEAN SERVICE WORKER ACTIVATING');
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
@@ -43,7 +43,7 @@ self.addEventListener('activate', (event) => {
         })
       );
     }).then(() => {
-      console.log('✅ COMPLETE CACHE CLEANUP - FRESH START READY');
+      console.log('✅ COMPLETE CLEANUP DONE');
       return self.clients.claim();
     })
   );
