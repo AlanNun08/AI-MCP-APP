@@ -1362,7 +1362,7 @@ async def create_custom_cart(cart_data: Dict[str, Any]):
 # CORS middleware configuration - Production ready
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allows all origins for deployment flexibility
+    allow_origins=["*"],  # Should be restricted to specific origins in production
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE"],
     allow_headers=["*"],
