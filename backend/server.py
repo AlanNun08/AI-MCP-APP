@@ -1332,8 +1332,13 @@ async def create_custom_cart(cart_data: Dict[str, Any]):
         if not product_ids:
             raise HTTPException(status_code=400, detail="No valid Walmart product IDs found. Only real Walmart products can be added to cart.")
         
-        # Generate Walmart URL with validated product IDs
-        walmart_url = f"https://affil.walmart.com/cart/addToCart?items={','.join(product_ids)}"
+        # Generate Walmart URL with validated product IDs using correct affiliate format
+        # Walmart requires: offers=SKU1|Quantity1,SKU2|Quantity2
+        walmart_offers = []
+        for product in cart_products:
+            walmart_offers.append(f"{product.product_id}|{product.quantity}")
+        
+        walmart_url = f"https://affil.walmart.com/cart/addToCart?offers={','.join(walmart_offers)}"
         
         # Create cart
         cart = GroceryCart(
