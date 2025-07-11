@@ -1844,7 +1844,7 @@ app.add_middleware(
         "https://buildyoursmartcart.com", 
         "http://localhost:3000", 
         "http://localhost:8001",
-        "https://407d4e17-1478-4b87-bdc3-d8a695a6f09c.preview.emergentagent.com",  # Preview environment
+        "https://recipe-cart-app.preview.emergentagent.com",  # New preview environment
         "*"  # Allow all origins for preview testing
     ],
     allow_credentials=True,
