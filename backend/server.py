@@ -1064,27 +1064,27 @@ def _extract_core_ingredient(ingredient: str) -> str:
     return ingredient_lower.strip() if ingredient_lower.strip() else ingredient
 
 async def _get_walmart_product_options(ingredient: str, max_options: int = 3) -> List[WalmartProduct]:
-    """Get product options from Walmart API with improved error handling and retries"""
+    """Get product options from Walmart API - PRODUCTION VERSION - NO MOCK DATA"""
     try:
         # Extract core ingredient name for better search results
         clean_ingredient = _extract_core_ingredient(ingredient)
         
-        logging.info(f"Original ingredient: '{ingredient}' -> Cleaned: '{clean_ingredient}'")
+        logging.info(f"🔍 PRODUCTION: Searching Walmart for '{ingredient}' -> cleaned: '{clean_ingredient}'")
         
         # Skip empty or very short ingredients
         if not clean_ingredient or len(clean_ingredient.strip()) < 2:
-            logging.warning(f"Skipping too short ingredient: '{clean_ingredient}'")
+            logging.warning(f"⏭️ PRODUCTION: Skipping too short ingredient: '{clean_ingredient}'")
             return []
         
-        # Try real Walmart API with retry logic
+        # PRODUCTION: Try real Walmart API with enhanced retry logic
         for attempt in range(3):  # Retry up to 3 times
             try:
                 # Generate signature and timestamp
                 timestamp, signature = _get_walmart_signature()
                 
                 # Prepare API call with improved query
-                query = clean_ingredient.replace(' ', '+').replace(',', '')
-                url = f"https://developer.api.walmart.com/api-proxy/service/affil/product/v2/search?query={query}&numItems={max_options}"
+                query = clean_ingredient.replace(' ', '+').replace(',', '').replace('/', '')
+                url = f"https://developer.api.walmart.com/api-proxy/service/affil/product/v2/search?query={query}&numItems={max_options + 2}"  # Get extra to filter
                 
                 headers = {
                     "WM_CONSUMER.ID": WALMART_CONSUMER_ID,
@@ -1092,94 +1092,125 @@ async def _get_walmart_product_options(ingredient: str, max_options: int = 3) ->
                     "WM_SEC.KEY_VERSION": WALMART_KEY_VERSION,
                     "WM_SEC.AUTH_SIGNATURE": signature,
                     "Content-Type": "application/json",
-                    "User-Agent": "AI-Chef-App/1.0"
+                    "User-Agent": "BuildYourSmartCart/1.0"
                 }
                 
-                logging.info(f"Making Walmart API call (attempt {attempt + 1}) for ingredient: '{clean_ingredient}'")
+                logging.info(f"🌐 PRODUCTION: Walmart API call attempt {attempt + 1} for '{clean_ingredient}' -> {url}")
                 
                 async with httpx.AsyncClient() as client:
-                    response = await client.get(url, headers=headers, timeout=30)
+                    response = await client.get(url, headers=headers, timeout=45)  # Longer timeout for production
                     
                     if response.status_code == 200:
                         data = response.json()
                         products = []
                         
                         if 'items' in data and len(data['items']) > 0:
-                            logging.info(f"Found {len(data['items'])} items from Walmart API for '{clean_ingredient}'")
+                            logging.info(f"✅ PRODUCTION: Found {len(data['items'])} raw items from Walmart API for '{clean_ingredient}'")
                             
-                            for item in data['items'][:max_options]:
+                            valid_products_count = 0
+                            for item in data['items']:
+                                if valid_products_count >= max_options:
+                                    break
+                                    
                                 if 'itemId' in item and 'name' in item:
                                     product_id = str(item.get('itemId', ''))
+                                    product_name = item.get('name', '').strip()
                                     
-                                    # Validate that this is a real Walmart product ID
+                                    # PRODUCTION: Strict validation - only real Walmart products
                                     if (product_id.isdigit() and 
                                         len(product_id) >= 6 and
+                                        len(product_id) <= 12 and  # Walmart IDs are typically 8-11 digits
                                         not product_id.startswith('10315') and  # Mock pattern
+                                        not product_id.startswith('12345') and  # Mock pattern
+                                        not product_id.startswith('99999') and  # Mock pattern
                                         not product_id.startswith('walmart-') and
-                                        not product_id.startswith('mock-')):
+                                        not product_id.startswith('mock-') and
+                                        not product_id.startswith('test-') and
+                                        product_name and len(product_name) > 3):
                                         
-                                        # Additional validation: check if product has valid price
+                                        # Additional validation: check if product has valid price and name
                                         price = float(item.get('salePrice', 0.0))
-                                        if price > 0:
-                                            product = WalmartProduct(
-                                                product_id=product_id,
-                                                name=item.get('name', clean_ingredient),
-                                                price=price,
-                                                thumbnail_image=item.get('thumbnailImage', ''),
-                                                availability="Available"
+                                        if price > 0 and price < 1000:  # Reasonable price range
+                                            # Check if product name is relevant to ingredient
+                                            name_lower = product_name.lower()
+                                            ingredient_lower = clean_ingredient.lower()
+                                            
+                                            # Basic relevance check
+                                            is_relevant = (
+                                                ingredient_lower in name_lower or
+                                                any(word in name_lower for word in ingredient_lower.split() if len(word) > 2)
                                             )
-                                            products.append(product)
-                                            logging.info(f"Valid Walmart product: {product.name} - ${product.price} (ID: {product.product_id})")
+                                            
+                                            if is_relevant or attempt == 2:  # Accept less relevant on final attempt
+                                                product = WalmartProduct(
+                                                    product_id=product_id,
+                                                    name=product_name,
+                                                    price=price,
+                                                    thumbnail_image=item.get('thumbnailImage', ''),
+                                                    availability="Available"
+                                                )
+                                                products.append(product)
+                                                valid_products_count += 1
+                                                logging.info(f"✅ PRODUCTION: Valid product {valid_products_count}: {product.name} - ${product.price} (ID: {product.product_id})")
+                                            else:
+                                                logging.info(f"⏭️ PRODUCTION: Skipping irrelevant product: {product_name} for '{clean_ingredient}'")
                                         else:
-                                            logging.warning(f"Skipping product with invalid price: {item.get('name', 'Unknown')} - ${price}")
+                                            logging.warning(f"⏭️ PRODUCTION: Skipping product with invalid price: {product_name} - ${price}")
                                     else:
-                                        logging.warning(f"Skipping invalid product ID: {product_id} for '{clean_ingredient}'")
+                                        logging.warning(f"⏭️ PRODUCTION: Skipping invalid product ID or name: {product_id} - '{product_name}'")
                             
                             if products:
-                                logging.info(f"Successfully found {len(products)} valid products for '{clean_ingredient}'")
+                                logging.info(f"🎉 PRODUCTION: Successfully found {len(products)} valid products for '{clean_ingredient}'")
                                 return products
                             else:
-                                logging.warning(f"No valid products found in response for '{clean_ingredient}'")
+                                logging.warning(f"⚠️ PRODUCTION: No valid products found in response for '{clean_ingredient}' on attempt {attempt + 1}")
                         else:
-                            logging.warning(f"No items found in Walmart API response for '{clean_ingredient}'")
+                            logging.warning(f"⚠️ PRODUCTION: No items found in Walmart API response for '{clean_ingredient}' on attempt {attempt + 1}")
                     
                     elif response.status_code == 429:  # Rate limit
-                        logging.warning(f"Rate limited for '{clean_ingredient}', attempt {attempt + 1}")
+                        logging.warning(f"🚫 PRODUCTION: Rate limited for '{clean_ingredient}', attempt {attempt + 1}")
                         if attempt < 2:  # Wait before retry
-                            await asyncio.sleep(2 ** attempt)  # Exponential backoff
+                            await asyncio.sleep(3 ** attempt)  # Exponential backoff
                             continue
                     
                     elif response.status_code == 403:  # Authentication error
-                        logging.error(f"Authentication error for '{clean_ingredient}': {response.status_code} - {response.text}")
+                        logging.error(f"🔐 PRODUCTION: Authentication error for '{clean_ingredient}': {response.status_code}")
+                        logging.error(f"Response: {response.text}")
+                        break  # Don't retry auth errors
+                    
+                    elif response.status_code == 401:  # Authentication error
+                        logging.error(f"🔐 PRODUCTION: Authentication error for '{clean_ingredient}': {response.status_code}")
+                        logging.error(f"Response: {response.text}")
                         break  # Don't retry auth errors
                     
                     else:
-                        logging.warning(f"Walmart API error for '{clean_ingredient}': {response.status_code} - {response.text}")
+                        logging.warning(f"⚠️ PRODUCTION: Walmart API error for '{clean_ingredient}': {response.status_code}")
+                        logging.warning(f"Response: {response.text}")
                         if attempt < 2 and response.status_code >= 500:  # Retry server errors
-                            await asyncio.sleep(1)
+                            await asyncio.sleep(2)
                             continue
                 
                 # If we get here, the attempt failed
                 break
                         
             except asyncio.TimeoutError:
-                logging.error(f"Timeout error for '{clean_ingredient}' on attempt {attempt + 1}")
+                logging.error(f"⏰ PRODUCTION: Timeout error for '{clean_ingredient}' on attempt {attempt + 1}")
                 if attempt < 2:
-                    await asyncio.sleep(1)
+                    await asyncio.sleep(2)
                     continue
                 
             except Exception as api_error:
-                logging.error(f"Walmart API call failed for '{clean_ingredient}' on attempt {attempt + 1}: {str(api_error)}")
+                logging.error(f"💥 PRODUCTION: Walmart API call failed for '{clean_ingredient}' on attempt {attempt + 1}: {str(api_error)}")
                 if attempt < 2:
-                    await asyncio.sleep(1)
+                    await asyncio.sleep(2)
                     continue
         
         # If all attempts failed, return empty list
-        logging.warning(f"All attempts failed for '{clean_ingredient}' - returning empty list")
+        logging.error(f"❌ PRODUCTION: All attempts failed for '{clean_ingredient}' - returning empty list")
         return []
                 
     except Exception as e:
-        logging.error(f"Error fetching Walmart products for '{ingredient}': {str(e)}")
+        logging.error(f"💥 PRODUCTION: Critical error fetching Walmart products for '{ingredient}': {str(e)}")
         return []
 
 @api_router.post("/recipes/generate")
