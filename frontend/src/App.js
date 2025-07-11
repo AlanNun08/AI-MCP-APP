@@ -12,21 +12,19 @@ function App() {
   // Use environment variable for backend URL - PRODUCTION FIX
   const API = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
   
-  // FORCE LOG THE BACKEND URL FOR DEBUGGING
+  // LOG THE BACKEND URL FOR DEBUGGING (no forced reload)
   console.log('🔍 BACKEND URL CONFIG:', API);
   console.log('🔍 ENVIRONMENT:', process.env.NODE_ENV);
-  console.log('🔍 ALL ENV VARS:', process.env);
 
-  // AGGRESSIVE cache clearing on app startup to ensure fresh data
+  // Clear caches on app startup (WITHOUT forcing reload)
   useEffect(() => {
     const clearCaches = async () => {
       try {
-        console.log('🧹 STARTING AGGRESSIVE CACHE CLEAR...');
+        console.log('🧹 Clearing caches...');
         
-        // Clear ALL service worker caches
+        // Clear service worker caches
         if ('caches' in window) {
           const cacheNames = await caches.keys();
-          console.log('🗑️ Found caches to delete:', cacheNames);
           await Promise.all(
             cacheNames.map(cacheName => {
               console.log('🗑️ Deleting cache:', cacheName);
@@ -35,38 +33,18 @@ function App() {
           );
         }
         
-        // UNREGISTER and REREGISTER service workers
-        if ('serviceWorker' in navigator) {
-          const registrations = await navigator.serviceWorker.getRegistrations();
-          console.log('🔧 Found service workers:', registrations.length);
-          for (let registration of registrations) {
-            await registration.unregister();
-            console.log('❌ Unregistered service worker');
-          }
-          
-          // Force reload to reregister with new version
-          console.log('🔄 Service workers cleared, forcing reload...');
-          setTimeout(() => {
-            window.location.reload(true);
-          }, 1000);
-        }
+        // Clear browser storage
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('userSession');
+        localStorage.removeItem('user_auth_data');
         
-        // Clear ALL browser storage
-        localStorage.clear();
-        sessionStorage.clear();
-        
-        // Clear cookies
-        document.cookie.split(";").forEach(function(c) { 
-          document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
-        });
-        
-        console.log('✅ AGGRESSIVE CACHE CLEAR COMPLETED');
+        console.log('✅ Cache clearing completed (no reload)');
       } catch (error) {
         console.error('❌ Cache clearing error:', error);
       }
     };
     
-    // ALWAYS clear caches on every app load
+    // Clear caches once on app load
     clearCaches();
   }, []);
 
