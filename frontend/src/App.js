@@ -2197,6 +2197,17 @@ function App() {
           user={user}
           API={API}
         />;
+      case 'welcome-onboarding':
+        return <WelcomeOnboarding 
+          user={user}
+          setCurrentScreen={setCurrentScreen}
+          showNotification={showNotification}
+        />;
+      case 'tutorial':
+        return <TutorialScreen 
+          setCurrentScreen={setCurrentScreen}
+          showNotification={showNotification}
+        />;
       default:
         return <LandingScreen />;
     }
