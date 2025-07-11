@@ -1119,7 +1119,9 @@ Make this sound like a viral TikTok Starbucks hack that people would want to try
         if request.is_budget_friendly and request.max_budget:
             prompt_parts.append(f"Keep the total ingredient cost under ${request.max_budget}.")
         
-        prompt_parts.append("""
+        # Only add generic recipe instructions for non-Starbucks categories
+        if recipe_category != "starbucks":
+            prompt_parts.append("""
 Return ONLY a valid JSON object with this exact structure:
 
 {
