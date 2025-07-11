@@ -10,36 +10,26 @@ function App() {
   
   // Use environment variable for backend URL - PRODUCTION FIX
   const API = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
-  
-  // LOG THE BACKEND URL FOR DEBUGGING (no forced reload)
-  console.log('🔍 BACKEND URL CONFIG:', API);
-  console.log('🔍 ENVIRONMENT:', process.env.NODE_ENV);
 
-  // Clear caches on app startup (WITHOUT forcing reload)
+  // Simple cache clearing (no excessive logging)
   useEffect(() => {
     const clearCaches = async () => {
       try {
-        console.log('🧹 Clearing caches...');
-        
         // Clear service worker caches
         if ('caches' in window) {
           const cacheNames = await caches.keys();
           await Promise.all(
-            cacheNames.map(cacheName => {
-              console.log('🗑️ Deleting cache:', cacheName);
-              return caches.delete(cacheName);
-            })
+            cacheNames.map(cacheName => caches.delete(cacheName))
           );
         }
         
-        // Clear browser storage
+        // Clear auth storage
         localStorage.removeItem('authToken');
         localStorage.removeItem('userSession');
         localStorage.removeItem('user_auth_data');
         
-        console.log('✅ Cache clearing completed (no reload)');
       } catch (error) {
-        console.error('❌ Cache clearing error:', error);
+        // Silent error handling
       }
     };
     
