@@ -46,6 +46,7 @@ function App() {
   const [notification, setNotification] = useState(null);
   const [pendingVerificationEmail, setPendingVerificationEmail] = useState(null);
   const [pendingResetEmail, setPendingResetEmail] = useState(null);
+  const [isLoadingAuth, setIsLoadingAuth] = useState(true);
 
   // Check if user has completed onboarding
   const checkOnboardingStatus = () => {
