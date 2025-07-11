@@ -1,5 +1,5 @@
 // Service Worker for PWA functionality with aggressive cache clearing
-const CACHE_NAME = 'ai-chef-v21-selected-items-only-2024';
+const CACHE_NAME = 'ai-chef-v22-starbucks-drinks-2024';
 const urlsToCache = [
   '/',
   '/static/js/bundle.js',
