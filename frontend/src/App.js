@@ -2201,6 +2201,8 @@ function App() {
         return <RecipeHistoryScreen />;
       case 'recipe-detail':
         return <RecipeDetailScreen recipe={window.currentRecipe} showBackButton={true} />;
+      case 'starbucks-generator':
+        return <StarbucksGeneratorScreen />;
       default:
         return <LandingScreen />;
     }
