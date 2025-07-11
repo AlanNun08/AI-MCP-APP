@@ -49,53 +49,23 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Fetch event - Normal caching behavior (no forced reloads)
+// Fetch event - CLEAN HANDLING
 self.addEventListener('fetch', (event) => {
-  const url = new URL(event.request.url);
-  
-  // Always fetch fresh for HTML, JS, and CSS files
-  if (url.pathname.endsWith('.html') || 
-      url.pathname.endsWith('.js') || 
-      url.pathname.endsWith('.css') ||
-      url.pathname === '/') {
-    event.respondWith(
-      fetch(event.request.clone(), {
-        cache: 'no-store'
-      }).catch(() => {
-        // Fallback to cache only if network fails
-        return caches.match(event.request);
-      })
-    );
-    return;
-  }
-  
-  // For other resources, use normal caching
   event.respondWith(
     caches.match(event.request)
-      .then((response) => {
+      .then(response => {
+        // Return cached version or fetch from network
         return response || fetch(event.request);
       })
   );
 });
 
-// Background sync for offline functionality
-self.addEventListener('sync', (event) => {
-  if (event.tag === 'background-sync') {
-    event.waitUntil(syncData());
-  }
-});
-
-async function syncData() {
-  // Handle background sync when user comes back online
-  console.log('Background sync triggered');
-}
-
-// Push notifications (for future use)
+// Push notification event
 self.addEventListener('push', (event) => {
   const options = {
-    body: 'New recipe suggestion available!',
+    body: event.data ? event.data.text() : 'New notification',
     icon: '/icon-192x192.png',
-    badge: '/icon-192x192.png'
+    badge: '/badge-72x72.png'
   };
 
   event.waitUntil(
