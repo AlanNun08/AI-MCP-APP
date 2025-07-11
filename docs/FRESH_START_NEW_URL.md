@@ -10,8 +10,8 @@
 - ✅ Fresh start for new testing in the future
 
 ### 🔄 **NEW PREVIEW URL CONFIGURED**
-- ✅ **Old URL:** https://407d4e17-1478-4b87-bdc3-d8a695a6f09c.preview.emergentagent.com
-- ✅ **New URL:** https://recipe-cart-app.preview.emergentagent.com
+- ✅ **Old URL:** https://4a624c76-fc66-4a7c-91df-de079314ff82.preview.emergentagent.com
+- ✅ **New URL:** https://4a624c76-fc66-4a7c-91df-de079314ff82.preview.emergentagent.com
 
 ### 🔧 **BACKEND UPDATES**
 - ✅ **CORS Configuration:** Updated to include new preview URL
@@ -30,7 +30,7 @@
 - ✅ **Database:** Connected and functional
 
 ## 🚀 **NEW PREVIEW ACCESS**
-**URL:** https://recipe-cart-app.preview.emergentagent.com
+**URL:** https://4a624c76-fc66-4a7c-91df-de079314ff82.preview.emergentagent.com
 
 ### **Verified Working:**
 - ✅ API endpoints responding

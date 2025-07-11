@@ -81,7 +81,7 @@ Run this checklist before every deployment:
 
 ```bash
 # 1. Backend Health Check
-curl -s https://recipe-cart-app.preview.emergentagent.com/api/ | jq .
+curl -s https://4a624c76-fc66-4a7c-91df-de079314ff82.preview.emergentagent.com/api/ | jq .
 
 # 2. Run Full Test Suite
 cd /app && python tests/backend_test.py
@@ -93,7 +93,7 @@ grep -E "MONGO_URL|WALMART_|MAILJET_|OPENAI_" backend/.env
 sudo supervisorctl status
 
 # 5. Verify Frontend Build
-curl -s https://recipe-cart-app.preview.emergentagent.com/ | head -5
+curl -s https://4a624c76-fc66-4a7c-91df-de079314ff82.preview.emergentagent.com/ | head -5
 ```
 
 ### **Environment Configuration**
@@ -121,7 +121,7 @@ OPENAI_API_KEY=your_openai_key
 
 #### **Frontend (.env)**
 ```bash
-REACT_APP_BACKEND_URL=https://recipe-cart-app.preview.emergentagent.com
+REACT_APP_BACKEND_URL=https://4a624c76-fc66-4a7c-91df-de079314ff82.preview.emergentagent.com
 WDS_SOCKET_PORT=443
 ```
 
@@ -133,14 +133,14 @@ WDS_SOCKET_PORT=443
 
 #### **1. Check API Health**
 ```bash
-curl -X GET https://recipe-cart-app.preview.emergentagent.com/api/
+curl -X GET https://4a624c76-fc66-4a7c-91df-de079314ff82.preview.emergentagent.com/api/
 # Expected: {"message":"AI Recipe & Grocery API","version":"2.0.0","status":"running"}
 ```
 
 #### **2. Test Authentication Flow**
 ```bash
 # Register User
-curl -X POST https://recipe-cart-app.preview.emergentagent.com/api/auth/register \
+curl -X POST https://4a624c76-fc66-4a7c-91df-de079314ff82.preview.emergentagent.com/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{
     "first_name": "Test",
@@ -153,15 +153,15 @@ curl -X POST https://recipe-cart-app.preview.emergentagent.com/api/auth/register
   }'
 
 # Get Verification Code (Debug Endpoint)
-curl https://recipe-cart-app.preview.emergentagent.com/api/debug/verification-codes/test@example.com
+curl https://4a624c76-fc66-4a7c-91df-de079314ff82.preview.emergentagent.com/api/debug/verification-codes/test@example.com
 
 # Verify Email
-curl -X POST https://recipe-cart-app.preview.emergentagent.com/api/auth/verify \
+curl -X POST https://4a624c76-fc66-4a7c-91df-de079314ff82.preview.emergentagent.com/api/auth/verify \
   -H "Content-Type: application/json" \
   -d '{"email": "test@example.com", "code": "VERIFICATION_CODE"}'
 
 # Login
-curl -X POST https://recipe-cart-app.preview.emergentagent.com/api/auth/login \
+curl -X POST https://4a624c76-fc66-4a7c-91df-de079314ff82.preview.emergentagent.com/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email": "test@example.com", "password": "testpass123"}'
 ```
@@ -169,7 +169,7 @@ curl -X POST https://recipe-cart-app.preview.emergentagent.com/api/auth/login \
 #### **3. Test Recipe Generation**
 ```bash
 # Generate Cuisine Recipe
-curl -X POST https://recipe-cart-app.preview.emergentagent.com/api/recipes/generate \
+curl -X POST https://4a624c76-fc66-4a7c-91df-de079314ff82.preview.emergentagent.com/api/recipes/generate \
   -H "Content-Type: application/json" \
   -d '{
     "recipe_category": "cuisine",
@@ -181,7 +181,7 @@ curl -X POST https://recipe-cart-app.preview.emergentagent.com/api/recipes/gener
   }'
 
 # Generate Starbucks Drink
-curl -X POST https://recipe-cart-app.preview.emergentagent.com/api/recipes/generate \
+curl -X POST https://4a624c76-fc66-4a7c-91df-de079314ff82.preview.emergentagent.com/api/recipes/generate \
   -H "Content-Type: application/json" \
   -d '{
     "recipe_category": "starbucks",
@@ -194,7 +194,7 @@ curl -X POST https://recipe-cart-app.preview.emergentagent.com/api/recipes/gener
 #### **4. Test Walmart Integration**
 ```bash
 # Get Cart Options for Recipe
-curl -X POST "https://recipe-cart-app.preview.emergentagent.com/api/grocery/cart-options?recipe_id=RECIPE_ID&user_id=USER_ID"
+curl -X POST "https://4a624c76-fc66-4a7c-91df-de079314ff82.preview.emergentagent.com/api/grocery/cart-options?recipe_id=RECIPE_ID&user_id=USER_ID"
 ```
 
 ### **Log Analysis**
@@ -386,7 +386,7 @@ Get Walmart products for recipe ingredients.
 **Debugging Steps:**
 ```bash
 # Check if user exists
-curl https://recipe-cart-app.preview.emergentagent.com/api/debug/verification-codes/USER_EMAIL
+curl https://4a624c76-fc66-4a7c-91df-de079314ff82.preview.emergentagent.com/api/debug/verification-codes/USER_EMAIL
 
 # Check user verification status
 # Login to MongoDB and check user document
@@ -468,7 +468,7 @@ echo "Testing API performance..."
 
 # Test multiple concurrent requests
 for i in {1..10}; do
-  curl -s -w "%{time_total}\n" -o /dev/null https://recipe-cart-app.preview.emergentagent.com/api/ &
+  curl -s -w "%{time_total}\n" -o /dev/null https://4a624c76-fc66-4a7c-91df-de079314ff82.preview.emergentagent.com/api/ &
 done
 wait
 
@@ -501,10 +501,10 @@ echo "Load test completed"
 python -c "import bcrypt; print(bcrypt.checkpw(b'test', bcrypt.hashpw(b'test', bcrypt.gensalt())))"
 
 # Test CORS headers
-curl -I -X OPTIONS https://recipe-cart-app.preview.emergentagent.com/api/auth/login
+curl -I -X OPTIONS https://4a624c76-fc66-4a7c-91df-de079314ff82.preview.emergentagent.com/api/auth/login
 
 # Test input validation
-curl -X POST https://recipe-cart-app.preview.emergentagent.com/api/auth/register \
+curl -X POST https://4a624c76-fc66-4a7c-91df-de079314ff82.preview.emergentagent.com/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{"invalid": "data"}'
 ```
