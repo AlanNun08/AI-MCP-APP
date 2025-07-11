@@ -11,7 +11,7 @@ function App() {
   // Use environment variable for backend URL - PRODUCTION FIX
   const API = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
 
-  // Simple cache clearing (no excessive logging)
+  // Simple cache clearing (no excessive logging) - ONLY CLEAR CACHES, NOT AUTH DATA
   useEffect(() => {
     const clearCaches = async () => {
       try {
@@ -23,10 +23,10 @@ function App() {
           );
         }
         
-        // Clear auth storage
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('userSession');
-        localStorage.removeItem('user_auth_data');
+        // DON'T clear auth storage on app load - let user stay logged in
+        // localStorage.removeItem('authToken');
+        // localStorage.removeItem('userSession');
+        // localStorage.removeItem('user_auth_data');
         
       } catch (error) {
         // Silent error handling
