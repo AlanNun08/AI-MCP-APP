@@ -56,7 +56,10 @@ function App() {
         if (savedUser) {
           const userData = JSON.parse(savedUser);
           setUser(userData);
-          setCurrentScreen('dashboard');
+          // Only set to dashboard if we're on landing page
+          if (currentScreen === 'landing') {
+            setCurrentScreen('dashboard');
+          }
           console.log('User session restored:', userData.email);
         }
       } catch (error) {
@@ -70,6 +73,27 @@ function App() {
     // Load user session after cache clearing
     setTimeout(loadUserSession, 100);
   }, []);
+
+  // Check and restore user session if lost during navigation
+  useEffect(() => {
+    const checkUserSession = () => {
+      if (!user) {
+        const savedUser = localStorage.getItem('ai_chef_user');
+        if (savedUser) {
+          try {
+            const userData = JSON.parse(savedUser);
+            console.log('Restoring lost user session:', userData.email);
+            setUser(userData);
+          } catch (error) {
+            console.error('Failed to restore lost user session:', error);
+            localStorage.removeItem('ai_chef_user');
+          }
+        }
+      }
+    };
+    
+    checkUserSession();
+  }, [currentScreen, user]);
 
   // Save user session to localStorage
   const saveUserSession = (userData) => {
