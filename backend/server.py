@@ -1000,7 +1000,22 @@ async def generate_recipe(request: RecipeGenRequest):
             elif recipe_type == "fruit lemon slices chili":
                 prompt_parts.append(f"Create a spicy and refreshing fruit lemon slices with chili recipe for {request.servings} people. Focus on fresh fruits, lemon juice, chili powder, lime, and traditional Mexican-style seasoning. Include cutting techniques and spice combinations.")
             elif recipe_type == "frozen yogurt berry bites":
-                prompt_parts.append(f"Create healthy frozen yogurt berry bites recipe for {request.servings} people. Focus on Greek yogurt, mixed berries, natural sweeteners, and bite-sized frozen treats. Include freezing techniques and presentation.")
+                prompt_parts.append(f"""Create an incredibly creative and Instagram-worthy frozen yogurt berry recipe for {request.servings} people. Think beyond basic bites - create something like 'Galaxy Swirl Yogurt Bark', 'Berry Cheesecake Bombs', 'Unicorn Yogurt Clusters', or 'Rainbow Protein Pops'. 
+
+Focus on:
+🌟 Creative presentation (layered colors, marbled effects, fun shapes)
+🧊 Multiple textures (crunchy toppings, smooth yogurt, chewy add-ins)
+🍓 Gourmet flavor combinations (lavender honey, matcha white chocolate, strawberry basil)
+✨ Instagram-worthy appearance (vibrant colors, artistic drizzles, edible flowers)
+🥄 Pro techniques (tempering chocolate, creating ombré effects, using molds)
+
+Include Greek yogurt as the base but elevate it with:
+- Superfood add-ins (chia seeds, acai powder, spirulina)
+- Gourmet flavor extracts (rose water, vanilla bean, almond)
+- Artisanal toppings (edible gold, freeze-dried fruits, nuts, coconut flakes)
+- Creative freezing techniques (layering, swirling, molding)
+
+Make this a show-stopping healthy dessert that looks like it came from a high-end dessert boutique!""")
             else:
                 prompt_parts.append(f"Create a {recipe_type} snack recipe for {request.servings} people. Focus on tasty, satisfying snacks that are perfect for any time of day.")
         
