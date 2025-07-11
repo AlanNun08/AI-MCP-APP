@@ -1353,6 +1353,63 @@ IMPORTANT FOR SPICES: If the recipe uses spices, list each spice individually in
         raise HTTPException(status_code=500, detail="Failed to generate recipe")
 
 @api_router.get("/recipes/{recipe_id}")
+@app.get("/api/recipes/history/{user_id}")
+async def get_recipe_history(user_id: str):
+    """Get all recipes for a user including regular recipes and Starbucks drinks"""
+    try:
+        # Get regular recipes
+        recipes = await db.recipes.find({"user_id": user_id}).sort("created_at", -1).to_list(100)
+        
+        # Get Starbucks recipes
+        starbucks_recipes = await db.starbucks_recipes.find({"user_id": user_id}).sort("created_at", -1).to_list(100)
+        
+        # Convert to dictionaries and add type labels
+        recipe_history = []
+        
+        # Process regular recipes
+        for recipe in recipes:
+            recipe_dict = mongo_to_dict(recipe)
+            # Determine category based on cuisine_type or content
+            if 'snack' in recipe_dict.get('cuisine_type', '').lower() or any(word in recipe_dict.get('title', '').lower() for word in ['bowl', 'bite', 'snack', 'yogurt', 'acai']):
+                recipe_dict['category'] = 'snacks'
+                recipe_dict['category_label'] = 'Snacks'
+                recipe_dict['category_icon'] = '🍪'
+            elif 'beverage' in recipe_dict.get('cuisine_type', '').lower() or any(word in recipe_dict.get('title', '').lower() for word in ['drink', 'tea', 'lemonade', 'boba', 'smoothie']):
+                recipe_dict['category'] = 'beverages'
+                recipe_dict['category_label'] = 'Beverages'
+                recipe_dict['category_icon'] = '🧋'
+            else:
+                recipe_dict['category'] = 'cuisine'
+                recipe_dict['category_label'] = 'Cuisine'
+                recipe_dict['category_icon'] = '🍝'
+            
+            recipe_dict['type'] = 'recipe'
+            recipe_history.append(recipe_dict)
+        
+        # Process Starbucks recipes
+        for starbucks_recipe in starbucks_recipes:
+            starbucks_dict = mongo_to_dict(starbucks_recipe)
+            starbucks_dict['category'] = 'starbucks'
+            starbucks_dict['category_label'] = 'Starbucks Drinks'
+            starbucks_dict['category_icon'] = '☕'
+            starbucks_dict['type'] = 'starbucks'
+            recipe_history.append(starbucks_dict)
+        
+        # Sort all recipes by created_at
+        recipe_history.sort(key=lambda x: x.get('created_at', ''), reverse=True)
+        
+        return {
+            "success": True,
+            "recipes": recipe_history,
+            "total_count": len(recipe_history),
+            "regular_recipes": len(recipes),
+            "starbucks_recipes": len(starbucks_recipes)
+        }
+        
+    except Exception as e:
+        print(f"Error getting recipe history: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get recipe history")
+
 async def get_recipe(recipe_id: str):
     """Get a specific recipe"""
     try:
