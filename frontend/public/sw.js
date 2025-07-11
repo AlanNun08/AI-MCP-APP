@@ -1,5 +1,5 @@
-// Service Worker for PWA functionality - CORS FIXED VERSION
-const CACHE_NAME = 'buildyoursmartcart-v103-cors-fixed';
+// Service Worker for PWA functionality - COMPLETE FRESH CLEAN VERSION
+const CACHE_NAME = 'buildyoursmartcart-v104-complete-clean';
 const urlsToCache = [
   '/',
   '/static/js/bundle.js',
@@ -7,12 +7,12 @@ const urlsToCache = [
   '/manifest.json'
 ];
 
-// Install event - CORS FIX CACHE CLEAR
+// Install event - COMPLETE FRESH START
 self.addEventListener('install', (event) => {
-  console.log('🔧 CORS FIXED - CLEARING CACHE FOR FRESH CONNECTION...');
+  console.log('🧹 COMPLETE CLEAN VERSION - CLEARING ALL CACHES...');
   event.waitUntil(
     caches.keys().then(cacheNames => {
-      console.log('🗑️ CLEARING ALL OLD CACHES:', cacheNames);
+      console.log('🗑️ DELETING ALL OLD CACHES:', cacheNames);
       return Promise.all(
         cacheNames.map(cacheName => {
           console.log('💥 DELETING CACHE:', cacheName);
@@ -20,10 +20,10 @@ self.addEventListener('install', (event) => {
         })
       );
     }).then(() => {
-      console.log('✅ ALL CACHES CLEARED - CREATING CORS-FIXED CACHE');
+      console.log('✅ ALL CACHES DELETED - CREATING CLEAN CACHE');
       return caches.open(CACHE_NAME);
     }).then(() => {
-      console.log('🎉 CORS-FIXED CACHE v103 CREATED');
+      console.log('🎉 CLEAN CACHE v104 CREATED');
       return self.skipWaiting();
     })
   );
