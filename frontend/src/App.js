@@ -1446,10 +1446,22 @@ function App() {
       setCartItems(updatedCartItems);
 
       // Regenerate affiliate URL
-      const itemIds = updatedCartItems.flatMap(item => 
-        Array(item.quantity).fill(item.product_id)
-      );
-      setFinalWalmartUrl(`https://affil.walmart.com/cart/addToCart?items=${itemIds.join(',')}`);
+      // Generate Walmart URL with correct affiliate format: offers=SKU1|Quantity1,SKU2|Quantity2
+      const walmartOffers = [];
+      const finalQuantities = {};
+      
+      // Count quantities for each product
+      updatedCartItems.forEach(item => {
+        const qty = finalQuantities[item.product_id] || 0;
+        finalQuantities[item.product_id] = qty + item.quantity;
+      });
+      
+      // Format for Walmart affiliate URL
+      Object.entries(finalQuantities).forEach(([productId, quantity]) => {
+        walmartOffers.push(`${productId}|${quantity}`);
+      });
+      
+      setFinalWalmartUrl(`https://affil.walmart.com/cart/addToCart?offers=${walmartOffers.join(',')}`);
 
       console.log('✅ Product selection updated for', ingredientName, ':', selectedProduct.name);
     };
