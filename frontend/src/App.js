@@ -2571,6 +2571,19 @@ function App() {
 
   // Main render function
   const renderScreen = () => {
+    // If user is logged in but on landing page, redirect to dashboard
+    if (user && currentScreen === 'landing') {
+      setCurrentScreen('dashboard');
+      return <DashboardScreen />;
+    }
+    
+    // If user is not logged in and trying to access protected screens, redirect to landing
+    if (!user && !['landing', 'register', 'verify-email', 'login', 'forgot-password', 'reset-password'].includes(currentScreen)) {
+      console.log('User not logged in, redirecting to landing from:', currentScreen);
+      setCurrentScreen('landing');
+      return <LandingScreen />;
+    }
+    
     switch (currentScreen) {
       case 'landing':
         return <LandingScreen />;
