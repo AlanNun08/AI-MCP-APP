@@ -1182,7 +1182,6 @@ The shopping_list should be a separate bullet-pointed shopping list that include
 - Clean ingredient names without quantities, measurements, or preparation instructions
 
 BEVERAGE EXAMPLES for reference (create one specific recipe based on user selection):
-- Coffee: Salted Caramel Cold Foam Macchiato with vanilla syrup and sea salt
 - Lemonade: Lavender Honey Lemonade with fresh herbs and edible flowers  
 - Thai Tea: Coconut Mango Thai Tea with layered presentation and tropical fruit
 - Boba: Taro Coconut Milk Tea with homemade taro paste and chewy tapioca pearls
