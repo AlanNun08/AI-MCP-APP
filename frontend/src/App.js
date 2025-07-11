@@ -19,6 +19,22 @@ function App() {
   const [pendingVerificationEmail, setPendingVerificationEmail] = useState(null);
   const [pendingResetEmail, setPendingResetEmail] = useState(null);
 
+  // Check if user has completed onboarding
+  const checkOnboardingStatus = () => {
+    if (user?.id) {
+      const isOnboarded = localStorage.getItem(`user_${user.id}_onboarded`);
+      return isOnboarded === 'true';
+    }
+    return false;
+  };
+
+  // Show onboarding for new users
+  useEffect(() => {
+    if (user && !checkOnboardingStatus() && currentScreen === 'dashboard') {
+      setCurrentScreen('welcome-onboarding');
+    }
+  }, [user, currentScreen]);
+
   // Notification system
   const showNotification = (message, type = 'success') => {
     setNotification({ message, type });
