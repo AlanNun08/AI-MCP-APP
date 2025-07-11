@@ -52,24 +52,32 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Fetch event - NEVER cache, always fetch fresh from network
+// Fetch event - Normal caching behavior (no forced reloads)
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
   
-  // FORCE FRESH FETCH for ALL resources to bypass any caching issues
+  // Always fetch fresh for HTML, JS, and CSS files
+  if (url.pathname.endsWith('.html') || 
+      url.pathname.endsWith('.js') || 
+      url.pathname.endsWith('.css') ||
+      url.pathname === '/') {
+    event.respondWith(
+      fetch(event.request.clone(), {
+        cache: 'no-store'
+      }).catch(() => {
+        // Fallback to cache only if network fails
+        return caches.match(event.request);
+      })
+    );
+    return;
+  }
+  
+  // For other resources, use normal caching
   event.respondWith(
-    fetch(event.request.clone(), {
-      cache: 'no-store',
-      headers: {
-        'Cache-Control': 'no-cache, no-store, must-revalidate',
-        'Pragma': 'no-cache',
-        'Expires': '0'
-      }
-    }).catch((error) => {
-      console.error('Fetch failed:', error);
-      // Only fallback to cache if absolutely necessary
-      return caches.match(event.request);
-    })
+    caches.match(event.request)
+      .then((response) => {
+        return response || fetch(event.request);
+      })
   );
 });
 
