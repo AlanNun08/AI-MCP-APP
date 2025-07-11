@@ -175,6 +175,24 @@ class Recipe(BaseModel):
             datetime: lambda v: v.isoformat()
         }
 
+class StarbucksRecipe(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    drink_name: str
+    description: str
+    base_drink: str
+    modifications: List[str]
+    ordering_script: str
+    pro_tips: List[str]
+    why_amazing: str
+    category: str  # frappuccino, latte, etc.
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    user_id: Optional[str] = None
+
+    class Config:
+        json_encoders = {
+            datetime: lambda v: v.isoformat()
+        }
+
 class WalmartProduct(BaseModel):
     product_id: str
     name: str
