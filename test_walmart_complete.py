@@ -14,10 +14,10 @@ def create_test_user():
     
     # Register test user
     registration_data = {
-        "name": "Test User",
+        "first_name": "Test",
+        "last_name": "User",
         "email": "test_walmart_user@example.com",
         "password": "testpassword123",
-        "confirmPassword": "testpassword123",
         "dietary_preferences": ["None"],
         "allergies": ["None"],
         "favorite_cuisines": ["Italian"]
