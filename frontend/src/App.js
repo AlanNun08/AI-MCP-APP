@@ -962,11 +962,10 @@ function App() {
   // Recipe Generation Screen Component
   const RecipeGenerationScreen = () => {
     const [formData, setFormData] = useState({
-      recipe_type: '', // 'cuisine', 'snack', 'beverage', or 'starbucks'
+      recipe_type: '', // 'cuisine', 'snack', or 'beverage'
       cuisine_type: '',
       snack_type: '',
       beverage_type: '',
-      starbucks_type: '',
       dietary_preferences: [],
       ingredients_on_hand: '',
       prep_time_max: '',
