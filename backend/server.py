@@ -1801,9 +1801,15 @@ async def delete_starbucks_recipe(recipe_id: str):
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://buildyoursmartcart.com", "http://localhost:3000", "http://localhost:8001"],  # Production and development origins
+    allow_origins=[
+        "https://buildyoursmartcart.com", 
+        "http://localhost:3000", 
+        "http://localhost:8001",
+        "https://407d4e17-1478-4b87-bdc3-d8a695a6f09c.preview.emergentagent.com",  # Preview environment
+        "*"  # Allow all origins for preview testing
+    ],
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
 
