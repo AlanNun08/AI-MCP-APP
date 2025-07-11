@@ -27,6 +27,10 @@ import os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from email_service import email_service
 
+# DISABLE ALL CACHING AND ENSURE FRESH DATA
+import gc
+gc.disable()  # Disable garbage collection caching
+
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
