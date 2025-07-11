@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 
 // Starbucks Secret Menu Generator Screen
-const StarbucksGeneratorScreen = () => {
+const StarbucksGeneratorScreen = ({ showNotification, setCurrentScreen, user, API }) => {
   const [drinkType, setDrinkType] = useState('');
   const [flavorInspiration, setFlavorInspiration] = useState('');
   const [generatedDrink, setGeneratedDrink] = useState(null);
