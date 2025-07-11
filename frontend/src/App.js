@@ -1538,30 +1538,32 @@ function App() {
       const updatedItems = cartItems.filter((_, i) => i !== index);
       setCartItems(updatedItems);
       
-      // Generate clean Walmart URL - ensure we always have data
+      // Generate Walmart URL with correct format: items=ID1,ID2_quantity,ID3
       const walmartItems = [];
       const finalQuantities = {};
       
-      // Count quantities for each product with more lenient validation
+      // Count quantities for each product
       updatedItems.forEach(item => {
         if (item.product_id) {
-          // Default quantity to 1 if not set properly
           const quantity = (typeof item.quantity === 'number' && item.quantity > 0) ? item.quantity : 1;
           const qty = finalQuantities[item.product_id] || 0;
           finalQuantities[item.product_id] = qty + quantity;
         }
       });
       
-      // Format for Walmart affiliate URL
+      // Format for Walmart URL: productId or productId_quantity
       Object.entries(finalQuantities).forEach(([productId, quantity]) => {
         if (productId) {
-          walmartItems.push(`${productId}|${Math.floor(quantity)}`);
+          if (quantity === 1) {
+            walmartItems.push(productId);
+          } else {
+            walmartItems.push(`${productId}_${Math.floor(quantity)}`);
+          }
         }
       });
       
-      // Always set URL if we have items
       if (walmartItems.length > 0) {
-        setFinalWalmartUrl(`https://affil.walmart.com/cart/addToCart?offers=${walmartItems.join(',')}`);
+        setFinalWalmartUrl(`https://affil.walmart.com/cart/addToCart?items=${walmartItems.join(',')}`);
       } else {
         setFinalWalmartUrl('');
       }
