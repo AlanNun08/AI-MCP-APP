@@ -620,6 +620,13 @@ function App() {
             </button>
             
             <button
+              onClick={() => setCurrentScreen('starbucks-generator')}
+              className="w-full bg-gradient-to-br from-green-500 to-green-600 text-white font-semibold py-4 px-6 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 active:scale-95"
+            >
+              ☕ Starbucks Secret Menu
+            </button>
+            
+            <button
               onClick={() => setCurrentScreen('all-recipes')}
               className="w-full bg-purple-500 text-white font-semibold py-4 px-6 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 active:scale-95"
             >
