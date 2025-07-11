@@ -7,28 +7,27 @@ const urlsToCache = [
   '/manifest.json'
 ];
 
-// Install event - clear all old caches immediately
+// Install event - clear old caches (no forced reloads)
 self.addEventListener('install', (event) => {
-  console.log('Installing new service worker v50 - FORCE PRODUCTION URL FIX...');
+  console.log('Installing service worker - clearing old caches...');
   event.waitUntil(
     caches.keys().then(cacheNames => {
       console.log('Found existing caches:', cacheNames);
       return Promise.all(
         cacheNames.map(cacheName => {
-          console.log('FORCE DELETING cache:', cacheName);
+          console.log('Deleting old cache:', cacheName);
           return caches.delete(cacheName);
         })
       );
     }).then(() => {
-      console.log('ALL CACHES FORCE DELETED, creating new cache...');
+      console.log('Old caches cleared, creating new cache...');
       return caches.open(CACHE_NAME);
     }).then(cache => {
-      console.log('New cache v50 created successfully');
-      // Don't cache anything initially - force fresh fetch
-      return Promise.resolve();
+      console.log('New cache created successfully');
+      return cache.addAll(urlsToCache);
     })
   );
-  // Force the new service worker to become active immediately
+  // Let the new service worker activate naturally
   self.skipWaiting();
 });
 
