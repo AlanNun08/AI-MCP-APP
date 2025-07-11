@@ -175,6 +175,11 @@ class Recipe(BaseModel):
             datetime: lambda v: v.isoformat()
         }
 
+class StarbucksRequest(BaseModel):
+    user_id: str
+    drink_type: str  # frappuccino, refresher, lemonade, iced_matcha_latte, random
+    flavor_inspiration: Optional[str] = None  # Optional flavor inspiration like "tres leches", "ube", "mango tajin"
+
 class StarbucksRecipe(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     drink_name: str
