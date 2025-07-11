@@ -1067,21 +1067,26 @@ Make the drink visually Instagram-worthy and perfect for any season.""")
 
 IMPORTANT: Focus on the {recipe_type} category and create a drink that fits that style (frappuccino, latte, refresher, cold brew, macchiato, or seasonal special).
 
-🌟 Creative, catchy drink name (like "Twix Frappuccino" or "Fresas con Crema")
-📱 Brief description of what the drink tastes like
-☕ Base drink to order (e.g., "Grande Vanilla Bean Frappuccino")
-🎨 List of specific modifications to request:
-   - Syrups to add/subtract (with pumps)
-   - Milk substitutions 
-   - Extra shots, decaf, etc.
-   - Toppings (whipped cream, foam, drizzles)
-   - Temperature changes
-   - Any special requests
-
-💬 EXACT ordering script: "Hi, can I get a [size] [base drink] with [list all modifications clearly]"
-
-💡 Pro tips for ordering (best times, customization limits, cost-saving tips)
-🔥 Why this drink is amazing and what makes it special
+Respond with JSON in this exact format:
+{{
+  "drink_name": "Creative catchy name like 'Twix Frappuccino'",
+  "description": "Brief description of taste and experience",
+  "base_drink": "Base Starbucks drink to order (e.g. 'Grande Vanilla Bean Frappuccino')",
+  "modifications": [
+    "Add 2 pumps caramel syrup",
+    "Add 1 pump hazelnut syrup", 
+    "Extra whipped cream",
+    "Caramel drizzle on top and bottom"
+  ],
+  "ordering_script": "Hi, can I get a Grande Vanilla Bean Frappuccino with 2 pumps caramel syrup, 1 pump hazelnut syrup, extra whipped cream, and caramel drizzle on top and bottom?",
+  "pro_tips": [
+    "Order during off-peak hours for best customization",
+    "Ask for extra drizzle to make it Instagram-worthy",
+    "Can substitute any milk for extra creaminess"
+  ],
+  "why_amazing": "Detailed explanation of what makes this drink special and viral-worthy",
+  "category": "{recipe_type}"
+}}
 
 Make this sound like a viral TikTok Starbucks hack that people would want to try and share!""")
         
