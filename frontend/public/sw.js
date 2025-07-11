@@ -1,5 +1,5 @@
-// Service Worker for PWA functionality - COMPLETE CACHE CLEAR
-const CACHE_NAME = 'buildyoursmartcart-v100-final-production-fix-2024';
+// Service Worker for PWA functionality - PRODUCTION DEPLOYMENT READY
+const CACHE_NAME = 'buildyoursmartcart-v101-production-deployment-ready';
 const urlsToCache = [
   '/',
   '/static/js/bundle.js',
@@ -9,10 +9,10 @@ const urlsToCache = [
 
 // Install event - FORCE DELETE ALL OLD CACHES
 self.addEventListener('install', (event) => {
-  console.log('🔥 FINAL CACHE CLEAR - DELETING ALL OLD CACHES...');
+  console.log('🚀 PRODUCTION DEPLOYMENT - CLEARING ALL CACHES...');
   event.waitUntil(
     caches.keys().then(cacheNames => {
-      console.log('🗑️ FORCE DELETING ALL CACHES:', cacheNames);
+      console.log('🗑️ CLEARING ALL OLD CACHES:', cacheNames);
       return Promise.all(
         cacheNames.map(cacheName => {
           console.log('💥 DELETING CACHE:', cacheName);
@@ -23,7 +23,7 @@ self.addEventListener('install', (event) => {
       console.log('✅ ALL OLD CACHES DELETED - CREATING NEW CACHE');
       return caches.open(CACHE_NAME);
     }).then(() => {
-      console.log('🎉 NEW CACHE v100 CREATED SUCCESSFULLY');
+      console.log('🎉 NEW CACHE v101 CREATED FOR PRODUCTION');
       return self.skipWaiting();
     })
   );
@@ -31,7 +31,7 @@ self.addEventListener('install', (event) => {
 
 // Activate event - TAKE CONTROL IMMEDIATELY
 self.addEventListener('activate', (event) => {
-  console.log('🚀 FINAL SERVICE WORKER ACTIVATING - TAKING CONTROL');
+  console.log('🚀 PRODUCTION SERVICE WORKER ACTIVATING - TAKING CONTROL');
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
