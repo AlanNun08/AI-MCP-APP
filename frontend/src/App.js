@@ -982,7 +982,6 @@ function App() {
     const cuisineOptions = ['italian', 'mexican', 'chinese', 'indian', 'mediterranean', 'american', 'thai', 'japanese', 'french', 'korean'];
     const snackOptions = ['acai bowls', 'fruit lemon slices chili', 'frozen yogurt berry bites'];
     const beverageOptions = ['boba tea', 'thai tea', 'special lemonades'];
-    const starbucksOptions = ['frappuccino', 'latte', 'refresher', 'cold brew', 'macchiato', 'seasonal special'];
     const dietaryOptions = ['vegetarian', 'vegan', 'gluten-free', 'dairy-free', 'keto', 'paleo'];
     const difficultyOptions = ['easy', 'medium', 'hard'];
 
