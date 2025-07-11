@@ -997,6 +997,9 @@ function App() {
       } else if (formData.recipe_type === 'beverage' && !formData.beverage_type) {
         showNotification('❌ Please select a beverage type', 'error');
         return;
+      } else if (formData.recipe_type === 'starbucks' && !formData.starbucks_type) {
+        showNotification('❌ Please select a Starbucks drink type', 'error');
+        return;
       }
 
       // Determine the final type for the API
@@ -1006,6 +1009,8 @@ function App() {
         selectedType = formData.snack_type;
       } else if (formData.recipe_type === 'beverage') {
         selectedType = formData.beverage_type;
+      } else if (formData.recipe_type === 'starbucks') {
+        selectedType = formData.starbucks_type;
       }
 
       setIsGenerating(true);
