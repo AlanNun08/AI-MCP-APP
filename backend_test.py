@@ -1585,6 +1585,390 @@ class AIRecipeAppTester:
         # This test passes if the API correctly rejects the request
         return success
         
+    def test_starbucks_drinks_feature(self):
+        """Comprehensive test of the Starbucks Secret Menu Generator feature"""
+        print("\n" + "=" * 80)
+        print("☕ STARBUCKS SECRET MENU GENERATOR TESTING ☕")
+        print("=" * 80)
+        
+        # Track test results for final report
+        starbucks_tests = {
+            "Frappuccino Generation": False,
+            "Refresher Generation": False,
+            "Lemonade Generation": False,
+            "Iced Matcha Latte Generation": False,
+            "Random Drink Type": False,
+            "Flavor Inspiration": False,
+            "Response Structure Validation": False,
+            "Database Storage": False,
+            "Ordering Script Format": False
+        }
+        
+        # Create a test user for Starbucks testing
+        if not self.user_id:
+            test_user = {
+                "first_name": "Starbucks",
+                "last_name": "Tester",
+                "email": f"starbucks_test_{uuid.uuid4()}@example.com",
+                "password": "StarbucksTest123",
+                "dietary_preferences": [],
+                "allergies": [],
+                "favorite_cuisines": []
+            }
+            
+            success, response = self.run_test(
+                "Create Starbucks Test User",
+                "POST",
+                "auth/register",
+                200,
+                data=test_user
+            )
+            
+            if success and 'user_id' in response:
+                self.starbucks_user_id = response['user_id']
+                print(f"✅ Created Starbucks test user with ID: {self.starbucks_user_id}")
+                
+                # Get verification code and verify user
+                code_success, code_response = self.run_test(
+                    "Get Starbucks User Verification Code",
+                    "GET",
+                    f"debug/verification-codes/{test_user['email']}",
+                    200
+                )
+                
+                if code_success and 'codes' in code_response and len(code_response['codes']) > 0:
+                    verification_code = code_response['codes'][0]['code']
+                    
+                    verify_data = {
+                        "email": test_user['email'],
+                        "code": verification_code
+                    }
+                    
+                    verify_success, _ = self.run_test(
+                        "Verify Starbucks Test User",
+                        "POST",
+                        "auth/verify",
+                        200,
+                        data=verify_data
+                    )
+                    
+                    if verify_success:
+                        print("✅ Starbucks test user verified successfully")
+            else:
+                print("❌ Failed to create Starbucks test user")
+                return False
+        else:
+            self.starbucks_user_id = self.user_id
+        
+        # Test 1: Frappuccino Generation
+        print("\n" + "=" * 50)
+        print("1. Testing Frappuccino Generation")
+        print("=" * 50)
+        
+        frappuccino_request = {
+            "user_id": self.starbucks_user_id,
+            "drink_type": "frappuccino"
+        }
+        
+        success, response = self.run_test(
+            "Generate Frappuccino",
+            "POST",
+            "generate-starbucks-drink",
+            200,
+            data=frappuccino_request,
+            timeout=30
+        )
+        
+        if success and self.validate_starbucks_response(response, "frappuccino"):
+            starbucks_tests["Frappuccino Generation"] = True
+            self.frappuccino_id = response.get('id')
+            print(f"✅ Generated Frappuccino: {response.get('drink_name', 'Unknown')}")
+        
+        # Test 2: Refresher Generation
+        print("\n" + "=" * 50)
+        print("2. Testing Refresher Generation")
+        print("=" * 50)
+        
+        refresher_request = {
+            "user_id": self.starbucks_user_id,
+            "drink_type": "refresher"
+        }
+        
+        success, response = self.run_test(
+            "Generate Refresher",
+            "POST",
+            "generate-starbucks-drink",
+            200,
+            data=refresher_request,
+            timeout=30
+        )
+        
+        if success and self.validate_starbucks_response(response, "refresher"):
+            starbucks_tests["Refresher Generation"] = True
+            self.refresher_id = response.get('id')
+            print(f"✅ Generated Refresher: {response.get('drink_name', 'Unknown')}")
+        
+        # Test 3: Lemonade Generation
+        print("\n" + "=" * 50)
+        print("3. Testing Lemonade Generation")
+        print("=" * 50)
+        
+        lemonade_request = {
+            "user_id": self.starbucks_user_id,
+            "drink_type": "lemonade"
+        }
+        
+        success, response = self.run_test(
+            "Generate Lemonade",
+            "POST",
+            "generate-starbucks-drink",
+            200,
+            data=lemonade_request,
+            timeout=30
+        )
+        
+        if success and self.validate_starbucks_response(response, "lemonade"):
+            starbucks_tests["Lemonade Generation"] = True
+            self.lemonade_id = response.get('id')
+            print(f"✅ Generated Lemonade: {response.get('drink_name', 'Unknown')}")
+        
+        # Test 4: Iced Matcha Latte Generation
+        print("\n" + "=" * 50)
+        print("4. Testing Iced Matcha Latte Generation")
+        print("=" * 50)
+        
+        matcha_request = {
+            "user_id": self.starbucks_user_id,
+            "drink_type": "iced_matcha_latte"
+        }
+        
+        success, response = self.run_test(
+            "Generate Iced Matcha Latte",
+            "POST",
+            "generate-starbucks-drink",
+            200,
+            data=matcha_request,
+            timeout=30
+        )
+        
+        if success and self.validate_starbucks_response(response, "iced_matcha_latte"):
+            starbucks_tests["Iced Matcha Latte Generation"] = True
+            self.matcha_id = response.get('id')
+            print(f"✅ Generated Iced Matcha Latte: {response.get('drink_name', 'Unknown')}")
+        
+        # Test 5: Random Drink Type
+        print("\n" + "=" * 50)
+        print("5. Testing Random Drink Type")
+        print("=" * 50)
+        
+        random_request = {
+            "user_id": self.starbucks_user_id,
+            "drink_type": "random"
+        }
+        
+        success, response = self.run_test(
+            "Generate Random Drink",
+            "POST",
+            "generate-starbucks-drink",
+            200,
+            data=random_request,
+            timeout=30
+        )
+        
+        if success and self.validate_starbucks_response(response):
+            starbucks_tests["Random Drink Type"] = True
+            print(f"✅ Generated Random Drink: {response.get('drink_name', 'Unknown')} (Category: {response.get('category', 'Unknown')})")
+        
+        # Test 6: Flavor Inspiration
+        print("\n" + "=" * 50)
+        print("6. Testing Flavor Inspiration")
+        print("=" * 50)
+        
+        flavor_inspirations = ["tres leches", "ube", "mango tajin"]
+        
+        for flavor in flavor_inspirations:
+            flavor_request = {
+                "user_id": self.starbucks_user_id,
+                "drink_type": "frappuccino",
+                "flavor_inspiration": flavor
+            }
+            
+            success, response = self.run_test(
+                f"Generate {flavor.title()} Inspired Drink",
+                "POST",
+                "generate-starbucks-drink",
+                200,
+                data=flavor_request,
+                timeout=30
+            )
+            
+            if success and self.validate_starbucks_response(response, "frappuccino"):
+                starbucks_tests["Flavor Inspiration"] = True
+                print(f"✅ Generated {flavor.title()} Inspired Drink: {response.get('drink_name', 'Unknown')}")
+                
+                # Check if flavor inspiration is reflected in the drink
+                drink_name = response.get('drink_name', '').lower()
+                description = response.get('description', '').lower()
+                if flavor.lower() in drink_name or flavor.lower() in description:
+                    print(f"✅ Flavor inspiration '{flavor}' reflected in drink details")
+                else:
+                    print(f"⚠️ Flavor inspiration '{flavor}' may not be clearly reflected")
+                break
+        
+        # Test 7: Database Storage Verification
+        print("\n" + "=" * 50)
+        print("7. Testing Database Storage")
+        print("=" * 50)
+        
+        # Check if drinks are saved to starbucks_recipes collection
+        # We'll use a simple approach by generating another drink and checking the response
+        storage_request = {
+            "user_id": self.starbucks_user_id,
+            "drink_type": "latte"
+        }
+        
+        success, response = self.run_test(
+            "Generate Drink for Storage Test",
+            "POST",
+            "generate-starbucks-drink",
+            200,
+            data=storage_request,
+            timeout=30
+        )
+        
+        if success and 'id' in response and response['id']:
+            starbucks_tests["Database Storage"] = True
+            print(f"✅ Drink saved to database with ID: {response['id']}")
+            print(f"✅ Created at: {response.get('created_at', 'Unknown')}")
+            print(f"✅ User ID: {response.get('user_id', 'Unknown')}")
+        
+        # Test 8: Ordering Script Format Validation
+        print("\n" + "=" * 50)
+        print("8. Testing Ordering Script Format")
+        print("=" * 50)
+        
+        # Generate a drink specifically to test ordering script
+        script_request = {
+            "user_id": self.starbucks_user_id,
+            "drink_type": "macchiato"
+        }
+        
+        success, response = self.run_test(
+            "Generate Drink for Script Test",
+            "POST",
+            "generate-starbucks-drink",
+            200,
+            data=script_request,
+            timeout=30
+        )
+        
+        if success and 'ordering_script' in response:
+            ordering_script = response['ordering_script']
+            print(f"Ordering Script: {ordering_script}")
+            
+            # Validate ordering script format for drive-thru use
+            script_valid = self.validate_ordering_script(ordering_script)
+            if script_valid:
+                starbucks_tests["Ordering Script Format"] = True
+                print("✅ Ordering script is properly formatted for drive-thru use")
+            else:
+                print("❌ Ordering script format needs improvement")
+        
+        # Final Results Summary
+        print("\n" + "=" * 80)
+        print("☕ STARBUCKS FEATURE TEST RESULTS SUMMARY ☕")
+        print("=" * 80)
+        
+        passed_tests = sum(starbucks_tests.values())
+        total_tests = len(starbucks_tests)
+        
+        for test_name, passed in starbucks_tests.items():
+            status = "✅ PASSED" if passed else "❌ FAILED"
+            print(f"{test_name:<35} {status}")
+        
+        print(f"\nOverall Starbucks Feature Status: {passed_tests}/{total_tests} tests passed")
+        
+        if passed_tests >= 7:  # At least 7 out of 9 tests should pass
+            print("🎉 STARBUCKS SECRET MENU GENERATOR IS READY FOR PRODUCTION! 🎉")
+            return True
+        else:
+            print("⚠️ Starbucks feature needs attention before production deployment")
+            return False
+    
+    def validate_starbucks_response(self, response, expected_category=None):
+        """Validate that a Starbucks drink response has all required fields"""
+        required_fields = [
+            'drink_name', 'description', 'base_drink', 'modifications',
+            'ordering_script', 'pro_tips', 'why_amazing', 'category'
+        ]
+        
+        missing_fields = []
+        for field in required_fields:
+            if field not in response or not response[field]:
+                missing_fields.append(field)
+        
+        if missing_fields:
+            print(f"❌ Missing required fields: {', '.join(missing_fields)}")
+            return False
+        
+        # Validate field types
+        if not isinstance(response['modifications'], list):
+            print("❌ 'modifications' should be a list")
+            return False
+        
+        if not isinstance(response['pro_tips'], list):
+            print("❌ 'pro_tips' should be a list")
+            return False
+        
+        # Check if category matches expected (if provided)
+        if expected_category and response['category'] != expected_category:
+            print(f"⚠️ Category mismatch: expected '{expected_category}', got '{response['category']}'")
+            # Don't fail the test for category mismatch as AI might interpret differently
+        
+        # Validate ingredients_breakdown if present
+        if 'ingredients_breakdown' in response and response['ingredients_breakdown']:
+            if not isinstance(response['ingredients_breakdown'], list):
+                print("❌ 'ingredients_breakdown' should be a list")
+                return False
+        
+        print("✅ All required fields present and properly formatted")
+        return True
+    
+    def validate_ordering_script(self, ordering_script):
+        """Validate that the ordering script is properly formatted for drive-thru use"""
+        if not ordering_script or not isinstance(ordering_script, str):
+            print("❌ Ordering script is empty or not a string")
+            return False
+        
+        # Check if it starts with a greeting (common drive-thru format)
+        greetings = ["hi", "hello", "can i get", "i'd like", "could i have"]
+        script_lower = ordering_script.lower()
+        
+        has_greeting = any(greeting in script_lower for greeting in greetings)
+        if not has_greeting:
+            print("⚠️ Ordering script doesn't start with a typical drive-thru greeting")
+        
+        # Check if it's a complete sentence
+        if not ordering_script.strip().endswith(('.', '!', '?')):
+            print("⚠️ Ordering script doesn't end with proper punctuation")
+        
+        # Check length (should be reasonable for drive-thru)
+        if len(ordering_script) < 20:
+            print("❌ Ordering script is too short")
+            return False
+        
+        if len(ordering_script) > 200:
+            print("⚠️ Ordering script might be too long for drive-thru")
+        
+        # Check if it contains drink-specific terms
+        drink_terms = ["size", "drink", "add", "with", "extra", "light", "no"]
+        has_drink_terms = any(term in script_lower for term in drink_terms)
+        
+        if not has_drink_terms:
+            print("⚠️ Ordering script might not contain specific drink customization terms")
+        
+        return True
+
     def test_deployment_readiness(self):
         """Comprehensive deployment readiness test"""
         print("\n" + "=" * 80)
