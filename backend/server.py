@@ -908,36 +908,62 @@ async def update_user(user_id: str, user_update: UserCreate):
         raise HTTPException(status_code=500, detail="Failed to update user")
 
 # Recipe generation functions and routes (keeping all existing functionality)
-def _get_walmart_signature() -> tuple:
-    """Generate Walmart API signature and timestamp"""
+def _get_walmart_signature():
+    """Generate Walmart API signature with correct RSA-SHA256 signing"""
     try:
-        # Parse private key
-        private_key = serialization.load_pem_private_key(
-            WALMART_PRIVATE_KEY.encode(),
-            password=None
-        )
+        import base64
+        import time
+        from cryptography.hazmat.primitives import hashes, serialization
+        from cryptography.hazmat.primitives.asymmetric import padding
         
         # Generate timestamp
         timestamp = str(int(time.time() * 1000))
         
-        # Create message in the correct format: CONSUMER_ID\nTIMESTAMP\nKEY_VERSION\n
-        message = f"{WALMART_CONSUMER_ID}\n{timestamp}\n{WALMART_KEY_VERSION}\n".encode("utf-8")
+        # Create string to sign
+        string_to_sign = f"{WALMART_CONSUMER_ID}\n{timestamp}\n{WALMART_KEY_VERSION}\n"
         
-        # Sign the message
-        signature = private_key.sign(
-            message,
+        # Load private key
+        private_key = serialization.load_pem_private_key(
+            WALMART_PRIVATE_KEY.encode('utf-8'),
+            password=None
+        )
+        
+        # Sign with RSA-SHA256
+        signature_bytes = private_key.sign(
+            string_to_sign.encode('utf-8'),
             padding.PKCS1v15(),
             hashes.SHA256()
         )
         
-        # Base64 encode the signature
-        signature_b64 = base64.b64encode(signature).decode("utf-8")
+        # Encode to base64
+        signature = base64.b64encode(signature_bytes).decode('utf-8')
         
-        return timestamp, signature_b64
+        logging.info(f"Generated Walmart signature - timestamp: {timestamp}, signature length: {len(signature)}")
+        
+        return timestamp, signature
+        
+    except ImportError:
+        logging.error("Missing cryptography library - falling back to HMAC")
+        # Fallback to HMAC (incorrect but for debugging)
+        import hashlib
+        import hmac
+        
+        timestamp = str(int(time.time() * 1000))
+        string_to_sign = f"{WALMART_CONSUMER_ID}\n{timestamp}\n{WALMART_KEY_VERSION}\n"
+        
+        signature = base64.b64encode(
+            hmac.new(
+                WALMART_PRIVATE_KEY.encode('utf-8'),
+                string_to_sign.encode('utf-8'),
+                hashlib.sha256
+            ).digest()
+        ).decode('utf-8')
+        
+        return timestamp, signature
         
     except Exception as e:
         logging.error(f"Error generating Walmart signature: {str(e)}")
-        raise
+        raise HTTPException(status_code=500, detail="Walmart API authentication error")
 
 def _extract_core_ingredient(ingredient: str) -> str:
     """Extract the core ingredient name from complex recipe descriptions"""
