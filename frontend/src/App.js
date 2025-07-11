@@ -6,44 +6,64 @@ import WelcomeOnboarding from './components/WelcomeOnboarding';
 import TutorialScreen from './components/TutorialScreen';
 
 function App() {
-  // Use environment variable for backend URL
+  // Use environment variable for backend URL - PRODUCTION FIX
   const API = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
+  
+  // FORCE LOG THE BACKEND URL FOR DEBUGGING
+  console.log('🔍 BACKEND URL CONFIG:', API);
+  console.log('🔍 ENVIRONMENT:', process.env.NODE_ENV);
+  console.log('🔍 ALL ENV VARS:', process.env);
 
-  // Clear all caches on app startup to ensure fresh data
+  // AGGRESSIVE cache clearing on app startup to ensure fresh data
   useEffect(() => {
     const clearCaches = async () => {
       try {
-        // Clear all service worker caches
+        console.log('🧹 STARTING AGGRESSIVE CACHE CLEAR...');
+        
+        // Clear ALL service worker caches
         if ('caches' in window) {
           const cacheNames = await caches.keys();
+          console.log('🗑️ Found caches to delete:', cacheNames);
           await Promise.all(
             cacheNames.map(cacheName => {
-              console.log('Clearing cache:', cacheName);
+              console.log('🗑️ Deleting cache:', cacheName);
               return caches.delete(cacheName);
             })
           );
         }
         
-        // Clear localStorage auth tokens and user sessions
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('userSession');
-        localStorage.removeItem('user_auth_data');
-        
-        // Force service worker update
+        // UNREGISTER and REREGISTER service workers
         if ('serviceWorker' in navigator) {
           const registrations = await navigator.serviceWorker.getRegistrations();
+          console.log('🔧 Found service workers:', registrations.length);
           for (let registration of registrations) {
-            await registration.update();
+            await registration.unregister();
+            console.log('❌ Unregistered service worker');
           }
+          
+          // Force reload to reregister with new version
+          console.log('🔄 Service workers cleared, forcing reload...');
+          setTimeout(() => {
+            window.location.reload(true);
+          }, 1000);
         }
         
-        console.log('✅ All caches cleared on startup');
+        // Clear ALL browser storage
+        localStorage.clear();
+        sessionStorage.clear();
+        
+        // Clear cookies
+        document.cookie.split(";").forEach(function(c) { 
+          document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+        });
+        
+        console.log('✅ AGGRESSIVE CACHE CLEAR COMPLETED');
       } catch (error) {
-        console.error('Cache clearing error:', error);
+        console.error('❌ Cache clearing error:', error);
       }
     };
     
-    // Clear caches on every app load for deployed site
+    // ALWAYS clear caches on every app load
     clearCaches();
   }, []);
 
