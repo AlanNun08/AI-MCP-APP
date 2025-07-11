@@ -2210,28 +2210,28 @@ class AIRecipeAppTester:
         # Return overall readiness status
         return overall_readiness
 
-def test_get_user_recipes(self):
-    """Test getting all recipes for a user"""
-    if not self.user_id:
-        print("❌ No user ID available for testing")
-        return False
-            
-    success, response = self.run_test(
-        "Get User Recipes",
-        "GET",
-        f"users/{self.user_id}/recipes",
-        200
-    )
-    
-    if success:
-        print(f"✅ Successfully retrieved {len(response)} recipes for user")
-        # Check if we have any recipes
-        if len(response) > 0:
-            print(f"Recipe titles: {[recipe.get('title', 'Untitled') for recipe in response]}")
-        else:
-            print("No recipes found for this user")
-    
-    return success
+    def test_get_user_recipes(self):
+        """Test getting all recipes for a user"""
+        if not self.user_id:
+            print("❌ No user ID available for testing")
+            return False
+                
+        success, response = self.run_test(
+            "Get User Recipes",
+            "GET",
+            f"users/{self.user_id}/recipes",
+            200
+        )
+        
+        if success:
+            print(f"✅ Successfully retrieved {len(response)} recipes for user")
+            # Check if we have any recipes
+            if len(response) > 0:
+                print(f"Recipe titles: {[recipe.get('title', 'Untitled') for recipe in response]}")
+            else:
+                print("No recipes found for this user")
+        
+        return success
 
     def test_lemonade_walmart_integration_urgent_fix(self):
         """URGENT: Test lemonade recipe generation and Walmart URL format fix"""
