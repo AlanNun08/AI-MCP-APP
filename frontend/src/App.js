@@ -1018,7 +1018,7 @@ function App() {
       try {
         const requestData = {
           user_id: user.id,
-          recipe_category: formData.recipe_type, // 'cuisine', 'snack', 'beverage', or 'starbucks'
+          recipe_category: formData.recipe_type, // 'cuisine', 'snack', or 'beverage'
           cuisine_type: selectedType,
           dietary_preferences: formData.dietary_preferences,
           ingredients_on_hand: formData.ingredients_on_hand ? formData.ingredients_on_hand.split(',').map(i => i.trim()) : [],
