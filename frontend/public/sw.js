@@ -29,21 +29,21 @@ self.addEventListener('install', (event) => {
   );
 });
 
-// Activate event - take control immediately
+// Activate event - TAKE CONTROL IMMEDIATELY
 self.addEventListener('activate', (event) => {
-  console.log('Activating streamlined options service worker...');
+  console.log('🚀 FINAL SERVICE WORKER ACTIVATING - TAKING CONTROL');
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
-        cacheNames.map(cacheName => {
-          if (cacheName !== CACHE_NAME) {
-            console.log('Deleting cache:', cacheName);
-            return caches.delete(cacheName);
-          }
+        cacheNames.filter(cacheName => {
+          return cacheName !== CACHE_NAME;
+        }).map(cacheName => {
+          console.log('🗑️ DELETING OLD CACHE:', cacheName);
+          return caches.delete(cacheName);
         })
       );
     }).then(() => {
-      console.log('Streamlined options service worker activated');
+      console.log('✅ ALL OLD CACHES DELETED - TAKING CONTROL');
       return self.clients.claim();
     })
   );
