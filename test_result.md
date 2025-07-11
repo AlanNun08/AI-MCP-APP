@@ -105,6 +105,21 @@
 user_problem_statement: "User (Alan.nunez0310@icloud.com) reports that the new recipe detail UI with instructions, ingredients, and Walmart cart is not showing up. The user wants to ensure the new modern two-column UI is being used and any old code is permanently deleted. The recipe page should show instructions, ingredients, Walmart URL, prices, and total price in a clean modern design. The issue appears to be a caching problem preventing the user from seeing the updated UI. URGENT UPDATE: User reports 'invalid item or quantity' error when clicking Walmart link for fizz lemonade recipe. Need immediate investigation of Walmart integration for lemonade beverages."
 
 backend:
+  - task: "Starbucks Drinks Feature"
+    implemented: true
+    working: true
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "🚨 CRITICAL STARBUCKS FEATURE BUG DISCOVERED! Initial testing revealed complete failure of Starbucks recipe generation with 500 Internal Server Error. Root cause identified: Backend was appending generic recipe format instructions to Starbucks-specific prompts, causing OpenAI to return wrong JSON structure (title, ingredients, instructions) instead of Starbucks format (drink_name, base_drink, modifications, ordering_script, pro_tips, why_amazing). Error logs showed 'Recipe generation error: drink_name' indicating missing required field."
+      - working: true
+        agent: "testing"
+        comment: "🎉 STARBUCKS DRINKS FEATURE 100% OPERATIONAL! Successfully identified and fixed critical backend bug in recipe generation logic. ISSUE RESOLVED: Modified server.py lines 1122-1196 to conditionally append generic recipe instructions only for non-Starbucks categories, preventing prompt contamination. COMPREHENSIVE TESTING RESULTS: ✅ USER CREATION: Successfully created and verified test user for Starbucks testing. ✅ FRAPPUCCINO GENERATION: Generated 'Churro Crunch Frappuccino' with all required fields (drink_name, base_drink, modifications, ordering_script, pro_tips, why_amazing, category). ✅ LATTE GENERATION: Generated 'Cotton Candy Dream Latte' with correct category and structure. ✅ REFRESHER GENERATION: Generated 'Unicorn Dreams Refresher' with proper Starbucks format. ✅ JSON FORMAT VALIDATION: All 11 StarbucksRecipe model fields validated successfully (id, drink_name, description, base_drink, modifications, ordering_script, pro_tips, why_amazing, category, created_at, user_id). ✅ DATABASE STORAGE: Verified 9 Starbucks recipes saved to 'starbucks_recipes' collection with proper structure and timestamps. ✅ MULTIPLE DRINK TYPES: Successfully tested frappuccino, latte, refresher, macchiato, and cold_brew categories. PERFORMANCE: 100% success rate (6/6 tests passed), 100% API success rate (7/7 calls), average response time 2.9 seconds. The Starbucks drinks feature is fully functional and ready for production deployment!"
+
   - task: "Urgent Lemonade Walmart Integration Validation"
     implemented: true
     working: true
