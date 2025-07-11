@@ -1006,18 +1006,7 @@ async def generate_recipe(request: RecipeGenRequest):
         
         elif recipe_category == "beverage":
             # Generate specific beverage type based on user selection
-            if recipe_type == "coffee":
-                prompt_parts.append(f"""Create a detailed specialty coffee recipe for {request.servings} people. Include exact measurements, brewing methods, and professional techniques. Focus on espresso-based drinks, cold brews, or gourmet coffee preparations.
-
-🧋 Creative, original drink name
-✨ Brief flavor description (1–2 sentences that describe taste and style)
-🧾 List of ingredients with exact quantities and units
-🍳 Step-by-step instructions including brewing, mixing, and serving techniques
-💡 Optional tips or variations (e.g., vegan swap, flavor twist, serving method)
-
-May include elements like cold foam, whipped crème, flavored syrups, or layered toppings like caramel drizzle — but only if it enhances the concept. Make the drink visually Instagram-worthy with professional techniques (shaking, layering, temperature control).""")
-
-            elif recipe_type == "boba tea":
+            if recipe_type == "boba tea":
                 prompt_parts.append(f"""Create a detailed brown sugar boba tea or fruit boba tea recipe for {request.servings} people. Include tapioca pearl cooking instructions, tea brewing methods, syrup preparation, and assembly techniques. Make it authentic bubble tea shop quality.
 
 🧋 Creative, original drink name
