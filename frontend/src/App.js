@@ -1625,6 +1625,127 @@ function App() {
       }
     };
 
+    // Special layout for Starbucks recipes
+    if (recipe?.drink_name || recipe?.base_drink || recipe?.ordering_script) {
+      return (
+        <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 p-4">
+          <div className="max-w-4xl mx-auto">
+            {/* Header */}
+            <div className="mb-8">
+              {showBackButton && (
+                <button
+                  onClick={() => setCurrentScreen('dashboard')}
+                  className="mb-4 flex items-center space-x-2 text-green-600 hover:text-green-700 font-medium"
+                >
+                  <span>←</span>
+                  <span>Back to Dashboard</span>
+                </button>
+              )}
+              
+              <div className="text-center">
+                <div className="text-6xl mb-4">☕</div>
+                <h1 className="text-4xl font-bold text-gray-800 mb-2">{recipe.drink_name}</h1>
+                <p className="text-lg text-gray-600">{recipe.description}</p>
+              </div>
+            </div>
+
+            {/* Starbucks Recipe Card */}
+            <div className="bg-white rounded-2xl shadow-lg p-8">
+              
+              {/* Base Drink Section */}
+              <div className="mb-8">
+                <h3 className="text-2xl font-bold text-gray-800 mb-4 flex items-center">
+                  <span className="mr-2">☕</span>
+                  Base Drink
+                </h3>
+                <div className="bg-green-50 rounded-lg p-4">
+                  <p className="text-lg font-medium text-gray-800">{recipe.base_drink}</p>
+                </div>
+              </div>
+
+              {/* Modifications Section */}
+              <div className="mb-8">
+                <h3 className="text-2xl font-bold text-gray-800 mb-4 flex items-center">
+                  <span className="mr-2">🎨</span>
+                  Modifications
+                </h3>
+                <div className="space-y-3">
+                  {recipe.modifications?.map((modification, index) => (
+                    <div key={index} className="flex items-start p-4 bg-gray-50 rounded-lg">
+                      <span className="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center font-bold text-sm mr-4 mt-0.5">
+                        {index + 1}
+                      </span>
+                      <p className="text-gray-800 leading-relaxed">{modification}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Ordering Script Section */}
+              <div className="mb-8">
+                <h3 className="text-2xl font-bold text-gray-800 mb-4 flex items-center">
+                  <span className="mr-2">💬</span>
+                  How to Order
+                </h3>
+                <div className="bg-yellow-50 border-l-4 border-yellow-400 p-6 rounded-lg">
+                  <p className="text-lg text-gray-800 italic">"{recipe.ordering_script}"</p>
+                </div>
+              </div>
+
+              {/* Pro Tips Section */}
+              {recipe.pro_tips && recipe.pro_tips.length > 0 && (
+                <div className="mb-8">
+                  <h3 className="text-2xl font-bold text-gray-800 mb-4 flex items-center">
+                    <span className="mr-2">💡</span>
+                    Pro Tips
+                  </h3>
+                  <div className="space-y-3">
+                    {recipe.pro_tips.map((tip, index) => (
+                      <div key={index} className="flex items-start p-4 bg-blue-50 rounded-lg">
+                        <span className="text-blue-500 mr-3 mt-1">•</span>
+                        <p className="text-gray-800">{tip}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Why Amazing Section */}
+              {recipe.why_amazing && (
+                <div className="mb-8">
+                  <h3 className="text-2xl font-bold text-gray-800 mb-4 flex items-center">
+                    <span className="mr-2">🔥</span>
+                    Why This Drink is Amazing
+                  </h3>
+                  <div className="bg-purple-50 rounded-lg p-6">
+                    <p className="text-gray-800 leading-relaxed">{recipe.why_amazing}</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Share Section */}
+              <div className="text-center">
+                <h3 className="text-xl font-bold text-gray-800 mb-4">Share this Starbucks hack!</h3>
+                <p className="text-gray-600 mb-4">Spread the word about this amazing drink creation</p>
+                <div className="flex justify-center space-x-4">
+                  <button 
+                    onClick={() => {
+                      const text = `Try this amazing Starbucks hack: ${recipe.drink_name}! Order: ${recipe.ordering_script}`;
+                      navigator.clipboard.writeText(text);
+                      showNotification('📱 Recipe copied to clipboard!', 'success');
+                    }}
+                    className="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition-colors"
+                  >
+                    📱 Copy Recipe
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     if (!recipe) {
       return (
         <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 p-4">
