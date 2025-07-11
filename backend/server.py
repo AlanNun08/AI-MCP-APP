@@ -1575,6 +1575,26 @@ async def create_custom_cart(cart_data: Dict[str, Any]):
         raise HTTPException(status_code=500, detail="Failed to create custom cart")
 
 # CORS middleware configuration - Production ready
+@app.delete("/api/starbucks-recipes/{recipe_id}")
+async def delete_starbucks_recipe(recipe_id: str):
+    """Delete a specific Starbucks recipe"""
+    try:
+        # Convert string ID to ObjectId if needed
+        from bson import ObjectId
+        if ObjectId.is_valid(recipe_id):
+            object_id = ObjectId(recipe_id)
+            result = await db.starbucks_recipes.delete_one({"_id": object_id})
+        else:
+            result = await db.starbucks_recipes.delete_one({"id": recipe_id})
+        
+        if result.deleted_count == 1:
+            return {"success": True, "message": "Starbucks recipe deleted successfully"}
+        else:
+            raise HTTPException(status_code=404, detail="Starbucks recipe not found")
+    except Exception as e:
+        print(f"Error deleting Starbucks recipe: {e}")
+        raise HTTPException(status_code=500, detail="Failed to delete Starbucks recipe")
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # Should be restricted to specific origins in production
