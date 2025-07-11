@@ -613,6 +613,7 @@ async def login_user(login_data: UserLogin):
         
         # Return successful login
         return {
+            "status": "success",  # Frontend expects this field
             "message": "Login successful",
             "user": {
                 "id": user["id"],
