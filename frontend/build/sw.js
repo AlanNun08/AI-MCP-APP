@@ -1,5 +1,5 @@
-// Service Worker for PWA functionality with aggressive cache clearing
-const CACHE_NAME = 'ai-chef-v50-force-production-url-fix-2024';
+// Service Worker for PWA functionality - COMPLETE CACHE CLEAR
+const CACHE_NAME = 'buildyoursmartcart-v100-final-production-fix-2024';
 const urlsToCache = [
   '/',
   '/static/js/bundle.js',
@@ -7,69 +7,74 @@ const urlsToCache = [
   '/manifest.json'
 ];
 
-// Install event - clear all old caches immediately
+// Install event - FORCE DELETE ALL OLD CACHES
 self.addEventListener('install', (event) => {
-  console.log('Installing new service worker v50 - FORCE PRODUCTION URL FIX...');
+  console.log('🔥 FINAL CACHE CLEAR - DELETING ALL OLD CACHES...');
   event.waitUntil(
     caches.keys().then(cacheNames => {
-      console.log('Found existing caches:', cacheNames);
+      console.log('🗑️ FORCE DELETING ALL CACHES:', cacheNames);
       return Promise.all(
         cacheNames.map(cacheName => {
-          console.log('FORCE DELETING cache:', cacheName);
+          console.log('💥 DELETING CACHE:', cacheName);
           return caches.delete(cacheName);
         })
       );
     }).then(() => {
-      console.log('ALL CACHES FORCE DELETED, creating new cache...');
+      console.log('✅ ALL OLD CACHES DELETED - CREATING NEW CACHE');
       return caches.open(CACHE_NAME);
-    }).then(cache => {
-      console.log('New cache v50 created successfully');
-      // Don't cache anything initially - force fresh fetch
-      return Promise.resolve();
+    }).then(() => {
+      console.log('🎉 NEW CACHE v100 CREATED SUCCESSFULLY');
+      return self.skipWaiting();
     })
   );
-  // Force the new service worker to become active immediately
-  self.skipWaiting();
 });
 
-// Activate event - take control immediately
+// Activate event - TAKE CONTROL IMMEDIATELY
 self.addEventListener('activate', (event) => {
-  console.log('Activating streamlined options service worker...');
+  console.log('🚀 FINAL SERVICE WORKER ACTIVATING - TAKING CONTROL');
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
-        cacheNames.map(cacheName => {
-          if (cacheName !== CACHE_NAME) {
-            console.log('Deleting cache:', cacheName);
-            return caches.delete(cacheName);
-          }
+        cacheNames.filter(cacheName => {
+          return cacheName !== CACHE_NAME;
+        }).map(cacheName => {
+          console.log('🗑️ DELETING OLD CACHE:', cacheName);
+          return caches.delete(cacheName);
         })
       );
     }).then(() => {
-      console.log('Streamlined options service worker activated');
+      console.log('✅ ALL OLD CACHES DELETED - TAKING CONTROL');
       return self.clients.claim();
     })
   );
 });
 
-// Fetch event - NEVER cache, always fetch fresh from network
+// Fetch event - Normal caching behavior (no forced reloads)
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
   
-  // FORCE FRESH FETCH for ALL resources to bypass any caching issues
+  // Always fetch fresh for HTML, JS, and CSS files
+  if (url.pathname.endsWith('.html') || 
+      url.pathname.endsWith('.js') || 
+      url.pathname.endsWith('.css') ||
+      url.pathname === '/') {
+    event.respondWith(
+      fetch(event.request.clone(), {
+        cache: 'no-store'
+      }).catch(() => {
+        // Fallback to cache only if network fails
+        return caches.match(event.request);
+      })
+    );
+    return;
+  }
+  
+  // For other resources, use normal caching
   event.respondWith(
-    fetch(event.request.clone(), {
-      cache: 'no-store',
-      headers: {
-        'Cache-Control': 'no-cache, no-store, must-revalidate',
-        'Pragma': 'no-cache',
-        'Expires': '0'
-      }
-    }).catch((error) => {
-      console.error('Fetch failed:', error);
-      // Only fallback to cache if absolutely necessary
-      return caches.match(event.request);
-    })
+    caches.match(event.request)
+      .then((response) => {
+        return response || fetch(event.request);
+      })
   );
 });
 
