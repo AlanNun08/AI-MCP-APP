@@ -1386,30 +1386,35 @@ function App() {
             setCartItems(newCartItems);
             
             // Generate affiliate URL with default selections
-            // Generate clean Walmart URL without NaN values
+            // Generate clean Walmart URL - ensure we always have data
             const walmartItems = [];
             const finalQuantities = {};
             
-            // Count quantities for each product, filtering out NaN values
+            // Count quantities for each product with more lenient validation
             Object.values(options).forEach(productList => {
               productList.forEach(item => {
-                if (item.product_id && typeof item.quantity === 'number' && !isNaN(item.quantity) && item.quantity > 0) {
+                if (item.product_id) {
+                  // Default quantity to 1 if not set properly
+                  const quantity = (typeof item.quantity === 'number' && item.quantity > 0) ? item.quantity : 1;
                   const qty = finalQuantities[item.product_id] || 0;
-                  finalQuantities[item.product_id] = qty + item.quantity;
+                  finalQuantities[item.product_id] = qty + quantity;
                 }
               });
             });
             
-            // Format for Walmart affiliate URL with clean values
+            // Format for Walmart affiliate URL
             Object.entries(finalQuantities).forEach(([productId, quantity]) => {
-              if (productId && !isNaN(quantity) && quantity > 0) {
+              if (productId) {
                 walmartItems.push(`${productId}|${Math.floor(quantity)}`);
               }
             });
             
+            // Always set URL if we have items
             if (walmartItems.length > 0) {
               setFinalWalmartUrl(`https://affil.walmart.com/cart/addToCart?offers=${walmartItems.join(',')}`);
+              console.log('✅ Walmart URL generated with', walmartItems.length, 'items');
             } else {
+              console.warn('⚠️ No valid items for Walmart URL generation');
               setFinalWalmartUrl('');
             };
             
