@@ -1,5 +1,5 @@
 // Service Worker for PWA functionality with aggressive cache clearing
-const CACHE_NAME = 'ai-chef-v26-categorized-history-2024';
+const CACHE_NAME = 'ai-chef-v27-clear-signin-button-2024';
 const urlsToCache = [
   '/',
   '/static/js/bundle.js',
