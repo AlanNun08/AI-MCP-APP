@@ -71,6 +71,26 @@ function App() {
     setTimeout(loadUserSession, 100);
   }, []);
 
+  // Save user session to localStorage
+  const saveUserSession = (userData) => {
+    try {
+      localStorage.setItem('ai_chef_user', JSON.stringify(userData));
+      console.log('User session saved:', userData.email);
+    } catch (error) {
+      console.error('Failed to save user session:', error);
+    }
+  };
+
+  // Clear user session from localStorage
+  const clearUserSession = () => {
+    try {
+      localStorage.removeItem('ai_chef_user');
+      console.log('User session cleared');
+    } catch (error) {
+      console.error('Failed to clear user session:', error);
+    }
+  };
+
   // Check if user has completed onboarding
   const checkOnboardingStatus = () => {
     if (user?.id) {
