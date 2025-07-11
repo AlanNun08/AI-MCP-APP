@@ -406,12 +406,8 @@ class BackendTester:
                     self.log_test_result("Walmart Integration", False, "No recipe ID returned")
                     return False
                 
-                # Test cart options endpoint (POST request)
-                cart_options_request = {
-                    "user_id": self.user_id,
-                    "recipe_id": recipe_id
-                }
-                cart_options_response = await client.post(f"{self.backend_url}/grocery/cart-options", json=cart_options_request)
+                # Test cart options endpoint (POST with query parameters)
+                cart_options_response = await client.post(f"{self.backend_url}/grocery/cart-options?recipe_id={recipe_id}&user_id={self.user_id}")
                 
                 if cart_options_response.status_code == 200:
                     cart_data = cart_options_response.json()
