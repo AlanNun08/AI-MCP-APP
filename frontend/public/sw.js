@@ -9,21 +9,23 @@ const urlsToCache = [
 
 // Install event - clear all old caches immediately
 self.addEventListener('install', (event) => {
-  console.log('Installing new service worker v18 - clean Walmart URLs...');
+  console.log('Installing new service worker v50 - FORCE PRODUCTION URL FIX...');
   event.waitUntil(
     caches.keys().then(cacheNames => {
+      console.log('Found existing caches:', cacheNames);
       return Promise.all(
         cacheNames.map(cacheName => {
-          console.log('Deleting old cache:', cacheName);
+          console.log('FORCE DELETING cache:', cacheName);
           return caches.delete(cacheName);
         })
       );
     }).then(() => {
-      console.log('All old caches cleared, creating new cache...');
+      console.log('ALL CACHES FORCE DELETED, creating new cache...');
       return caches.open(CACHE_NAME);
     }).then(cache => {
-      console.log('New cache v18 created successfully');
-      return cache.addAll(urlsToCache);
+      console.log('New cache v50 created successfully');
+      // Don't cache anything initially - force fresh fetch
+      return Promise.resolve();
     })
   );
   // Force the new service worker to become active immediately
