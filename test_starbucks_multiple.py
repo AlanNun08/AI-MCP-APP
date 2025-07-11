@@ -3,7 +3,7 @@ import json
 import time
 
 # Test multiple Starbucks recipe generations to see if there's inconsistency
-base_url = "https://d0aaf224-cbee-4960-9af5-9ebe32591c28.preview.emergentagent.com/api"
+base_url = "https://407d4e17-1478-4b87-bdc3-d8a695a6f09c.preview.emergentagent.com/api"
 user_id = "22199c6d-23e4-44b0-93af-9e346f90dd46"
 
 test_cases = [

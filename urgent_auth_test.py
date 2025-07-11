@@ -36,7 +36,7 @@ logger = logging.getLogger(__name__)
 class UrgentAuthTester:
     def __init__(self):
         # Use the production backend URL from frontend/.env
-        self.base_url = "https://d0aaf224-cbee-4960-9af5-9ebe32591c28.preview.emergentagent.com/api"
+        self.base_url = "https://407d4e17-1478-4b87-bdc3-d8a695a6f09c.preview.emergentagent.com/api"
         self.tests_run = 0
         self.tests_passed = 0
         self.critical_issues = []

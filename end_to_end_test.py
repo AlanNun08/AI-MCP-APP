@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 class EndToEndTester:
     def __init__(self):
-        self.base_url = "https://d0aaf224-cbee-4960-9af5-9ebe32591c28.preview.emergentagent.com/api"
+        self.base_url = "https://407d4e17-1478-4b87-bdc3-d8a695a6f09c.preview.emergentagent.com/api"
         
         # Test with similar email domains to the problematic ones
         self.test_emails = [
