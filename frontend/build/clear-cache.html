@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clear Cache - AI Chef</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        button {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            background: #ff5252;
+            transform: translateY(-2px);
+        }
+        .status {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+        .success {
+            background: rgba(76, 175, 80, 0.3);
+        }
+        .info {
+            background: rgba(33, 150, 243, 0.3);
+        }
+        .warning {
+            background: rgba(255, 152, 0, 0.3);
+        }
+        .credentials {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .step {
+            text-align: left;
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 AI Chef Cache Clear Tool</h1>
+        
+        <div class="credentials">
+            <h3>📧 Your Login Credentials</h3>
+            <p><strong>Email:</strong> alannunezsilva0310@gmail.com</p>
+            <p><strong>Password:</strong> TempPassword123!</p>
+        </div>
+        
+        <div class="status info">
+            <p>Use this tool to clear all caches and force refresh your deployed site.</p>
+        </div>
+        
+        <button onclick="clearAllCaches()">🧹 Clear All Caches</button>
+        <button onclick="clearServiceWorker()">🔧 Clear Service Worker</button>
+        <button onclick="clearBrowserCache()">🗑️ Clear Browser Cache</button>
+        <button onclick="forceReload()">🔄 Force Reload</button>
+        
+        <div id="status" class="status" style="display:none;"></div>
+        
+        <div class="step">
+            <h3>📋 Manual Steps (if buttons don't work):</h3>
+            <p><strong>1.</strong> Press <code>Ctrl+Shift+Delete</code> (or <code>Cmd+Shift+Delete</code> on Mac)</p>
+            <p><strong>2.</strong> Select "All time" and check all boxes</p>
+            <p><strong>3.</strong> Click "Clear data"</p>
+            <p><strong>4.</strong> Press <code>Ctrl+F5</code> (or <code>Cmd+R</code> on Mac) to hard refresh</p>
+            <p><strong>5.</strong> Try logging in again</p>
+        </div>
+        
+        <div class="step">
+            <h3>🛠️ Advanced: Clear Service Worker</h3>
+            <p><strong>1.</strong> Press <code>F12</code> to open DevTools</p>
+            <p><strong>2.</strong> Go to <strong>Application</strong> tab</p>
+            <p><strong>3.</strong> Click <strong>Service Workers</strong> on the left</p>
+            <p><strong>4.</strong> Click <strong>Unregister</strong> next to your site</p>
+            <p><strong>5.</strong> Go to <strong>Storage</strong> tab</p>
+            <p><strong>6.</strong> Click <strong>Clear site data</strong></p>
+        </div>
+        
+        <button onclick="goToLogin()" style="background: #4CAF50; font-size: 18px; padding: 20px 40px;">
+            🚀 Go to Login Page
+        </button>
+    </div>
+
+    <script>
+        function showStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${type}`;
+            statusDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                statusDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        async function clearAllCaches() {
+            showStatus('🔄 Clearing all caches...', 'info');
+            
+            try {
+                // Clear all caches
+                if ('caches' in window) {
+                    const cacheNames = await caches.keys();
+                    await Promise.all(
+                        cacheNames.map(cacheName => {
+                            console.log('Deleting cache:', cacheName);
+                            return caches.delete(cacheName);
+                        })
+                    );
+                }
+                
+                // Clear localStorage
+                localStorage.clear();
+                
+                // Clear sessionStorage
+                sessionStorage.clear();
+                
+                // Clear indexedDB
+                if (window.indexedDB) {
+                    const databases = await indexedDB.databases();
+                    databases.forEach(db => {
+                        indexedDB.deleteDatabase(db.name);
+                    });
+                }
+                
+                showStatus('✅ All caches cleared! Reloading page...', 'success');
+                
+                setTimeout(() => {
+                    window.location.reload(true);
+                }, 2000);
+                
+            } catch (error) {
+                showStatus('❌ Error clearing caches: ' + error.message, 'warning');
+            }
+        }
+
+        async function clearServiceWorker() {
+            showStatus('🔧 Clearing service worker...', 'info');
+            
+            try {
+                if ('serviceWorker' in navigator) {
+                    const registrations = await navigator.serviceWorker.getRegistrations();
+                    for (let registration of registrations) {
+                        await registration.unregister();
+                    }
+                }
+                
+                showStatus('✅ Service worker cleared!', 'success');
+                
+            } catch (error) {
+                showStatus('❌ Error clearing service worker: ' + error.message, 'warning');
+            }
+        }
+
+        function clearBrowserCache() {
+            showStatus('🗑️ Clearing browser cache...', 'info');
+            
+            // Clear localStorage
+            localStorage.clear();
+            
+            // Clear sessionStorage
+            sessionStorage.clear();
+            
+            showStatus('✅ Browser cache cleared!', 'success');
+        }
+
+        function forceReload() {
+            showStatus('🔄 Force reloading page...', 'info');
+            
+            // Force reload with cache bypass
+            window.location.reload(true);
+        }
+
+        function goToLogin() {
+            // Navigate to the main site
+            window.location.href = '/';
+        }
+
+        // Auto-clear caches on page load
+        window.addEventListener('load', () => {
+            showStatus('🔄 Auto-clearing caches on page load...', 'info');
+            setTimeout(clearAllCaches, 1000);
+        });
+    </script>
+</body>
+</html>
