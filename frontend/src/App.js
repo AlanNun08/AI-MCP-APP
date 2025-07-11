@@ -48,6 +48,29 @@ function App() {
   const [pendingResetEmail, setPendingResetEmail] = useState(null);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
 
+  // Load user session from localStorage on app start
+  useEffect(() => {
+    const loadUserSession = () => {
+      try {
+        const savedUser = localStorage.getItem('ai_chef_user');
+        if (savedUser) {
+          const userData = JSON.parse(savedUser);
+          setUser(userData);
+          setCurrentScreen('dashboard');
+          console.log('User session restored:', userData.email);
+        }
+      } catch (error) {
+        console.error('Failed to restore user session:', error);
+        localStorage.removeItem('ai_chef_user');
+      } finally {
+        setIsLoadingAuth(false);
+      }
+    };
+    
+    // Load user session after cache clearing
+    setTimeout(loadUserSession, 100);
+  }, []);
+
   // Check if user has completed onboarding
   const checkOnboardingStatus = () => {
     if (user?.id) {
