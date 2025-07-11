@@ -1497,10 +1497,22 @@ function App() {
       const updatedItems = cartItems.filter((_, i) => i !== index);
       setCartItems(updatedItems);
       
-      const itemIds = updatedItems.flatMap(item => 
-        Array(item.quantity).fill(item.product_id)
-      );
-      setFinalWalmartUrl(`https://affil.walmart.com/cart/addToCart?items=${itemIds.join(',')}`);
+      // Generate Walmart URL with correct affiliate format: offers=SKU1|Quantity1,SKU2|Quantity2
+      const walmartOffers = [];
+      const finalQuantities = {};
+      
+      // Count quantities for each product
+      updatedItems.forEach(item => {
+        const qty = finalQuantities[item.product_id] || 0;
+        finalQuantities[item.product_id] = qty + item.quantity;
+      });
+      
+      // Format for Walmart affiliate URL
+      Object.entries(finalQuantities).forEach(([productId, quantity]) => {
+        walmartOffers.push(`${productId}|${quantity}`);
+      });
+      
+      setFinalWalmartUrl(`https://affil.walmart.com/cart/addToCart?offers=${walmartOffers.join(',')}`);
     };
 
     // Calculate total price
