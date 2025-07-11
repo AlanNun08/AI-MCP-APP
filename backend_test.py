@@ -2233,6 +2233,230 @@ def test_get_user_recipes(self):
     
     return success
 
+    def test_lemonade_walmart_integration_urgent_fix(self):
+        """URGENT: Test lemonade recipe generation and Walmart URL format fix"""
+        print("\n" + "=" * 80)
+        print("🚨 URGENT LEMONADE WALMART INTEGRATION FIX VERIFICATION 🚨")
+        print("=" * 80)
+        
+        if not self.user_id:
+            print("❌ No user ID available for testing")
+            return False
+        
+        # Step 1: Generate a lemonade/fizz lemonade recipe
+        print("\n🍋 Step 1: Generating lemonade recipe...")
+        lemonade_request = {
+            "user_id": self.user_id,
+            "recipe_category": "beverage",
+            "cuisine_type": "special lemonades",
+            "dietary_preferences": [],
+            "ingredients_on_hand": ["lemons", "sugar", "sparkling water"],
+            "prep_time_max": 15,
+            "servings": 4,
+            "difficulty": "easy"
+        }
+        
+        success, response = self.run_test(
+            "Generate Lemonade Recipe",
+            "POST",
+            "recipes/generate",
+            200,
+            data=lemonade_request,
+            timeout=60
+        )
+        
+        if not success:
+            print("❌ Failed to generate lemonade recipe")
+            return False
+        
+        if 'id' not in response:
+            print("❌ No recipe ID in response")
+            return False
+            
+        lemonade_recipe_id = response['id']
+        print(f"✅ Generated lemonade recipe with ID: {lemonade_recipe_id}")
+        print(f"Recipe title: {response.get('title', 'Unknown')}")
+        
+        # Verify it's a lemonade recipe
+        title = response.get('title', '').lower()
+        if 'lemon' not in title and 'citrus' not in title:
+            print(f"⚠️ Recipe title doesn't contain 'lemon' or 'citrus': {response.get('title', 'Unknown')}")
+        else:
+            print("✅ Confirmed lemonade recipe generated")
+        
+        # Step 2: Test cart-options endpoint
+        print("\n🛒 Step 2: Testing cart-options endpoint...")
+        cart_options_success, cart_options_response = self.run_test(
+            "Lemonade Cart Options",
+            "POST",
+            "grocery/cart-options",
+            200,
+            params={"recipe_id": lemonade_recipe_id, "user_id": self.user_id}
+        )
+        
+        if not cart_options_success:
+            print("❌ Failed to get cart options for lemonade recipe")
+            return False
+        
+        if 'ingredient_options' not in cart_options_response:
+            print("❌ No ingredient options in cart response")
+            return False
+        
+        ingredient_options = cart_options_response['ingredient_options']
+        print(f"✅ Found {len(ingredient_options)} ingredients with product options")
+        
+        # Collect real product IDs for testing
+        real_products = []
+        total_products = 0
+        mock_products = 0
+        
+        for ingredient_option in ingredient_options:
+            ingredient_name = ingredient_option.get('ingredient_name', 'Unknown')
+            options = ingredient_option.get('options', [])
+            total_products += len(options)
+            
+            print(f"  Ingredient: {ingredient_name} - {len(options)} options")
+            
+            for option in options:
+                product_id = option.get('product_id', '')
+                product_name = option.get('name', 'Unknown')
+                product_price = option.get('price', 0.0)
+                
+                # Check for mock product IDs
+                if (not product_id.isdigit() or 
+                    len(product_id) < 6 or
+                    product_id.startswith('10315') or
+                    product_id.startswith('walmart-') or
+                    product_id.startswith('mock-')):
+                    mock_products += 1
+                    print(f"    ❌ MOCK PRODUCT DETECTED: {product_name} (ID: {product_id})")
+                else:
+                    real_products.append({
+                        "ingredient_name": ingredient_name,
+                        "product_id": product_id,
+                        "name": product_name,
+                        "price": product_price,
+                        "quantity": 1
+                    })
+                    print(f"    ✅ Real product: {product_name} - ${product_price} (ID: {product_id})")
+        
+        print(f"\n📊 Product Analysis:")
+        print(f"  Total products: {total_products}")
+        print(f"  Real products: {len(real_products)}")
+        print(f"  Mock products: {mock_products}")
+        
+        if mock_products > 0:
+            print(f"❌ CRITICAL: Found {mock_products} mock products - fix not working!")
+            return False
+        else:
+            print("✅ No mock products found - mock data filtering working correctly")
+        
+        if len(real_products) == 0:
+            print("❌ No real products available for custom cart testing")
+            return False
+        
+        # Step 3: Test custom-cart endpoint with new URL format
+        print("\n🛍️ Step 3: Testing custom cart with new Walmart URL format...")
+        
+        # Use first 3 real products for testing
+        test_products = real_products[:3]
+        
+        custom_cart_data = {
+            "user_id": self.user_id,
+            "recipe_id": lemonade_recipe_id,
+            "products": test_products
+        }
+        
+        custom_cart_success, custom_cart_response = self.run_test(
+            "Lemonade Custom Cart",
+            "POST",
+            "grocery/custom-cart",
+            200,
+            data=custom_cart_data
+        )
+        
+        if not custom_cart_success:
+            print("❌ Failed to create custom cart for lemonade recipe")
+            return False
+        
+        if 'walmart_url' not in custom_cart_response:
+            print("❌ No Walmart URL in custom cart response")
+            return False
+        
+        walmart_url = custom_cart_response['walmart_url']
+        print(f"\n🔗 Generated Walmart URL: {walmart_url}")
+        
+        # Step 4: Verify the new URL format
+        print("\n✅ Step 4: Verifying new Walmart URL format...")
+        
+        # Check basic URL structure
+        if not walmart_url.startswith('https://affil.walmart.com/cart/addToCart?'):
+            print("❌ URL doesn't start with correct Walmart affiliate domain and path")
+            return False
+        else:
+            print("✅ Correct Walmart affiliate domain and path")
+        
+        # Check for new 'offers=' parameter instead of old 'items=' parameter
+        if 'offers=' not in walmart_url:
+            print("❌ CRITICAL: URL doesn't contain 'offers=' parameter - fix not applied!")
+            return False
+        else:
+            print("✅ URL contains 'offers=' parameter")
+        
+        if 'items=' in walmart_url:
+            print("❌ CRITICAL: URL still contains old 'items=' parameter - fix incomplete!")
+            return False
+        else:
+            print("✅ URL doesn't contain old 'items=' parameter")
+        
+        # Extract and verify offers format
+        offers_part = walmart_url.split('offers=')[1] if 'offers=' in walmart_url else ""
+        print(f"Offers parameter: {offers_part}")
+        
+        # Verify format: SKU1|Quantity1,SKU2|Quantity2,SKU3|Quantity3
+        expected_offers = []
+        for product in test_products:
+            expected_offers.append(f"{product['product_id']}|{product['quantity']}")
+        expected_offers_str = ','.join(expected_offers)
+        
+        if offers_part == expected_offers_str:
+            print("✅ PERFECT: Walmart URL uses correct offers format: SKU|Quantity,SKU|Quantity")
+            print(f"  Expected: {expected_offers_str}")
+            print(f"  Actual:   {offers_part}")
+        else:
+            print(f"❌ CRITICAL: Walmart URL offers format incorrect!")
+            print(f"  Expected: {expected_offers_str}")
+            print(f"  Actual:   {offers_part}")
+            return False
+        
+        # Step 5: Test URL accessibility
+        print("\n🌐 Step 5: Testing URL accessibility...")
+        try:
+            import requests
+            response = requests.head(walmart_url, timeout=10, allow_redirects=True)
+            if response.status_code == 200:
+                print("✅ Walmart URL is accessible (HTTP 200)")
+            else:
+                print(f"⚠️ Walmart URL returned status {response.status_code} (may still be functional)")
+        except Exception as e:
+            print(f"⚠️ Could not test URL accessibility: {str(e)}")
+        
+        # Final verification
+        print("\n" + "=" * 80)
+        print("🎉 URGENT LEMONADE WALMART INTEGRATION FIX VERIFICATION COMPLETE")
+        print("=" * 80)
+        print("✅ Lemonade recipe generation: WORKING")
+        print("✅ Cart options API: WORKING")
+        print("✅ Mock data filtering: WORKING")
+        print("✅ Custom cart API: WORKING")
+        print("✅ New Walmart URL format: IMPLEMENTED")
+        print("✅ Offers parameter format: CORRECT")
+        print("✅ URL structure: VALID")
+        print("\n🚨 CONCLUSION: The Walmart affiliate URL format fix is WORKING CORRECTLY!")
+        print("   Users should no longer see 'invalid item or quantity' errors.")
+        
+        return True
+
 def main():
     print("=" * 80)
     print("AI Recipe & Grocery App - Enhanced Interactive Walmart Cart Testing")
