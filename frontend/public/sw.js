@@ -1,5 +1,5 @@
-// Service Worker for PWA functionality - PRODUCTION DEPLOYMENT READY
-const CACHE_NAME = 'buildyoursmartcart-v101-production-deployment-ready';
+// Service Worker for PWA functionality - COMPLETE FRESH START
+const CACHE_NAME = 'buildyoursmartcart-v102-complete-fresh-start';
 const urlsToCache = [
   '/',
   '/static/js/bundle.js',
@@ -7,43 +7,43 @@ const urlsToCache = [
   '/manifest.json'
 ];
 
-// Install event - FORCE DELETE ALL OLD CACHES
+// Install event - NUCLEAR CACHE CLEAR
 self.addEventListener('install', (event) => {
-  console.log('🚀 PRODUCTION DEPLOYMENT - CLEARING ALL CACHES...');
+  console.log('💥 NUCLEAR CACHE CLEAR - DELETING EVERYTHING...');
   event.waitUntil(
     caches.keys().then(cacheNames => {
-      console.log('🗑️ CLEARING ALL OLD CACHES:', cacheNames);
+      console.log('🗑️ FORCE DELETING ALL CACHES:', cacheNames);
       return Promise.all(
         cacheNames.map(cacheName => {
-          console.log('💥 DELETING CACHE:', cacheName);
+          console.log('💥 NUKING CACHE:', cacheName);
           return caches.delete(cacheName);
         })
       );
     }).then(() => {
-      console.log('✅ ALL OLD CACHES DELETED - CREATING NEW CACHE');
+      console.log('✅ ALL CACHES NUKED - CREATING FRESH CACHE');
       return caches.open(CACHE_NAME);
     }).then(() => {
-      console.log('🎉 NEW CACHE v101 CREATED FOR PRODUCTION');
+      console.log('🎉 FRESH CACHE v102 CREATED - COMPLETE RESTART');
       return self.skipWaiting();
     })
   );
 });
 
-// Activate event - TAKE CONTROL IMMEDIATELY
+// Activate event - IMMEDIATE CONTROL
 self.addEventListener('activate', (event) => {
-  console.log('🚀 PRODUCTION SERVICE WORKER ACTIVATING - TAKING CONTROL');
+  console.log('🚀 FRESH START SERVICE WORKER - TAKING IMMEDIATE CONTROL');
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
         cacheNames.filter(cacheName => {
           return cacheName !== CACHE_NAME;
         }).map(cacheName => {
-          console.log('🗑️ DELETING OLD CACHE:', cacheName);
+          console.log('🗑️ FINAL CLEANUP:', cacheName);
           return caches.delete(cacheName);
         })
       );
     }).then(() => {
-      console.log('✅ ALL OLD CACHES DELETED - TAKING CONTROL');
+      console.log('✅ COMPLETE CACHE CLEANUP - FRESH START READY');
       return self.clients.claim();
     })
   );
