@@ -244,6 +244,109 @@ class GroceryCart(BaseModel):
         }
 
 # Password hashing utilities
+@app.post("/api/generate-starbucks-drink")
+async def generate_starbucks_drink(request: StarbucksRequest):
+    """Generate a creative Starbucks secret menu drink with drive-thru ordering script"""
+    try:
+        # Handle random drink type
+        if request.drink_type == "random":
+            import random
+            drink_types = ["frappuccino", "refresher", "lemonade", "iced_matcha_latte"]
+            request.drink_type = random.choice(drink_types)
+            
+        # Build specialized prompt for Starbucks drinks
+        prompt_parts = []
+        
+        # Add flavor inspiration if provided
+        flavor_context = ""
+        if request.flavor_inspiration:
+            flavor_context = f" with {request.flavor_inspiration} flavors"
+            
+        prompt_parts.append(f"""Create a viral-worthy Starbucks secret menu drink that's a creative {request.drink_type}{flavor_context}. This should be an Instagram-ready drink hack that TikTok users would love to try and share.
+
+IMPORTANT: Focus on creating a {request.drink_type} that's unique, visually appealing, and easy to order at any Starbucks location.
+
+Respond with JSON in this exact format:
+{{
+  "drink_name": "Creative catchy name (like 'Unicorn Dreams Frappuccino' or 'Sunset Mango Refresher')",
+  "description": "1-2 sentence description of taste and visual appeal",
+  "base_drink": "Base Starbucks drink to order (size and drink name)",
+  "modifications": [
+    "Specific modification 1",
+    "Specific modification 2",
+    "Specific modification 3"
+  ],
+  "ordering_script": "Complete sentence to say at drive-thru: 'Hi, can I get a...'",
+  "pro_tips": [
+    "Pro tip 1 for best results",
+    "Pro tip 2 for customization"
+  ],
+  "why_amazing": "Why this drink is special and Instagram-worthy",
+  "category": "{request.drink_type}",
+  "ingredients_breakdown": [
+    "Main ingredient 1",
+    "Main ingredient 2", 
+    "Main ingredient 3"
+  ]
+}}
+
+Make this drink sound like a must-try secret menu item that would go viral on social media!""")
+
+        # Generate the drink using OpenAI
+        response = openai_client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "You are a creative Starbucks drink expert who creates viral secret menu items. Always respond with valid JSON only."},
+                {"role": "user", "content": " ".join(prompt_parts)}
+            ],
+            max_tokens=1000,
+            temperature=0.8  # Higher temperature for more creativity
+        )
+        
+        # Parse the response
+        recipe_json = response.choices[0].message.content.strip()
+        
+        # Clean up the JSON (remove markdown formatting if present)
+        if recipe_json.startswith("```json"):
+            recipe_json = recipe_json[7:]
+        if recipe_json.endswith("```"):
+            recipe_json = recipe_json[:-3]
+        
+        recipe_data = json.loads(recipe_json)
+        
+        # Create Starbucks recipe object
+        starbucks_drink = StarbucksRecipe(
+            drink_name=recipe_data['drink_name'],
+            description=recipe_data['description'],
+            base_drink=recipe_data['base_drink'],
+            modifications=recipe_data['modifications'],
+            ordering_script=recipe_data['ordering_script'],
+            pro_tips=recipe_data['pro_tips'],
+            why_amazing=recipe_data['why_amazing'],
+            category=recipe_data['category'],
+            user_id=request.user_id
+        )
+        
+        # Add ingredients_breakdown if present
+        if 'ingredients_breakdown' in recipe_data:
+            starbucks_drink.ingredients_breakdown = recipe_data['ingredients_breakdown']
+        
+        # Save to database
+        drink_dict = starbucks_drink.dict()
+        result = await db.starbucks_recipes.insert_one(drink_dict)
+        
+        # Return the created drink
+        if result.inserted_id:
+            inserted_drink = await db.starbucks_recipes.find_one({"_id": result.inserted_id})
+            return mongo_to_dict(inserted_drink)
+        else:
+            raise HTTPException(status_code=500, detail="Failed to save drink to database")
+            
+    except json.JSONDecodeError:
+        raise HTTPException(status_code=500, detail="Failed to parse drink recipe from AI")
+    except Exception as e:
+        print(f"Error generating Starbucks drink: {e}")
+        raise HTTPException(status_code=500, detail="Failed to generate Starbucks drink")
 def hash_password(password: str) -> str:
     """Hash a password using bcrypt"""
     salt = bcrypt.gensalt()
