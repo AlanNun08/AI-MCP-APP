@@ -7,12 +7,12 @@ const urlsToCache = [
   '/manifest.json'
 ];
 
-// Install event - NEW URL CACHE CLEAR
+// Install event - AUTH PERSISTENCE CACHE UPDATE
 self.addEventListener('install', (event) => {
-  console.log('🔄 NEW PREVIEW URL - CLEARING ALL CACHES...');
+  console.log('🔄 AUTH PERSISTENCE UPDATE - CLEARING CACHES...');
   event.waitUntil(
     caches.keys().then(cacheNames => {
-      console.log('🗑️ DELETING ALL OLD CACHES FOR NEW URL:', cacheNames);
+      console.log('🗑️ DELETING OLD CACHES:', cacheNames);
       return Promise.all(
         cacheNames.map(cacheName => {
           console.log('💥 DELETING CACHE:', cacheName);
@@ -20,10 +20,10 @@ self.addEventListener('install', (event) => {
         })
       );
     }).then(() => {
-      console.log('✅ ALL CACHES DELETED - CREATING NEW URL CACHE');
+      console.log('✅ CACHES DELETED - CREATING AUTH PERSISTENCE CACHE');
       return caches.open(CACHE_NAME);
     }).then(() => {
-      console.log('🎉 NEW URL CACHE v105 CREATED');
+      console.log('🎉 AUTH PERSISTENCE CACHE v106 CREATED');
       return self.skipWaiting();
     })
   );
