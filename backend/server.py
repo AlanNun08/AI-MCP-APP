@@ -1043,6 +1043,30 @@ Refreshing, fruity, or herbal — perfect for summer with unique fruit combinati
 
 Make the drink visually Instagram-worthy and perfect for any season.""")
         
+        elif recipe_category == "starbucks":
+            # Generate creative Starbucks ordering instructions
+            prompt_parts.append(f"""Create a creative Starbucks drink ordering guide that shows how to order an amazing custom drink at Starbucks. This should be a unique, Instagram-worthy drink like "Fresas con Crema Frappuccino" or "Twix Frappuccino" that uses creative modifications of existing Starbucks menu items.
+
+IMPORTANT: Focus on the {recipe_type} category and create a drink that fits that style (frappuccino, latte, refresher, cold brew, macchiato, or seasonal special).
+
+🌟 Creative, catchy drink name (like "Twix Frappuccino" or "Fresas con Crema")
+📱 Brief description of what the drink tastes like
+☕ Base drink to order (e.g., "Grande Vanilla Bean Frappuccino")
+🎨 List of specific modifications to request:
+   - Syrups to add/subtract (with pumps)
+   - Milk substitutions 
+   - Extra shots, decaf, etc.
+   - Toppings (whipped cream, foam, drizzles)
+   - Temperature changes
+   - Any special requests
+
+💬 EXACT ordering script: "Hi, can I get a [size] [base drink] with [list all modifications clearly]"
+
+💡 Pro tips for ordering (best times, customization limits, cost-saving tips)
+🔥 Why this drink is amazing and what makes it special
+
+Make this sound like a viral TikTok Starbucks hack that people would want to try and share!""")
+        
         else:  # cuisine category
             if recipe_type == "snacks & bowls":
                 prompt_parts.append(f"Create a healthy snack or bowl recipe for {request.servings} people. Focus on nutritious snacks, smoothie bowls, acai bowls, poke bowls, grain bowls, or energy bites.")
