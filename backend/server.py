@@ -562,21 +562,33 @@ async def login_user(login_data: UserLogin):
     try:
         # Normalize email
         email_lower = login_data.email.lower().strip()
+        logging.info(f"Login attempt for email: '{login_data.email}' -> normalized: '{email_lower}'")
         
         # Find user (case-insensitive) - try both exact and regex match
         user = await db.users.find_one({"email": email_lower})
+        logging.info(f"First search (exact lowercase): found={user is not None}")
+        
         if not user:
             # Try case-insensitive regex as fallback
             user = await db.users.find_one({"email": {"$regex": f"^{email_lower}$", "$options": "i"}})
+            logging.info(f"Second search (regex): found={user is not None}")
         if not user:
             # Try original email case as final fallback
             user = await db.users.find_one({"email": login_data.email})
+            logging.info(f"Third search (original case): found={user is not None}")
         
         if not user:
+            logging.warning(f"User not found for email: {login_data.email}")
             raise HTTPException(status_code=401, detail="Invalid email or password")
         
+        logging.info(f"User found: email='{user.get('email')}', verified={user.get('is_verified')}")
+        
         # Verify password FIRST
-        if not verify_password(login_data.password, user["password_hash"]):
+        password_valid = verify_password(login_data.password, user["password_hash"])
+        logging.info(f"Password verification: {password_valid}")
+        
+        if not password_valid:
+            logging.warning(f"Invalid password for user: {user.get('email')}")
             raise HTTPException(status_code=401, detail="Invalid email or password")
         
         # THEN check if user is verified (after valid credentials)
