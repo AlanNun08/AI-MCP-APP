@@ -190,6 +190,7 @@ class StarbucksRecipe(BaseModel):
     pro_tips: List[str]
     why_amazing: str
     category: str  # frappuccino, latte, etc.
+    ingredients_breakdown: Optional[List[str]] = []  # Main ingredients for display
     created_at: datetime = Field(default_factory=datetime.utcnow)
     user_id: Optional[str] = None
 
