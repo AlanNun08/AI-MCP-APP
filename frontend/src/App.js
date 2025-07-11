@@ -6,6 +6,9 @@ import WelcomeOnboarding from './components/WelcomeOnboarding';
 import TutorialScreen from './components/TutorialScreen';
 
 function App() {
+  // FORCE PRODUCTION URL FIX - VERSION 50
+  console.log('🚀 AI CHEF APP LOADING - VERSION 50 (PRODUCTION URL FIX)');
+  
   // Use environment variable for backend URL - PRODUCTION FIX
   const API = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
   
