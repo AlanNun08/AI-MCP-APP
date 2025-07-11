@@ -16,7 +16,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 class AIRecipeAppTester:
-    def __init__(self, base_url="http://localhost:8001"):
+    def __init__(self, base_url="https://407d4e17-1478-4b87-bdc3-d8a695a6f09c.preview.emergentagent.com"):
         self.base_url = f"{base_url}/api"
         self.tests_run = 0
         self.tests_passed = 0
@@ -29,6 +29,10 @@ class AIRecipeAppTester:
         # Test user credentials
         self.test_email = f"test_{uuid.uuid4()}@example.com"
         self.test_password = "SecureP@ssw0rd123"
+        # Email verification specific attributes
+        self.verification_code = None
+        self.email_service_working = False
+        self.mailjet_configured = False
 
     def run_test(self, name, method, endpoint, expected_status, data=None, params=None, timeout=30):
         """Run a single API test with configurable timeout"""
