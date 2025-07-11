@@ -22,7 +22,7 @@ self.addEventListener('install', (event) => {
       console.log('All old caches cleared, creating new cache...');
       return caches.open(CACHE_NAME);
     }).then(cache => {
-      console.log('New cache v17 created successfully');
+      console.log('New cache v18 created successfully');
       return cache.addAll(urlsToCache);
     })
   );
