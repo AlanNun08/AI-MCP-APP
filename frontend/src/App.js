@@ -989,7 +989,7 @@ function App() {
       
       // Validate that a recipe type and specific type are selected
       if (!formData.recipe_type) {
-        showNotification('❌ Please select a recipe category (Cuisine, Snack, Beverage, or Starbucks)', 'error');
+        showNotification('❌ Please select a recipe category (Cuisine, Snack, or Beverage)', 'error');
         return;
       }
 
