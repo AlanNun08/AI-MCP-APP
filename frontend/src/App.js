@@ -2159,103 +2159,283 @@ function App() {
     );
   };
 
-  // Recipe History Screen Component  
+  // Recipe History Screen Component with Categories
   const RecipeHistoryScreen = () => {
     const [recipes, setRecipes] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [activeCategory, setActiveCategory] = useState('all');
+    const [stats, setStats] = useState({
+      total_count: 0,
+      regular_recipes: 0,
+      starbucks_recipes: 0
+    });
+
+    const categories = [
+      { id: 'all', label: 'All', icon: '📝', color: 'bg-gray-500' },
+      { id: 'cuisine', label: 'Cuisine', icon: '🍝', color: 'bg-orange-500' },
+      { id: 'snacks', label: 'Snacks', icon: '🍪', color: 'bg-purple-500' },
+      { id: 'beverages', label: 'Beverages', icon: '🧋', color: 'bg-blue-500' },
+      { id: 'starbucks', label: 'Starbucks', icon: '☕', color: 'bg-green-500' }
+    ];
 
     useEffect(() => {
-      const fetchRecipes = async () => {
-        console.log('🔍 Fetching recipes for user:', user);
-        console.log('🔍 User ID:', user?.id);
-        console.log('🔍 API URL:', `${API}/api/users/${user.id}/recipes`);
-        
-        try {
-          const response = await axios.get(`${API}/api/users/${user.id}/recipes`);
-          console.log('✅ Recipes fetched successfully:', response.data);
-          setRecipes(response.data);
-        } catch (error) {
-          console.error('❌ Failed to fetch recipes:', error);
-          showNotification('❌ Failed to load recipes', 'error');
-        } finally {
-          setLoading(false);
-        }
-      };
+      fetchRecipes();
+    }, []);
 
-      if (user?.id) {
-        fetchRecipes();
-      } else {
-        console.log('⚠️ No user ID available, not fetching recipes');
+    const fetchRecipes = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get(`${API}/api/recipes/history/${user?.id || 'demo_user'}`);
+        
+        if (response.data.success) {
+          setRecipes(response.data.recipes);
+          setStats({
+            total_count: response.data.total_count,
+            regular_recipes: response.data.regular_recipes,
+            starbucks_recipes: response.data.starbucks_recipes
+          });
+        } else {
+          setRecipes([]);
+        }
+      } catch (error) {
+        console.error('Error fetching recipes:', error);
+        showNotification('❌ Failed to load recipe history', 'error');
+        setRecipes([]);
+      } finally {
         setLoading(false);
       }
-    }, [user]);
+    };
+
+    const filteredRecipes = activeCategory === 'all' 
+      ? recipes 
+      : recipes.filter(recipe => recipe.category === activeCategory);
+
+    const getCategoryCount = (categoryId) => {
+      if (categoryId === 'all') return recipes.length;
+      return recipes.filter(recipe => recipe.category === categoryId).length;
+    };
+
+    const viewRecipe = (recipe) => {
+      if (recipe.type === 'starbucks') {
+        // For Starbucks recipes, show them in the existing Starbucks detail view
+        window.currentRecipe = recipe;
+        setCurrentScreen('recipe-detail');
+      } else {
+        // For regular recipes, show them in the regular recipe detail view  
+        window.currentRecipe = recipe;
+        setCurrentScreen('recipe-detail');
+      }
+    };
+
+    const deleteRecipe = async (recipeId, recipeType) => {
+      if (window.confirm('Are you sure you want to delete this recipe?')) {
+        try {
+          const endpoint = recipeType === 'starbucks' ? 'starbucks-recipes' : 'recipes';
+          await axios.delete(`${API}/api/${endpoint}/${recipeId}`);
+          showNotification('✅ Recipe deleted successfully', 'success');
+          fetchRecipes(); // Refresh the list
+        } catch (error) {
+          console.error('Error deleting recipe:', error);
+          showNotification('❌ Failed to delete recipe', 'error');
+        }
+      }
+    };
+
+    const formatDate = (dateString) => {
+      return new Date(dateString).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    };
 
     if (loading) {
       return (
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-          <div className="text-center">
-            <div className="w-8 h-8 border-4 border-green-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading your recipes...</p>
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 p-4">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center py-20">
+              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500 mx-auto mb-4"></div>
+              <h2 className="text-2xl font-bold text-gray-800 mb-2">Loading Your Recipe History</h2>
+              <p className="text-gray-600">Fetching all your amazing creations...</p>
+            </div>
           </div>
         </div>
       );
     }
 
     return (
-      <div className="min-h-screen bg-gray-50 p-4">
-        <div className="max-w-md mx-auto">
-          <div className="flex items-center space-x-3 mb-6">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 p-4">
+        <div className="max-w-6xl mx-auto">
+          
+          {/* Header */}
+          <div className="text-center mb-8">
             <button
               onClick={() => setCurrentScreen('dashboard')}
-              className="text-gray-600 hover:text-gray-800"
+              className="mb-4 inline-flex items-center text-gray-600 hover:text-gray-800 font-medium"
             >
-              ← Back
+              <span className="mr-2">←</span>
+              Back to Dashboard
             </button>
-            <div>
-              <h2 className="text-xl font-bold text-gray-800">📚 Recipe History</h2>
-              <p className="text-gray-600 text-sm">{recipes.length} saved recipes</p>
+            <div className="text-6xl mb-4">📖</div>
+            <h1 className="text-4xl font-bold text-gray-800 mb-2">Recipe History</h1>
+            <p className="text-lg text-gray-600">
+              All your culinary creations in one place
+            </p>
+          </div>
+
+          {/* Stats Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+            <div className="bg-white rounded-xl shadow-lg p-6 text-center">
+              <div className="text-3xl mb-2">📝</div>
+              <div className="text-2xl font-bold text-gray-800">{stats.total_count}</div>
+              <div className="text-sm text-gray-600">Total Recipes</div>
+            </div>
+            <div className="bg-white rounded-xl shadow-lg p-6 text-center">
+              <div className="text-3xl mb-2">🍳</div>
+              <div className="text-2xl font-bold text-orange-600">{stats.regular_recipes}</div>
+              <div className="text-sm text-gray-600">Food Recipes</div>
+            </div>
+            <div className="bg-white rounded-xl shadow-lg p-6 text-center">
+              <div className="text-3xl mb-2">☕</div>
+              <div className="text-2xl font-bold text-green-600">{stats.starbucks_recipes}</div>
+              <div className="text-sm text-gray-600">Starbucks Drinks</div>
+            </div>
+            <div className="bg-white rounded-xl shadow-lg p-6 text-center">
+              <div className="text-3xl mb-2">🏆</div>
+              <div className="text-2xl font-bold text-purple-600">{filteredRecipes.length}</div>
+              <div className="text-sm text-gray-600">Showing Now</div>
             </div>
           </div>
 
-          <div className="space-y-4">
-            {recipes.length === 0 ? (
-              <div className="bg-white rounded-2xl shadow-sm p-8 text-center">
-                <div className="text-4xl mb-4">🍽️</div>
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">No Recipes Yet</h3>
-                <p className="text-gray-600 mb-4">Generate your first AI recipe to get started!</p>
+          {/* Category Filters */}
+          <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
+            <h3 className="text-xl font-bold text-gray-800 mb-4">Filter by Category</h3>
+            <div className="flex flex-wrap gap-3">
+              {categories.map(category => (
                 <button
-                  onClick={() => setCurrentScreen('generate-recipe')}
-                  className="bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600"
+                  key={category.id}
+                  onClick={() => setActiveCategory(category.id)}
+                  className={`flex items-center px-4 py-2 rounded-xl font-medium transition-all duration-200 ${
+                    activeCategory === category.id 
+                      ? `${category.color} text-white shadow-lg` 
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
                 >
-                  Generate Recipe
+                  <span className="mr-2">{category.icon}</span>
+                  <span>{category.label}</span>
+                  <span className="ml-2 text-sm opacity-80">({getCategoryCount(category.id)})</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Recipe Grid */}
+          {filteredRecipes.length === 0 ? (
+            <div className="text-center py-20">
+              <div className="text-8xl mb-4">🍽️</div>
+              <h2 className="text-2xl font-bold text-gray-800 mb-2">
+                {activeCategory === 'all' ? 'No Recipes Yet' : `No ${categories.find(c => c.id === activeCategory)?.label} Recipes`}
+              </h2>
+              <p className="text-gray-600 mb-6">
+                {activeCategory === 'all' 
+                  ? "Start creating some delicious recipes and viral Starbucks drinks!" 
+                  : `Try creating some ${categories.find(c => c.id === activeCategory)?.label.toLowerCase()} recipes!`}
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <button
+                  onClick={() => setCurrentScreen('recipe-generation')}
+                  className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-xl transition-all duration-200"
+                >
+                  🍳 Generate Recipe
+                </button>
+                <button
+                  onClick={() => setCurrentScreen('starbucks-generator')}
+                  className="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-xl transition-all duration-200"
+                >
+                  ☕ Create Starbucks Drink
                 </button>
               </div>
-            ) : (
-              recipes.map((recipe) => (
-                <div key={recipe.id} className="bg-white rounded-2xl shadow-sm p-4 hover:shadow-md transition-shadow cursor-pointer"
-                     onClick={() => {
-                       window.currentRecipe = recipe;
-                       setCurrentScreen('recipe-detail');
-                     }}>
-                  <h3 className="font-semibold text-gray-800 mb-1">{recipe.title}</h3>
-                  <p className="text-gray-600 text-sm mb-2">{recipe.description}</p>
-                  <div className="flex space-x-2 text-xs">
-                    <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                      {recipe.prep_time}min
-                    </span>
-                    <span className="bg-green-100 text-green-800 px-2 py-1 rounded">
-                      {recipe.servings} servings
-                    </span>
-                    {recipe.calories_per_serving && (
-                      <span className="bg-orange-100 text-orange-800 px-2 py-1 rounded">
-                        {recipe.calories_per_serving} cal
-                      </span>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredRecipes.map((recipe) => (
+                <div key={recipe.id} className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                  
+                  {/* Recipe Header */}
+                  <div className={`p-4 ${
+                    recipe.category === 'cuisine' ? 'bg-gradient-to-r from-orange-500 to-red-500' :
+                    recipe.category === 'snacks' ? 'bg-gradient-to-r from-purple-500 to-pink-500' :
+                    recipe.category === 'beverages' ? 'bg-gradient-to-r from-blue-500 to-cyan-500' :
+                    recipe.category === 'starbucks' ? 'bg-gradient-to-r from-green-500 to-teal-500' :
+                    'bg-gradient-to-r from-gray-500 to-gray-600'
+                  } text-white`}>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-2xl">{recipe.category_icon}</span>
+                      <span className="text-xs opacity-80">{recipe.category_label}</span>
+                    </div>
+                    <h3 className="text-lg font-bold line-clamp-2">
+                      {recipe.type === 'starbucks' ? recipe.drink_name : recipe.title}
+                    </h3>
+                  </div>
+
+                  {/* Recipe Content */}
+                  <div className="p-4">
+                    <p className="text-gray-600 text-sm mb-4 line-clamp-3">
+                      {recipe.description}
+                    </p>
+                    
+                    {recipe.type === 'starbucks' ? (
+                      <div className="space-y-2 text-sm">
+                        <div className="flex items-center text-gray-600">
+                          <span className="mr-2">🎯</span>
+                          <span>Base: {recipe.base_drink}</span>
+                        </div>
+                        <div className="flex items-center text-gray-600">
+                          <span className="mr-2">🎨</span>
+                          <span>{recipe.modifications?.length || 0} modifications</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="space-y-2 text-sm">
+                        <div className="flex items-center text-gray-600">
+                          <span className="mr-2">⏱️</span>
+                          <span>{recipe.prep_time + recipe.cook_time} min total</span>
+                        </div>
+                        <div className="flex items-center text-gray-600">
+                          <span className="mr-2">🍽️</span>
+                          <span>{recipe.servings} servings</span>
+                        </div>
+                      </div>
                     )}
+                    
+                    <div className="mt-4 pt-4 border-t border-gray-200">
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs text-gray-500">
+                          {formatDate(recipe.created_at)}
+                        </span>
+                        <div className="flex space-x-2">
+                          <button
+                            onClick={() => viewRecipe(recipe)}
+                            className="bg-blue-500 hover:bg-blue-600 text-white text-xs px-3 py-1 rounded-lg transition-colors"
+                          >
+                            View
+                          </button>
+                          <button
+                            onClick={() => deleteRecipe(recipe.id, recipe.type)}
+                            className="bg-red-500 hover:bg-red-600 text-white text-xs px-3 py-1 rounded-lg transition-colors"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              ))
-            )}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     );
