@@ -9,6 +9,44 @@ function App() {
   // Use environment variable for backend URL
   const API = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
 
+  // Clear all caches on app startup to ensure fresh data
+  useEffect(() => {
+    const clearCaches = async () => {
+      try {
+        // Clear all service worker caches
+        if ('caches' in window) {
+          const cacheNames = await caches.keys();
+          await Promise.all(
+            cacheNames.map(cacheName => {
+              console.log('Clearing cache:', cacheName);
+              return caches.delete(cacheName);
+            })
+          );
+        }
+        
+        // Clear localStorage auth tokens and user sessions
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('userSession');
+        localStorage.removeItem('user_auth_data');
+        
+        // Force service worker update
+        if ('serviceWorker' in navigator) {
+          const registrations = await navigator.serviceWorker.getRegistrations();
+          for (let registration of registrations) {
+            await registration.update();
+          }
+        }
+        
+        console.log('✅ All caches cleared on startup');
+      } catch (error) {
+        console.error('Cache clearing error:', error);
+      }
+    };
+    
+    // Clear caches on every app load for deployed site
+    clearCaches();
+  }, []);
+
   const [currentScreen, setCurrentScreen] = useState('landing');
   const [user, setUser] = useState(null);
   const [users, setUsers] = useState([]);
