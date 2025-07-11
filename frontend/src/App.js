@@ -6,8 +6,7 @@ import WelcomeOnboarding from './components/WelcomeOnboarding';
 import TutorialScreen from './components/TutorialScreen';
 
 function App() {
-  // AI CHEF APP - VERSION 51 (NO FORCED RELOADS)
-  console.log('🚀 AI CHEF APP LOADING - VERSION 51 (NO FORCED RELOADS)');
+  // BUILDYOURSMARTCART - PRODUCTION VERSION
   
   // Use environment variable for backend URL - PRODUCTION FIX
   const API = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
