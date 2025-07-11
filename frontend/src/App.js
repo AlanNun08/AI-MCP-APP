@@ -1082,7 +1082,7 @@ function App() {
               {/* Recipe Category Selection */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-3">Recipe Category *</label>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {/* Cuisine Card */}
                   <div 
                     className={`border-2 rounded-xl p-4 cursor-pointer transition-all duration-200 ${
@@ -1090,7 +1090,7 @@ function App() {
                         ? 'border-green-500 bg-green-50' 
                         : 'border-gray-200 hover:border-green-300'
                     }`}
-                    onClick={() => setFormData({...formData, recipe_type: 'cuisine', snack_type: '', beverage_type: '', starbucks_type: ''})}
+                    onClick={() => setFormData({...formData, recipe_type: 'cuisine', snack_type: '', beverage_type: ''})}
                   >
                     <div className="text-center">
                       <div className="text-3xl mb-2">🍝</div>
@@ -1106,7 +1106,7 @@ function App() {
                         ? 'border-green-500 bg-green-50' 
                         : 'border-gray-200 hover:border-green-300'
                     }`}
-                    onClick={() => setFormData({...formData, recipe_type: 'snack', cuisine_type: '', beverage_type: '', starbucks_type: ''})}
+                    onClick={() => setFormData({...formData, recipe_type: 'snack', cuisine_type: '', beverage_type: ''})}
                   >
                     <div className="text-center">
                       <div className="text-3xl mb-2">🍪</div>
@@ -1122,28 +1122,12 @@ function App() {
                         ? 'border-green-500 bg-green-50' 
                         : 'border-gray-200 hover:border-green-300'
                     }`}
-                    onClick={() => setFormData({...formData, recipe_type: 'beverage', cuisine_type: '', snack_type: '', starbucks_type: ''})}
+                    onClick={() => setFormData({...formData, recipe_type: 'beverage', cuisine_type: '', snack_type: ''})}
                   >
                     <div className="text-center">
                       <div className="text-3xl mb-2">🧋</div>
                       <h3 className="font-bold text-gray-800">Beverages</h3>
                       <p className="text-xs text-gray-600">Boba, tea, and specialty drinks</p>
-                    </div>
-                  </div>
-
-                  {/* Starbucks Card */}
-                  <div 
-                    className={`border-2 rounded-xl p-4 cursor-pointer transition-all duration-200 ${
-                      formData.recipe_type === 'starbucks' 
-                        ? 'border-green-500 bg-green-50' 
-                        : 'border-gray-200 hover:border-green-300'
-                    }`}
-                    onClick={() => setFormData({...formData, recipe_type: 'starbucks', cuisine_type: '', snack_type: '', beverage_type: ''})}
-                  >
-                    <div className="text-center">
-                      <div className="text-3xl mb-2">☕</div>
-                      <h3 className="font-bold text-gray-800">Starbucks</h3>
-                      <p className="text-xs text-gray-600">Creative drinks you can order at Starbucks</p>
                     </div>
                   </div>
                 </div>
