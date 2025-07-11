@@ -645,6 +645,13 @@ function App() {
             </button>
             
             <button
+              onClick={() => setCurrentScreen('tutorial')}
+              className="w-full bg-gradient-to-br from-blue-500 to-purple-600 text-white font-semibold py-4 px-6 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 active:scale-95"
+            >
+              📚 How to Use AI Chef
+            </button>
+            
+            <button
               onClick={() => setCurrentScreen('all-recipes')}
               className="w-full bg-purple-500 text-white font-semibold py-4 px-6 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 active:scale-95"
             >
