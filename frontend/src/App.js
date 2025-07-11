@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './App.css';
 import StarbucksGeneratorScreen from './components/StarbucksGeneratorScreen';
+import WelcomeOnboarding from './components/WelcomeOnboarding';
+import TutorialScreen from './components/TutorialScreen';
 
 function App() {
   // Use environment variable for backend URL
