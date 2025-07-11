@@ -1,5 +1,5 @@
 // Service Worker for PWA functionality with aggressive cache clearing
-const CACHE_NAME = 'ai-chef-v15-real-walmart-only-2024';
+const CACHE_NAME = 'ai-chef-v16-verified-walmart-clean-2024';
 const urlsToCache = [
   '/',
   '/static/js/bundle.js',
