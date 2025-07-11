@@ -948,68 +948,92 @@ def _extract_core_ingredient(ingredient: str) -> str:
     # Remove common recipe measurements and quantities at the beginning
     ingredient_lower = re.sub(r'^(\d+[\s\/\-]*\d*\s*)?(cups?|cup|tbsp|tablespoons?|tablespoon|tsp|teaspoons?|teaspoon|lbs?|pounds?|pound|oz|ounces?|ounce|cans?|can|jars?|jar|bottles?|bottle|packages?|package|bags?|bag|cloves?|clove|slices?|slice|pieces?|piece|pinch|dash)\s+', '', ingredient_lower)
     
-    # Remove quantities at the beginning (like "1", "2", "1/2", "1-2", etc.)
-    ingredient_lower = re.sub(r'^\d+[\s\/\-]*\d*\s+', '', ingredient_lower)
+    # Remove common preparation words
+    ingredient_lower = re.sub(r'\b(fresh|frozen|dried|chopped|diced|minced|sliced|grated|crushed|ground|whole|raw|cooked|boiled|steamed|roasted|baked|organic|extra|virgin|pure|natural|unsalted|salted|low[- ]fat|fat[- ]free|sugar[- ]free)\b\s*', '', ingredient_lower)
     
-    # Remove preparation instructions (everything after comma, parentheses, or "to taste")
-    ingredient_lower = re.sub(r'[,\(].*$', '', ingredient_lower)
-    ingredient_lower = re.sub(r'\s+to\s+taste.*$', '', ingredient_lower)
-    ingredient_lower = re.sub(r'\s+(drained|rinsed|chopped|sliced|diced|minced|cooked|fresh|dried|ground|whole|halved|quartered).*$', '', ingredient_lower)
+    # Remove preparation instructions in parentheses
+    ingredient_lower = re.sub(r'\([^)]*\)', '', ingredient_lower)
     
-    # Handle specific ingredient mappings for better search results
-    ingredient_mappings = {
-        'bbq sauce': 'barbecue sauce',
-        'mixed vegetables': 'frozen mixed vegetables',
-        'bell peppers': 'bell pepper',
-        'olive oil': 'olive oil',
-        'chickpeas': 'chickpeas',
-        'garbanzo beans': 'chickpeas',
-        'quinoa': 'quinoa',
-        'avocado': 'avocado',
-        'salt and pepper': 'salt pepper',
-        'tomato sauce': 'tomato sauce',
-        'tomato paste': 'tomato paste',
-        'chicken breast': 'chicken breast',
-        'ground beef': 'ground beef',
-        'pasta': 'pasta',
-        'spaghetti': 'spaghetti pasta',
-        'rice': 'rice',
-        'onion': 'onion',
-        'garlic': 'garlic',
-        'cheese': 'shredded cheese'
+    # Special handling for beverage ingredients
+    beverage_substitutions = {
+        'ice cubes': 'ice',
+        'ice cube': 'ice',
+        'tapioca pearls': 'tapioca pearls',
+        'boba pearls': 'tapioca pearls',
+        'bubble tea pearls': 'tapioca pearls',
+        'black tea bags': 'black tea',
+        'tea bags': 'black tea',
+        'green tea bags': 'green tea',
+        'oat milk': 'oat milk',
+        'almond milk': 'almond milk',
+        'coconut milk': 'coconut milk',
+        'whole milk': 'milk',
+        'skim milk': 'milk',
+        '2% milk': 'milk',
+        'heavy cream': 'heavy cream',
+        'whipped cream': 'whipped cream',
+        'brown sugar syrup': 'brown sugar',
+        'simple syrup': 'sugar',
+        'honey syrup': 'honey',
+        'maple syrup': 'maple syrup',
+        'agave syrup': 'agave',
+        'mint leaves': 'mint',
+        'fresh mint': 'mint',
+        'lemon juice': 'lemons',
+        'lime juice': 'limes',
+        'orange juice': 'oranges',
+        'pineapple juice': 'pineapple',
+        'coconut water': 'coconut water',
+        'sparkling water': 'sparkling water',
+        'club soda': 'club soda',
+        'soda water': 'club soda'
     }
     
-    # Clean up extra spaces
-    ingredient_lower = ' '.join(ingredient_lower.split())
+    # Apply beverage-specific substitutions
+    for original, replacement in beverage_substitutions.items():
+        if original in ingredient_lower:
+            ingredient_lower = ingredient_lower.replace(original, replacement)
+            break
     
-    # Check for direct mappings first
-    for key, value in ingredient_mappings.items():
-        if key in ingredient_lower:
-            return value
+    # Handle spice blends and specific cooking terms
+    spice_substitutions = {
+        'italian seasoning': 'italian seasoning',
+        'garlic powder': 'garlic powder',
+        'onion powder': 'onion powder',
+        'black pepper': 'black pepper',
+        'white pepper': 'white pepper',
+        'sea salt': 'sea salt',
+        'kosher salt': 'salt',
+        'table salt': 'salt',
+        'olive oil': 'olive oil',
+        'vegetable oil': 'vegetable oil',
+        'canola oil': 'canola oil',
+        'coconut oil': 'coconut oil',
+        'butter': 'butter',
+        'unsalted butter': 'butter'
+    }
     
-    # If no direct mapping, try to extract the main ingredient
-    # Remove adjectives and modifiers
-    ingredient_lower = re.sub(r'\b(fresh|dried|ground|whole|chopped|sliced|diced|minced|cooked|raw|organic|extra\s+virgin|virgin|pure|natural|unsalted|salted|sweet|hot|mild|spicy|large|small|medium)\b\s*', '', ingredient_lower)
+    # Apply spice and cooking substitutions
+    for original, replacement in spice_substitutions.items():
+        if original in ingredient_lower:
+            ingredient_lower = replacement
+            break
     
-    # Remove extra spaces again
-    ingredient_lower = ' '.join(ingredient_lower.split())
+    # Remove any remaining quantities and measurements
+    ingredient_lower = re.sub(r'^\d+[\s\-\/]*\d*\s*', '', ingredient_lower)
+    ingredient_lower = re.sub(r'\b\d+[\s\-\/]*\d*\s*(ml|l|g|kg|mg)\b', '', ingredient_lower)
     
-    # If the result is too short or empty, return the original (cleaned)
-    if len(ingredient_lower) < 3:
-        # Fallback: try to extract noun from original
-        original_words = ingredient.lower().split()
-        # Look for common food nouns
-        food_nouns = ['oil', 'sauce', 'vegetables', 'quinoa', 'chickpeas', 'avocado', 'tomatoes', 'onion', 'garlic', 'cheese', 'pasta', 'rice', 'chicken', 'beef', 'pork', 'salt', 'pepper', 'herbs', 'spices']
-        for word in original_words:
-            clean_word = re.sub(r'[,\(\)]', '', word)
-            if clean_word in food_nouns:
-                return clean_word
-        
-        # If still nothing found, return first substantial word
-        for word in original_words:
-            clean_word = re.sub(r'[,\(\)\d]', '', word).strip()
-            if len(clean_word) > 2 and clean_word not in ['cup', 'cups', 'tbsp', 'tsp', 'can', 'jar', 'bottle', 'package', 'bag']:
-                return clean_word
+    # Remove extra whitespace and clean up
+    ingredient_lower = re.sub(r'\s+', ' ', ingredient_lower).strip()
+    
+    # Remove common suffixes that don't help with searching
+    ingredient_lower = re.sub(r'\s+(to taste|as needed|optional|for garnish|for serving)$', '', ingredient_lower)
+    
+    # If we end up with something too short or generic, try to use the original
+    if len(ingredient_lower) < 2 or ingredient_lower in ['for', 'and', 'or', 'with', 'of', 'the', 'a', 'an']:
+        # Fall back to just removing obvious quantities from the start
+        fallback = re.sub(r'^\d+\s*', '', ingredient.lower().strip())
+        return fallback if len(fallback) > 2 else ingredient.lower().strip()
     
     return ingredient_lower.strip() if ingredient_lower.strip() else ingredient
 
