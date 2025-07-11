@@ -1030,36 +1030,375 @@ class AIRecipeAppTester:
         
         return success
         
-    def test_login_with_verified_user(self):
-        """Test login with verified user"""
-        if not self.test_email:
-            print("❌ No test email available")
-            return False
-            
-        # Try to login with verified user
-        login_data = {
-            "email": self.test_email,
-            "password": self.test_password
+    def comprehensive_email_verification_test(self):
+        """Comprehensive test of the email verification system as requested"""
+        print("\n" + "=" * 80)
+        print("🔍 COMPREHENSIVE EMAIL VERIFICATION SYSTEM TESTING 🔍")
+        print("=" * 80)
+        print("Testing the complete email verification flow to identify why verification codes are not being sent")
+        
+        # Track all test results
+        email_tests = {
+            "Email Service Configuration": False,
+            "Registration Test": False,
+            "Verification Code Generation": False,
+            "Email Sending Test": False,
+            "Database Storage Test": False,
+            "Verification Process Test": False,
+            "Complete Flow Test": False,
+            "Error Handling Test": False
         }
         
+        # Test 1: Email Service Configuration
+        print("\n" + "=" * 60)
+        print("1. TESTING EMAIL SERVICE CONFIGURATION")
+        print("=" * 60)
+        
+        # Check if Mailjet credentials are configured
+        try:
+            # Test API root to ensure backend is accessible
+            success, response = self.run_test(
+                "Backend Connectivity Check",
+                "GET",
+                "",
+                200
+            )
+            
+            if success:
+                print("✅ Backend is accessible")
+                print(f"Backend Version: {response.get('version', 'Unknown')}")
+                print(f"Backend Status: {response.get('status', 'Unknown')}")
+                
+                # Check if we can access debug endpoints (indicates development mode)
+                debug_success, debug_response = self.run_test(
+                    "Debug Endpoint Availability",
+                    "GET",
+                    f"debug/verification-codes/test@example.com",
+                    200
+                )
+                
+                if debug_success:
+                    print("✅ Debug endpoints are available (development mode)")
+                    email_tests["Email Service Configuration"] = True
+                else:
+                    print("⚠️ Debug endpoints not available (may be production mode)")
+                    
+            else:
+                print("❌ Backend is not accessible")
+                return email_tests
+                
+        except Exception as e:
+            print(f"❌ Error checking email service configuration: {str(e)}")
+            return email_tests
+        
+        # Test 2: Registration Test
+        print("\n" + "=" * 60)
+        print("2. TESTING USER REGISTRATION")
+        print("=" * 60)
+        
+        # Create a unique test user
+        test_user_data = {
+            "first_name": "EmailTest",
+            "last_name": "User",
+            "email": self.test_email,
+            "password": self.test_password,
+            "dietary_preferences": ["vegetarian"],
+            "allergies": ["nuts"],
+            "favorite_cuisines": ["italian"]
+        }
+        
+        print(f"Registering test user: {self.test_email}")
+        
         success, response = self.run_test(
-            "Login with Verified User",
+            "User Registration",
             "POST",
-            "auth/login",
+            "auth/register",
             200,
-            data=login_data
+            data=test_user_data
         )
         
-        # Check if the login was successful
-        if success and 'status' in response:
-            if response['status'] == 'success':
-                print("✅ Verified user login successful")
-                return True
+        if success:
+            print("✅ User registration successful")
+            if 'user_id' in response:
+                self.user_id = response['user_id']
+                print(f"User ID: {self.user_id}")
+                email_tests["Registration Test"] = True
             else:
-                print(f"❌ Unexpected response for verified user: {response}")
-                return False
+                print("⚠️ Registration successful but no user_id returned")
+        else:
+            print("❌ User registration failed")
+            print(f"Error: {response}")
+            return email_tests
         
-        return success
+        # Test 3: Verification Code Generation and Database Storage
+        print("\n" + "=" * 60)
+        print("3. TESTING VERIFICATION CODE GENERATION & DATABASE STORAGE")
+        print("=" * 60)
+        
+        # Wait a moment for the verification code to be generated and stored
+        import time
+        time.sleep(2)
+        
+        # Try to get verification code from debug endpoint
+        code_success, code_response = self.run_test(
+            "Get Verification Code from Database",
+            "GET",
+            f"debug/verification-codes/{self.test_email}",
+            200
+        )
+        
+        if code_success:
+            print("✅ Debug endpoint accessible")
+            
+            if 'codes' in code_response and len(code_response['codes']) > 0:
+                self.verification_code = code_response['codes'][0]['code']
+                print(f"✅ Verification code found in database: {self.verification_code}")
+                print(f"Code expires at: {code_response['codes'][0].get('expires_at', 'Unknown')}")
+                print(f"Code is expired: {code_response['codes'][0].get('is_expired', 'Unknown')}")
+                email_tests["Verification Code Generation"] = True
+                email_tests["Database Storage Test"] = True
+            elif 'last_test_code' in code_response and code_response['last_test_code']:
+                self.verification_code = code_response['last_test_code']
+                print(f"✅ Verification code found from email service: {self.verification_code}")
+                email_tests["Verification Code Generation"] = True
+            else:
+                print("❌ No verification code found in database or email service")
+                print(f"Response: {code_response}")
+        else:
+            print("❌ Failed to access debug endpoint for verification codes")
+            print(f"Error: {code_response}")
+        
+        # Test 4: Email Sending Test
+        print("\n" + "=" * 60)
+        print("4. TESTING EMAIL SENDING FUNCTIONALITY")
+        print("=" * 60)
+        
+        # Test resending verification code to trigger email sending
+        resend_data = {
+            "email": self.test_email
+        }
+        
+        print(f"Testing email sending by resending verification code to: {self.test_email}")
+        
+        resend_success, resend_response = self.run_test(
+            "Resend Verification Code (Email Sending Test)",
+            "POST",
+            "auth/resend-code",
+            200,
+            data=resend_data
+        )
+        
+        if resend_success:
+            print("✅ Resend verification code API call successful")
+            print(f"Response: {resend_response.get('message', 'No message')}")
+            
+            # Wait a moment and check for new verification code
+            time.sleep(3)
+            
+            # Get the new verification code
+            new_code_success, new_code_response = self.run_test(
+                "Get New Verification Code After Resend",
+                "GET",
+                f"debug/verification-codes/{self.test_email}",
+                200
+            )
+            
+            if new_code_success:
+                if 'codes' in new_code_response and len(new_code_response['codes']) > 0:
+                    new_code = new_code_response['codes'][0]['code']
+                    if new_code != self.verification_code:
+                        print(f"✅ New verification code generated: {new_code}")
+                        self.verification_code = new_code
+                        email_tests["Email Sending Test"] = True
+                    else:
+                        print("⚠️ Same verification code returned (may indicate email sending issue)")
+                elif 'last_test_code' in new_code_response and new_code_response['last_test_code']:
+                    new_code = new_code_response['last_test_code']
+                    if new_code != self.verification_code:
+                        print(f"✅ New verification code from email service: {new_code}")
+                        self.verification_code = new_code
+                        email_tests["Email Sending Test"] = True
+                    else:
+                        print("⚠️ Same verification code from email service")
+        else:
+            print("❌ Failed to resend verification code")
+            print(f"Error: {resend_response}")
+        
+        # Test 5: Verification Process Test
+        print("\n" + "=" * 60)
+        print("5. TESTING EMAIL VERIFICATION PROCESS")
+        print("=" * 60)
+        
+        if self.verification_code:
+            verify_data = {
+                "email": self.test_email,
+                "code": self.verification_code
+            }
+            
+            print(f"Testing email verification with code: {self.verification_code}")
+            
+            verify_success, verify_response = self.run_test(
+                "Email Verification",
+                "POST",
+                "auth/verify",
+                200,
+                data=verify_data
+            )
+            
+            if verify_success:
+                print("✅ Email verification successful")
+                print(f"Response: {verify_response.get('message', 'No message')}")
+                email_tests["Verification Process Test"] = True
+            else:
+                print("❌ Email verification failed")
+                print(f"Error: {verify_response}")
+        else:
+            print("❌ Cannot test verification process - no verification code available")
+        
+        # Test 6: Complete Flow Test (Registration → Email → Verification → Login)
+        print("\n" + "=" * 60)
+        print("6. TESTING COMPLETE AUTHENTICATION FLOW")
+        print("=" * 60)
+        
+        if email_tests["Verification Process Test"]:
+            # Test login with verified user
+            login_data = {
+                "email": self.test_email,
+                "password": self.test_password
+            }
+            
+            print(f"Testing login with verified user: {self.test_email}")
+            
+            login_success, login_response = self.run_test(
+                "Login with Verified User",
+                "POST",
+                "auth/login",
+                200,
+                data=login_data
+            )
+            
+            if login_success:
+                if 'status' in login_response and login_response['status'] == 'success':
+                    print("✅ Complete authentication flow successful")
+                    print(f"User logged in: {login_response.get('user', {}).get('first_name', 'Unknown')}")
+                    email_tests["Complete Flow Test"] = True
+                elif 'status' in login_response and login_response['status'] == 'unverified':
+                    print("❌ User still shows as unverified after verification")
+                    print(f"Response: {login_response}")
+                else:
+                    print("⚠️ Unexpected login response")
+                    print(f"Response: {login_response}")
+            else:
+                print("❌ Login failed after verification")
+                print(f"Error: {login_response}")
+        else:
+            print("❌ Cannot test complete flow - verification process failed")
+        
+        # Test 7: Error Handling Test
+        print("\n" + "=" * 60)
+        print("7. TESTING ERROR HANDLING")
+        print("=" * 60)
+        
+        # Test with invalid verification code
+        invalid_verify_data = {
+            "email": self.test_email,
+            "code": "999999"  # Invalid code
+        }
+        
+        invalid_success, invalid_response = self.run_test(
+            "Invalid Verification Code Test",
+            "POST",
+            "auth/verify",
+            400,
+            data=invalid_verify_data
+        )
+        
+        if invalid_success:
+            print("✅ Invalid verification code correctly rejected")
+            email_tests["Error Handling Test"] = True
+        else:
+            print("❌ Invalid verification code handling failed")
+        
+        # Test with non-existent email
+        nonexistent_resend_data = {
+            "email": f"nonexistent_{uuid.uuid4()}@example.com"
+        }
+        
+        nonexistent_success, nonexistent_response = self.run_test(
+            "Resend to Non-existent Email Test",
+            "POST",
+            "auth/resend-code",
+            404,
+            data=nonexistent_resend_data
+        )
+        
+        if nonexistent_success:
+            print("✅ Non-existent email correctly handled")
+        else:
+            print("⚠️ Non-existent email handling may need improvement")
+        
+        # Final Results Summary
+        print("\n" + "=" * 80)
+        print("📊 EMAIL VERIFICATION SYSTEM TEST RESULTS")
+        print("=" * 80)
+        
+        passed_tests = sum(1 for test_passed in email_tests.values() if test_passed)
+        total_tests = len(email_tests)
+        
+        for test_name, test_passed in email_tests.items():
+            status = "✅ PASS" if test_passed else "❌ FAIL"
+            print(f"{status} - {test_name}")
+        
+        print(f"\nOverall Results: {passed_tests}/{total_tests} tests passed ({(passed_tests/total_tests)*100:.1f}%)")
+        
+        # Critical Issues Analysis
+        print("\n" + "=" * 80)
+        print("🚨 CRITICAL ISSUES ANALYSIS")
+        print("=" * 80)
+        
+        critical_issues = []
+        
+        if not email_tests["Registration Test"]:
+            critical_issues.append("User registration is failing - users cannot create accounts")
+        
+        if not email_tests["Verification Code Generation"]:
+            critical_issues.append("Verification codes are not being generated or stored in database")
+        
+        if not email_tests["Email Sending Test"]:
+            critical_issues.append("Email sending functionality is not working - users won't receive verification codes")
+        
+        if not email_tests["Verification Process Test"]:
+            critical_issues.append("Email verification process is broken - users cannot verify their accounts")
+        
+        if not email_tests["Complete Flow Test"]:
+            critical_issues.append("Complete authentication flow is broken - users cannot login after verification")
+        
+        if critical_issues:
+            print("CRITICAL ISSUES FOUND:")
+            for i, issue in enumerate(critical_issues, 1):
+                print(f"{i}. {issue}")
+        else:
+            print("✅ No critical issues found - email verification system is working correctly")
+        
+        # Recommendations
+        print("\n" + "=" * 80)
+        print("💡 RECOMMENDATIONS")
+        print("=" * 80)
+        
+        if not email_tests["Email Service Configuration"]:
+            print("1. Check Mailjet API credentials in backend/.env file")
+            print("2. Verify MAILJET_API_KEY, MAILJET_SECRET_KEY, and SENDER_EMAIL are set correctly")
+        
+        if not email_tests["Email Sending Test"]:
+            print("3. Check email service logs for Mailjet API errors")
+            print("4. Verify Mailjet account is active and has sending quota")
+            print("5. Check if sender email is verified in Mailjet dashboard")
+        
+        if not email_tests["Database Storage Test"]:
+            print("6. Check MongoDB connection and database permissions")
+            print("7. Verify verification_codes collection is being created and populated")
+        
+        return email_tests
     def test_openai_api_key(self):
         """Test if the OpenAI API key is working correctly"""
         print("\n🔍 Testing OpenAI API Key...")
