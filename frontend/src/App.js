@@ -648,6 +648,10 @@ function App() {
         if (response.data.status === 'success') {
           setUser(response.data.user);
           setCurrentScreen('dashboard');
+          
+          // Mark user as onboarded to skip tutorial for returning users
+          localStorage.setItem(`user_${response.data.user.id}_onboarded`, 'true');
+          
           showNotification(`🎉 Welcome back, ${response.data.user.first_name}!`, 'success');
         }
         
