@@ -1192,26 +1192,6 @@ function App() {
                 </div>
               )}
 
-              {formData.recipe_type === 'starbucks' && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Starbucks Drink Type *</label>
-                  <select
-                    value={formData.starbucks_type}
-                    onChange={(e) => setFormData({...formData, starbucks_type: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                    required
-                    data-testid="starbucks-type-select"
-                  >
-                    <option value="">Select Starbucks drink type...</option>
-                    {starbucksOptions.map(drink => (
-                      <option key={drink} value={drink}>
-                        {drink.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
-
               {/* Dietary Preferences */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Dietary Preferences</label>
