@@ -1142,13 +1142,11 @@ SNACKS: Focus on healthy and refreshing snack options such as:
 
 BEVERAGES: Generate specific beverage recipes based on user selection:
 
-1. COFFEE-BASED DRINK: Specialty espresso drinks, cold brews, or gourmet preparations with elements like cold foam, whipped crème, flavored syrups, or layered toppings like caramel drizzle
+1. LEMONADE-BASED DRINK: Refreshing, fruity, or herbal lemonades perfect for summer with unique fruit combinations, natural sweeteners, and fresh herbs
 
-2. LEMONADE-BASED DRINK: Refreshing, fruity, or herbal lemonades perfect for summer with unique fruit combinations, natural sweeteners, and fresh herbs
+2. THAI TEA-BASED DRINK: Authentic Thai tea layered or infused with other flavors (fruit, spices, milk alternatives, or syrups) with traditional preparation methods
 
-3. THAI TEA-BASED DRINK: Authentic Thai tea layered or infused with other flavors (fruit, spices, milk alternatives, or syrups) with traditional preparation methods
-
-4. BOBA DRINK: Milk-based or fruit-based bubble tea using tapioca, popping boba, or creative textures with authentic bubble tea shop quality
+3. BOBA DRINK: Milk-based or fruit-based bubble tea using tapioca, popping boba, or creative textures with authentic bubble tea shop quality
 
 For each beverage, include:
 🧋 Creative, original drink name
