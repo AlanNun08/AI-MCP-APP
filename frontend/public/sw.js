@@ -7,9 +7,9 @@ const urlsToCache = [
   '/manifest.json'
 ];
 
-// Install event - AUTH PERSISTENCE CACHE UPDATE
+// Install event - AUTH PERSISTENCE FIX
 self.addEventListener('install', (event) => {
-  console.log('🔄 AUTH PERSISTENCE UPDATE - CLEARING CACHES...');
+  console.log('🔄 AUTH PERSISTENCE FIX - CLEARING CACHES...');
   event.waitUntil(
     caches.keys().then(cacheNames => {
       console.log('🗑️ DELETING OLD CACHES:', cacheNames);
@@ -20,10 +20,10 @@ self.addEventListener('install', (event) => {
         })
       );
     }).then(() => {
-      console.log('✅ CACHES DELETED - CREATING AUTH PERSISTENCE CACHE');
+      console.log('✅ CACHES DELETED - CREATING AUTH FIX CACHE');
       return caches.open(CACHE_NAME);
     }).then(() => {
-      console.log('🎉 AUTH PERSISTENCE CACHE v106 CREATED');
+      console.log('🎉 AUTH FIX CACHE v107 CREATED');
       return self.skipWaiting();
     })
   );
