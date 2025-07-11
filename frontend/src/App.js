@@ -862,6 +862,7 @@ function App() {
         <button
           onClick={() => {
             setUser(null);
+            clearUserSession(); // Clear localStorage
             setPendingVerificationEmail(null);
             setCurrentScreen('landing');
             showNotification('👋 Signed out successfully', 'success');
