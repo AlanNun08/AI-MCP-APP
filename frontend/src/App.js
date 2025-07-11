@@ -131,6 +131,15 @@ function App() {
     }
   }, [user, currentScreen]);
 
+  // Debug logging for user state changes
+  useEffect(() => {
+    if (user) {
+      console.log('User state updated:', user.email, 'Screen:', currentScreen);
+    } else {
+      console.log('User state cleared, Screen:', currentScreen);
+    }
+  }, [user, currentScreen]);
+
   // Notification system
   const showNotification = (message, type = 'success') => {
     setNotification({ message, type });
