@@ -563,8 +563,15 @@ async def login_user(login_data: UserLogin):
         # Normalize email
         email_lower = login_data.email.lower().strip()
         
-        # Find user (case-insensitive)
-        user = await db.users.find_one({"email": {"$regex": f"^{email_lower}$", "$options": "i"}})
+        # Find user (case-insensitive) - try both exact and regex match
+        user = await db.users.find_one({"email": email_lower})
+        if not user:
+            # Try case-insensitive regex as fallback
+            user = await db.users.find_one({"email": {"$regex": f"^{email_lower}$", "$options": "i"}})
+        if not user:
+            # Try original email case as final fallback
+            user = await db.users.find_one({"email": login_data.email})
+        
         if not user:
             raise HTTPException(status_code=401, detail="Invalid email or password")
         
