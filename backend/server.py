@@ -1173,35 +1173,6 @@ Refreshing, fruity, or herbal — perfect for summer with unique fruit combinati
 
 Make the drink visually Instagram-worthy and perfect for any season.""")
         
-        elif recipe_category == "starbucks":
-            # Generate creative Starbucks ordering instructions
-            prompt_parts.append(f"""Create a creative Starbucks drink ordering guide that shows how to order an amazing custom drink at Starbucks. This should be a unique, Instagram-worthy drink like "Fresas con Crema Frappuccino" or "Twix Frappuccino" that uses creative modifications of existing Starbucks menu items.
-
-IMPORTANT: Focus on the {recipe_type} category and create a drink that fits that style (frappuccino, latte, refresher, cold brew, macchiato, or seasonal special).
-
-Respond with JSON in this exact format:
-{{
-  "drink_name": "Creative catchy name like 'Twix Frappuccino'",
-  "description": "Brief description of taste and experience",
-  "base_drink": "Base Starbucks drink to order (e.g. 'Grande Vanilla Bean Frappuccino')",
-  "modifications": [
-    "Add 2 pumps caramel syrup",
-    "Add 1 pump hazelnut syrup", 
-    "Extra whipped cream",
-    "Caramel drizzle on top and bottom"
-  ],
-  "ordering_script": "Hi, can I get a Grande Vanilla Bean Frappuccino with 2 pumps caramel syrup, 1 pump hazelnut syrup, extra whipped cream, and caramel drizzle on top and bottom?",
-  "pro_tips": [
-    "Order during off-peak hours for best customization",
-    "Ask for extra drizzle to make it Instagram-worthy",
-    "Can substitute any milk for extra creaminess"
-  ],
-  "why_amazing": "Detailed explanation of what makes this drink special and viral-worthy",
-  "category": "{recipe_type}"
-}}
-
-Make this sound like a viral TikTok Starbucks hack that people would want to try and share!""")
-        
         else:  # cuisine category
             if recipe_type == "snacks & bowls":
                 prompt_parts.append(f"Create a healthy snack or bowl recipe for {request.servings} people. Focus on nutritious snacks, smoothie bowls, acai bowls, poke bowls, grain bowls, or energy bites.")
