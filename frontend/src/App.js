@@ -2202,7 +2202,12 @@ function App() {
       case 'recipe-detail':
         return <RecipeDetailScreen recipe={window.currentRecipe} showBackButton={true} />;
       case 'starbucks-generator':
-        return <StarbucksGeneratorScreen />;
+        return <StarbucksGeneratorScreen 
+          showNotification={showNotification}
+          setCurrentScreen={setCurrentScreen}
+          user={user}
+          API={API}
+        />;
       default:
         return <LandingScreen />;
     }
