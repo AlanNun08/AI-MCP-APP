@@ -19,7 +19,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 class WalmartMockDataTester:
-    def __init__(self, base_url="http://localhost:8001"):
+    def __init__(self, base_url="https://390faeca-fe6c-42c5-afe1-d1d19d490134.preview.emergentagent.com"):
         self.base_url = f"{base_url}/api"
         self.tests_run = 0
         self.tests_passed = 0
