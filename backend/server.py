@@ -1502,52 +1502,109 @@ async def get_user_recipes(user_id: str):
 
 @api_router.post("/grocery/cart-options")
 async def create_grocery_cart_options(recipe_id: str, user_id: str):
-    """Create grocery cart with multiple options per ingredient"""
+    """Get grocery cart options for a recipe with enhanced error handling and logging"""
     try:
-        # Get the recipe
-        recipe = await db.recipes.find_one({"id": recipe_id})
+        logging.info(f"🛒 Cart options request: recipe_id={recipe_id}, user_id={user_id}")
+        
+        # Get recipe from database
+        recipe = await db.recipes.find_one({"id": recipe_id, "user_id": user_id})
         if not recipe:
+            logging.error(f"❌ Recipe not found: {recipe_id} for user {user_id}")
             raise HTTPException(status_code=404, detail="Recipe not found")
         
-        # Use shopping list if available, otherwise fall back to parsing ingredients
-        ingredients_to_search = []
+        recipe_title = recipe.get('title', 'Unknown Recipe')
+        shopping_list = recipe.get('shopping_list', [])
+        logging.info(f"📋 Recipe '{recipe_title}' has {len(shopping_list)} ingredients: {shopping_list}")
         
-        if recipe.get('shopping_list') and len(recipe.get('shopping_list', [])) > 0:
-            logging.info(f"Using shopping list for product search: {recipe['shopping_list']}")
-            ingredients_to_search = recipe['shopping_list']
-        else:
-            logging.info(f"No shopping list found, using ingredient parsing for: {recipe['ingredients']}")
-            ingredients_to_search = recipe['ingredients']
+        if not shopping_list:
+            logging.warning(f"⚠️ No shopping list found for recipe {recipe_id}")
+            return {"error": "No shopping list available for this recipe"}
         
-        # Get product options for each ingredient
+        # Create cart options with enhanced error handling
         ingredient_options = []
-        for index, ingredient in enumerate(ingredients_to_search):
-            products = await _get_walmart_product_options(ingredient, max_options=3)
-            
-            ingredient_option = IngredientOption(
-                ingredient_name=ingredient,  # Clean ingredient name for searching and display
-                original_ingredient=ingredient,  # Use clean name for both fields
-                options=products
-            )
-            ingredient_options.append(ingredient_option)
-            
-            logging.info(f"Ingredient: '{ingredient}' -> Found {len(products)} products")
+        total_ingredients = len(shopping_list)
+        successful_ingredients = 0
+        failed_ingredients = []
+        
+        for i, ingredient in enumerate(shopping_list, 1):
+            try:
+                logging.info(f"🔍 Processing ingredient {i}/{total_ingredients}: '{ingredient}'")
+                
+                # Get Walmart product options with timeout and retry
+                product_options = await _get_walmart_product_options(ingredient, max_options=3)
+                
+                if product_options:
+                    ingredient_option = IngredientOption(
+                        ingredient_name=ingredient,
+                        original_ingredient=ingredient,
+                        options=product_options
+                    )
+                    ingredient_options.append(ingredient_option)
+                    successful_ingredients += 1
+                    logging.info(f"✅ Found {len(product_options)} products for '{ingredient}'")
+                    
+                    # Log sample products for verification
+                    for j, product in enumerate(product_options[:2]):
+                        logging.info(f"   Product {j+1}: {product.name} - ${product.price} (ID: {product.product_id})")
+                else:
+                    failed_ingredients.append(ingredient)
+                    logging.warning(f"❌ No products found for ingredient: '{ingredient}'")
+                
+                # Add small delay to avoid rate limiting
+                if i < total_ingredients:
+                    await asyncio.sleep(0.5)
+                    
+            except Exception as ingredient_error:
+                failed_ingredients.append(ingredient)
+                logging.error(f"❌ Error processing ingredient '{ingredient}': {str(ingredient_error)}")
+                continue
+        
+        # Log final results
+        logging.info(f"📊 Cart options completed: {successful_ingredients}/{total_ingredients} ingredients successful")
+        if failed_ingredients:
+            logging.warning(f"⚠️ Failed ingredients: {failed_ingredients}")
         
         # Create cart options object
         cart_options = GroceryCartOptions(
+            id=str(uuid.uuid4()),
             user_id=user_id,
             recipe_id=recipe_id,
-            ingredient_options=ingredient_options
+            ingredient_options=ingredient_options,
+            created_at=datetime.utcnow()
         )
         
         # Save to database
-        cart_dict = cart_options.dict()
-        result = await db.grocery_cart_options.insert_one(cart_dict)
+        await db.grocery_cart_options.insert_one(cart_options.dict())
         
-        # Get the inserted document and return it
-        if result.inserted_id:
-            inserted_cart = await db.grocery_cart_options.find_one({"_id": result.inserted_id})
-            return mongo_to_dict(inserted_cart)
+        cart_dict = cart_options.dict()
+        
+        # Enhanced logging for debugging
+        if not ingredient_options:
+            logging.error(f"🚨 CRITICAL: No ingredient options found for recipe '{recipe_title}'")
+            logging.error(f"   Shopping list: {shopping_list}")
+            logging.error(f"   Failed ingredients: {failed_ingredients}")
+            
+            # Return detailed error response for debugging
+            return {
+                "error": "No Walmart products found for any ingredients",
+                "debug_info": {
+                    "recipe_id": recipe_id,
+                    "recipe_title": recipe_title,
+                    "shopping_list": shopping_list,
+                    "failed_ingredients": failed_ingredients,
+                    "total_ingredients": total_ingredients
+                }
+            }
+        else:
+            logging.info(f"✅ Successfully created cart options with {len(ingredient_options)} ingredient groups")
+        
+        return cart_dict
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"❌ Cart options error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error creating cart options: {str(e)}")
         
         return cart_dict
         
