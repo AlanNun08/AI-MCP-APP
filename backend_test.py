@@ -1529,16 +1529,31 @@ class AIRecipeAppTester:
                     walmart_url = response['walmart_url']
                     print(f"Walmart URL: {walmart_url}")
                     
-                    if 'affil.walmart.com' in walmart_url and 'items=' in walmart_url:
-                        print("✅ Walmart URL correctly formatted")
+                    # UPDATED: Check for new offers format instead of items format
+                    if 'affil.walmart.com' in walmart_url and 'offers=' in walmart_url:
+                        print("✅ Walmart URL correctly formatted with offers parameter")
                         
-                        # Check if all product IDs are in the URL
+                        # Check if all product IDs are in the URL with quantity format (ID|quantity)
                         product_ids = [p['product_id'] for p in custom_cart_data['products']]
                         all_ids_in_url = all(pid in walmart_url for pid in product_ids)
                         if all_ids_in_url:
                             print("✅ All product IDs included in Walmart URL")
+                            
+                            # Verify the offers format: SKU1|Quantity1,SKU2|Quantity2
+                            offers_part = walmart_url.split('offers=')[1] if 'offers=' in walmart_url else ""
+                            expected_offers = []
+                            for product in custom_cart_data['products']:
+                                expected_offers.append(f"{product['product_id']}|{product['quantity']}")
+                            expected_offers_str = ','.join(expected_offers)
+                            
+                            if offers_part == expected_offers_str:
+                                print("✅ Walmart URL uses correct offers format: SKU|Quantity,SKU|Quantity")
+                            else:
+                                print(f"❌ Walmart URL offers format incorrect. Expected: {expected_offers_str}, Got: {offers_part}")
                         else:
                             print("❌ Not all product IDs found in Walmart URL")
+                    elif 'affil.walmart.com' in walmart_url and 'items=' in walmart_url:
+                        print("❌ Walmart URL still using old 'items=' format instead of new 'offers=' format")
                     else:
                         print("❌ Walmart URL format may be incorrect")
             
