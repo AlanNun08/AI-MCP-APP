@@ -1,5 +1,5 @@
-// Service Worker for PWA functionality - AUTH PERSISTENCE VERSION
-const CACHE_NAME = 'buildyoursmartcart-v106-auth-persistence';
+// Service Worker for PWA functionality - AUTH PERSISTENCE FIX
+const CACHE_NAME = 'buildyoursmartcart-v107-auth-fix';
 const urlsToCache = [
   '/',
   '/static/js/bundle.js',
