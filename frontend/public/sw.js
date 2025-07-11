@@ -1,5 +1,5 @@
-// Service Worker for PWA functionality - COMPLETE FRESH CLEAN VERSION
-const CACHE_NAME = 'buildyoursmartcart-v104-complete-clean';
+// Service Worker for PWA functionality - NEW PREVIEW URL VERSION
+const CACHE_NAME = 'buildyoursmartcart-v105-new-preview-url';
 const urlsToCache = [
   '/',
   '/static/js/bundle.js',
@@ -7,12 +7,12 @@ const urlsToCache = [
   '/manifest.json'
 ];
 
-// Install event - COMPLETE FRESH START
+// Install event - NEW URL CACHE CLEAR
 self.addEventListener('install', (event) => {
-  console.log('🧹 COMPLETE CLEAN VERSION - CLEARING ALL CACHES...');
+  console.log('🔄 NEW PREVIEW URL - CLEARING ALL CACHES...');
   event.waitUntil(
     caches.keys().then(cacheNames => {
-      console.log('🗑️ DELETING ALL OLD CACHES:', cacheNames);
+      console.log('🗑️ DELETING ALL OLD CACHES FOR NEW URL:', cacheNames);
       return Promise.all(
         cacheNames.map(cacheName => {
           console.log('💥 DELETING CACHE:', cacheName);
@@ -20,10 +20,10 @@ self.addEventListener('install', (event) => {
         })
       );
     }).then(() => {
-      console.log('✅ ALL CACHES DELETED - CREATING CLEAN CACHE');
+      console.log('✅ ALL CACHES DELETED - CREATING NEW URL CACHE');
       return caches.open(CACHE_NAME);
     }).then(() => {
-      console.log('🎉 CLEAN CACHE v104 CREATED');
+      console.log('🎉 NEW URL CACHE v105 CREATED');
       return self.skipWaiting();
     })
   );
