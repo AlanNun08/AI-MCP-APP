@@ -1386,24 +1386,32 @@ function App() {
             setCartItems(newCartItems);
             
             // Generate affiliate URL with default selections
-            // Generate Walmart URL with correct affiliate format: offers=SKU1|Quantity1,SKU2|Quantity2
-            const walmartOffers = [];
+            // Generate clean Walmart URL without NaN values
+            const walmartItems = [];
             const finalQuantities = {};
             
-            // Count quantities for each product
+            // Count quantities for each product, filtering out NaN values
             Object.values(options).forEach(productList => {
               productList.forEach(item => {
-                const qty = finalQuantities[item.product_id] || 0;
-                finalQuantities[item.product_id] = qty + item.quantity;
+                if (item.product_id && typeof item.quantity === 'number' && !isNaN(item.quantity) && item.quantity > 0) {
+                  const qty = finalQuantities[item.product_id] || 0;
+                  finalQuantities[item.product_id] = qty + item.quantity;
+                }
               });
             });
             
-            // Format for Walmart affiliate URL
+            // Format for Walmart affiliate URL with clean values
             Object.entries(finalQuantities).forEach(([productId, quantity]) => {
-              walmartOffers.push(`${productId}|${quantity}`);
+              if (productId && !isNaN(quantity) && quantity > 0) {
+                walmartItems.push(`${productId}|${Math.floor(quantity)}`);
+              }
             });
             
-            setFinalWalmartUrl(`https://affil.walmart.com/cart/addToCart?offers=${walmartOffers.join(',')}`);
+            if (walmartItems.length > 0) {
+              setFinalWalmartUrl(`https://affil.walmart.com/cart/addToCart?offers=${walmartItems.join(',')}`);
+            } else {
+              setFinalWalmartUrl('');
+            };
             
             console.log('✅ Product options loaded:', Object.keys(options).length, 'ingredients');
           } else {
