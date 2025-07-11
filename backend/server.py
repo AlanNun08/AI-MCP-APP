@@ -1216,27 +1216,44 @@ IMPORTANT FOR SPICES: If the recipe uses spices, list each spice individually in
         
         recipe_data = json.loads(recipe_json)
         
-        # Create recipe object
-        recipe = Recipe(
-            title=recipe_data['title'],
-            description=recipe_data['description'],
-            ingredients=recipe_data['ingredients'],
-            instructions=recipe_data['instructions'],
-            prep_time=recipe_data['prep_time'],
-            cook_time=recipe_data['cook_time'],
-            servings=request.servings,
-            cuisine_type=request.cuisine_type or "general",
-            dietary_tags=request.dietary_preferences,
-            difficulty=request.difficulty,
-            calories_per_serving=recipe_data.get('calories_per_serving'),
-            is_healthy=request.is_healthy,
-            user_id=request.user_id,
-            shopping_list=recipe_data.get('shopping_list', [])
-        )
+        # Create recipe object based on category
+        if recipe_category == "starbucks":
+            # Create Starbucks recipe
+            recipe = StarbucksRecipe(
+                drink_name=recipe_data['drink_name'],
+                description=recipe_data['description'],
+                base_drink=recipe_data['base_drink'],
+                modifications=recipe_data['modifications'],
+                ordering_script=recipe_data['ordering_script'],
+                pro_tips=recipe_data['pro_tips'],
+                why_amazing=recipe_data['why_amazing'],
+                category=recipe_data['category'],
+                user_id=request.user_id
+            )
+            collection_name = "starbucks_recipes"
+        else:
+            # Create regular recipe
+            recipe = Recipe(
+                title=recipe_data['title'],
+                description=recipe_data['description'],
+                ingredients=recipe_data['ingredients'],
+                instructions=recipe_data['instructions'],
+                prep_time=recipe_data['prep_time'],
+                cook_time=recipe_data['cook_time'],
+                servings=request.servings,
+                cuisine_type=request.cuisine_type or "general",
+                dietary_tags=request.dietary_preferences,
+                difficulty=request.difficulty,
+                calories_per_serving=recipe_data.get('calories_per_serving'),
+                is_healthy=request.is_healthy,
+                user_id=request.user_id,
+                shopping_list=recipe_data.get('shopping_list', [])
+            )
+            collection_name = "recipes"
         
         # Save to database
         recipe_dict = recipe.dict()
-        result = await db.recipes.insert_one(recipe_dict)
+        result = await db[collection_name].insert_one(recipe_dict)
         
         # Get the inserted document and return it
         if result.inserted_id:
