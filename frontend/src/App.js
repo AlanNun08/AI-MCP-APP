@@ -42,32 +42,142 @@ function App() {
   };
 
   // Landing Screen Component
-  const LandingScreen = () => (
-    <div className="min-h-screen bg-gradient-to-br from-green-400 to-blue-500 flex items-center justify-center p-4">
-      <div className="text-center max-w-md">
-        <div className="text-6xl mb-4 animate-bounce">👨‍🍳</div>
-        <h1 className="text-4xl font-bold text-white mb-2 drop-shadow-lg">AI Chef</h1>
-        <p className="text-xl text-white mb-8 opacity-90 leading-relaxed">Personalized recipes with instant grocery delivery</p>
-        <div className="space-y-4">
-          <button
-            onClick={() => setCurrentScreen('register')}
-            className="w-full bg-white text-green-600 font-semibold py-4 px-8 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 hover:bg-gray-50 active:scale-95"
-          >
-            ✨ Get Started
-          </button>
-          <button
-            onClick={() => setCurrentScreen('login')}
-            className="w-full bg-transparent border-2 border-white text-white font-semibold py-4 px-8 rounded-2xl hover:bg-white hover:text-green-600 transition-all duration-200 active:scale-95"
-          >
-            🔑 I Have an Account
-          </button>
-        </div>
-        <div className="mt-8 text-white/70 text-sm">
-          <p>🤖 AI-powered • 🛒 Walmart delivery • 🍃 Healthy options</p>
+  const LandingScreen = () => {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-pink-50 p-4">
+        <div className="max-w-6xl mx-auto">
+          
+          {/* Hero Section */}
+          <div className="text-center py-16">
+            <div className="mb-8">
+              <div className="text-8xl mb-4">👨‍🍳</div>
+              <h1 className="text-5xl md:text-6xl font-bold text-gray-800 mb-4">
+                Welcome to <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-red-500">AI Chef</span>
+              </h1>
+              <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto">
+                Your personal cooking assistant that creates custom recipes, generates viral Starbucks drinks, and builds automatic shopping lists!
+              </p>
+            </div>
+
+            {/* Feature Highlights */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+              <div className="bg-white rounded-2xl shadow-lg p-8 transform hover:scale-105 transition-all duration-300">
+                <div className="text-4xl mb-4">🍳</div>
+                <h3 className="text-xl font-bold text-gray-800 mb-2">AI Recipe Generator</h3>
+                <p className="text-gray-600">Create personalized recipes with automatic Walmart shopping lists</p>
+              </div>
+              <div className="bg-white rounded-2xl shadow-lg p-8 transform hover:scale-105 transition-all duration-300">
+                <div className="text-4xl mb-4">☕</div>
+                <h3 className="text-xl font-bold text-gray-800 mb-2">Starbucks Secret Menu</h3>
+                <p className="text-gray-600">Generate viral TikTok drink hacks with drive-thru ordering scripts</p>
+              </div>
+              <div className="bg-white rounded-2xl shadow-lg p-8 transform hover:scale-105 transition-all duration-300">
+                <div className="text-4xl mb-4">🛒</div>
+                <h3 className="text-xl font-bold text-gray-800 mb-2">Smart Shopping</h3>
+                <p className="text-gray-600">One-click Walmart integration for all your ingredients</p>
+              </div>
+            </div>
+
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <button
+                onClick={() => setCurrentScreen('register')}
+                className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold py-4 px-8 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 text-lg"
+              >
+                🚀 Start Cooking for Free
+              </button>
+              <button
+                onClick={() => setCurrentScreen('login')}
+                className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-4 px-8 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 text-lg"
+              >
+                👋 Welcome Back
+              </button>
+            </div>
+          </div>
+
+          {/* How It Works */}
+          <div className="bg-white rounded-3xl shadow-xl p-8 md:p-12 mb-16">
+            <h2 className="text-3xl font-bold text-gray-800 text-center mb-12">How AI Chef Works</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+              
+              {/* Recipe Flow */}
+              <div>
+                <h3 className="text-2xl font-bold text-orange-600 mb-6 flex items-center">
+                  <span className="mr-3">🍳</span>
+                  Recipe Magic
+                </h3>
+                <div className="space-y-4">
+                  <div className="flex items-start">
+                    <span className="w-8 h-8 bg-orange-500 text-white rounded-full flex items-center justify-center text-sm font-bold mr-4 mt-1">1</span>
+                    <div>
+                      <h4 className="font-semibold text-gray-800">Choose Your Style</h4>
+                      <p className="text-gray-600 text-sm">Pick from Cuisine, Snacks, or Beverages</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start">
+                    <span className="w-8 h-8 bg-orange-500 text-white rounded-full flex items-center justify-center text-sm font-bold mr-4 mt-1">2</span>
+                    <div>
+                      <h4 className="font-semibold text-gray-800">AI Creates Your Recipe</h4>
+                      <p className="text-gray-600 text-sm">Personalized with your preferences and dietary needs</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start">
+                    <span className="w-8 h-8 bg-orange-500 text-white rounded-full flex items-center justify-center text-sm font-bold mr-4 mt-1">3</span>
+                    <div>
+                      <h4 className="font-semibold text-gray-800">Shop with One Click</h4>
+                      <p className="text-gray-600 text-sm">Automatic Walmart cart with all ingredients</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Starbucks Flow */}
+              <div>
+                <h3 className="text-2xl font-bold text-green-600 mb-6 flex items-center">
+                  <span className="mr-3">☕</span>
+                  Starbucks Hacks
+                </h3>
+                <div className="space-y-4">
+                  <div className="flex items-start">
+                    <span className="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold mr-4 mt-1">1</span>
+                    <div>
+                      <h4 className="font-semibold text-gray-800">Pick Your Vibe</h4>
+                      <p className="text-gray-600 text-sm">Frappuccino, Refresher, Lemonade, or Surprise Me!</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start">
+                    <span className="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold mr-4 mt-1">2</span>
+                    <div>
+                      <h4 className="font-semibold text-gray-800">Get Your Secret Drink</h4>
+                      <p className="text-gray-600 text-sm">Unique creations with viral potential</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start">
+                    <span className="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold mr-4 mt-1">3</span>
+                    <div>
+                      <h4 className="font-semibold text-gray-800">Order Like a Pro</h4>
+                      <p className="text-gray-600 text-sm">Perfect drive-thru script ready to use</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Social Proof */}
+          <div className="text-center">
+            <h2 className="text-3xl font-bold text-gray-800 mb-8">Join the AI Chef Community</h2>
+            <div className="flex flex-wrap justify-center gap-4 text-2xl mb-8">
+              <span>🍕</span><span>🥗</span><span>🍜</span><span>🧋</span><span>☕</span><span>🍰</span><span>🍱</span><span>🥙</span>
+            </div>
+            <p className="text-xl text-gray-600 mb-8">
+              Ready to transform your cooking and coffee game? Let's get started! 🚀
+            </p>
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   // Enhanced Registration Screen Component
   const RegisterScreen = () => {
