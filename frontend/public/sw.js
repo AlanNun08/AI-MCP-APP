@@ -9,7 +9,7 @@ const urlsToCache = [
 
 // Install event - clear all old caches immediately
 self.addEventListener('install', (event) => {
-  console.log('Installing new service worker v17 - fixed Walmart URLs...');
+  console.log('Installing new service worker v18 - clean Walmart URLs...');
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
