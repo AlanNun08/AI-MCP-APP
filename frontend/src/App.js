@@ -90,7 +90,7 @@ function App() {
                 onClick={() => setCurrentScreen('login')}
                 className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-4 px-8 rounded-2xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 text-lg"
               >
-                👋 Welcome Back
+                🔑 Sign In
               </button>
             </div>
           </div>
