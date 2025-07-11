@@ -1386,19 +1386,17 @@ function App() {
             setCartItems(newCartItems);
             
             // Generate affiliate URL with default selections
-            // Generate Walmart URL with correct format: items=ID1,ID2_quantity,ID3
+            // Generate Walmart URL with correct format using SELECTED items only
             const walmartItems = [];
             const finalQuantities = {};
             
-            // Count quantities for each product
-            Object.values(options).forEach(productList => {
-              productList.forEach(item => {
-                if (item.product_id) {
-                  const quantity = (typeof item.quantity === 'number' && item.quantity > 0) ? item.quantity : 1;
-                  const qty = finalQuantities[item.product_id] || 0;
-                  finalQuantities[item.product_id] = qty + quantity;
-                }
-              });
+            // Count quantities for SELECTED products only (from cartItems)
+            newCartItems.forEach(item => {
+              if (item.product_id) {
+                const quantity = (typeof item.quantity === 'number' && item.quantity > 0) ? item.quantity : 1;
+                const qty = finalQuantities[item.product_id] || 0;
+                finalQuantities[item.product_id] = qty + quantity;
+              }
             });
             
             // Format for Walmart URL: productId or productId_quantity
@@ -1414,9 +1412,9 @@ function App() {
             
             if (walmartItems.length > 0) {
               setFinalWalmartUrl(`https://affil.walmart.com/cart/addToCart?items=${walmartItems.join(',')}`);
-              console.log('✅ Walmart URL generated with correct format:', walmartItems.length, 'items');
+              console.log('✅ Walmart URL generated with SELECTED items only:', walmartItems.length, 'items');
             } else {
-              console.warn('⚠️ No valid items for Walmart URL generation');
+              console.warn('⚠️ No selected items for Walmart URL generation');
               setFinalWalmartUrl('');
             };
             
