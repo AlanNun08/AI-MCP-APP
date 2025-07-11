@@ -102,7 +102,47 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "User reports that the Walmart product ID search with real recipes from users is not working. After comprehensive testing, the issue appears to be resolved. The system is successfully generating real user recipes and finding authentic Walmart products for all ingredients across all recipe categories (beverages, cuisine, snacks). All product IDs are authentic Walmart catalog products with realistic prices. The app is ready for deployment."
+#===================================================
+# FRESH START - ALL TESTS DELETED FOR NEW TESTING
+#===================================================
+
+# Testing Protocol for AI Recipe + Grocery Delivery App
+
+## Current Application Status
+- **Preview URL**: https://recipe-cart-app.preview.emergentagent.com
+- **Backend**: FastAPI (Version 2.0.0) - Running
+- **Frontend**: React 19 - Running  
+- **Database**: MongoDB - Connected
+- **Service Worker**: v105 (Fresh cache for new URL)
+
+## ✅ VERIFIED WORKING FEATURES
+- API endpoints responding correctly
+- CORS configured for new preview URL
+- User registration working
+- Database connectivity confirmed
+- All services running optimally
+
+## 🧪 READY FOR NEW TESTING
+All previous test files have been deleted. The application is ready for fresh comprehensive testing with the new preview URL.
+
+## Testing Protocol
+**IMPORTANT**: Always read and update this file before invoking testing agents.
+
+### Communication Protocol with Testing Sub-agents
+1. **Read this file completely** before calling any testing agent
+2. **Update status** after each testing session
+3. **Follow the guidelines** mentioned in "Incorporate User Feedback" section
+4. **Test backend first** using `deep_testing_backend_v2`
+5. **Ask user permission** before frontend testing
+6. **Never fix** something already fixed by testing agents
+
+### Incorporate User Feedback
+- Test only what user specifically requests
+- Don't make unnecessary changes
+- Focus on critical functionality
+- Always ask user before frontend testing
+
+user_problem_statement: "Fresh start - All tests deleted. Application updated for new preview URL: https://recipe-cart-app.preview.emergentagent.com. Ready for new comprehensive testing when needed."
 
 backend:
   - task: "Starbucks Drinks Feature"
