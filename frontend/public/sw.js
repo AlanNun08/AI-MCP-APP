@@ -1,5 +1,5 @@
-// Service Worker for PWA functionality - NEW PREVIEW URL VERSION
-const CACHE_NAME = 'buildyoursmartcart-v105-new-preview-url';
+// Service Worker for PWA functionality - AUTH PERSISTENCE VERSION
+const CACHE_NAME = 'buildyoursmartcart-v106-auth-persistence';
 const urlsToCache = [
   '/',
   '/static/js/bundle.js',
