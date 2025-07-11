@@ -3185,70 +3185,57 @@ class AIRecipeAppTester:
         return True
 
 def main():
-    print("=" * 80)
-    print("AI Recipe & Grocery App - Enhanced Interactive Walmart Cart Testing")
+    """Main function to run comprehensive email verification system tests"""
+    print("🚀 Starting Comprehensive Email Verification System Testing")
     print("=" * 80)
     
+    # Initialize tester with production URL
     tester = AIRecipeAppTester()
     
-    # Test API root
-    tester.test_api_root()
+    print(f"Testing backend at: {tester.base_url}")
+    print(f"Test email: {tester.test_email}")
     
-    # Test user creation and verification
-    print("\n" + "=" * 50)
-    print("Testing User Creation and Verification")
-    print("=" * 50)
-    user_created = tester.test_create_user()
+    # Run comprehensive email verification tests
+    email_test_results = tester.comprehensive_email_verification_test()
     
-    if not user_created:
-        print("❌ Failed to create and verify user - cannot continue testing")
-        return 1
+    # Final Summary
+    print("\n" + "=" * 80)
+    print("🎯 FINAL TEST SUMMARY")
+    print("=" * 80)
     
-    # Test recipe generation
-    print("\n" + "=" * 50)
-    print("Testing Recipe Generation")
-    print("=" * 50)
-    recipe_generated = tester.test_generate_recipe()
+    passed_tests = sum(1 for test_passed in email_test_results.values() if test_passed)
+    total_tests = len(email_test_results)
+    success_rate = (passed_tests / total_tests) * 100 if total_tests > 0 else 0
     
-    if not recipe_generated:
-        print("❌ Failed to generate recipe - cannot continue testing")
-        return 1
+    print(f"Total Tests Run: {total_tests}")
+    print(f"Tests Passed: {passed_tests}")
+    print(f"Tests Failed: {total_tests - passed_tests}")
+    print(f"Success Rate: {success_rate:.1f}%")
     
-    # Test getting recipe
-    tester.test_get_recipe()
+    # Determine overall system status
+    critical_tests = [
+        "Registration Test",
+        "Verification Code Generation", 
+        "Email Sending Test",
+        "Verification Process Test"
+    ]
     
-    # Test cart options endpoint
-    print("\n" + "=" * 50)
-    print("Testing Cart Options Endpoint")
-    print("=" * 50)
-    tester.test_cart_options_endpoint()
+    critical_failures = [test for test in critical_tests if not email_test_results.get(test, False)]
     
-    # Test error handling
-    print("\n" + "=" * 50)
-    print("Testing Error Handling")
-    print("=" * 50)
-    tester.test_cart_options_missing_recipe_id()
-    tester.test_cart_options_invalid_user_id()
+    if not critical_failures:
+        print("\n✅ EMAIL VERIFICATION SYSTEM STATUS: WORKING")
+        print("All critical components are functioning correctly.")
+    else:
+        print("\n❌ EMAIL VERIFICATION SYSTEM STATUS: BROKEN")
+        print("Critical failures detected:")
+        for failure in critical_failures:
+            print(f"  - {failure}")
     
-    # Test custom cart creation
-    print("\n" + "=" * 50)
-    print("Testing Custom Cart Creation")
-    print("=" * 50)
-    tester.test_custom_cart_creation()
-    tester.test_custom_cart_missing_fields()
+    print("\n" + "=" * 80)
+    print("📋 TESTING COMPLETE")
+    print("=" * 80)
     
-    # Test recipe retrieval
-    print("\n" + "=" * 50)
-    print("Testing Recipe Retrieval")
-    print("=" * 50)
-    tester.test_get_user_recipes()
-    
-    # Print results
-    print("\n" + "=" * 50)
-    print(f"📊 Tests passed: {tester.tests_passed}/{tester.tests_run}")
-    print("=" * 50)
-    
-    return 0 if tester.tests_passed == tester.tests_run else 1
+    return email_test_results
 
 def test_objectid_serialization_fix():
     """Test if the MongoDB ObjectId serialization issue has been resolved"""
