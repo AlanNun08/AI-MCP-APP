@@ -7,28 +7,26 @@ const urlsToCache = [
   '/manifest.json'
 ];
 
-// Install event - clear old caches (no forced reloads)
+// Install event - FORCE DELETE ALL OLD CACHES
 self.addEventListener('install', (event) => {
-  console.log('Installing service worker - clearing old caches...');
+  console.log('🔥 FINAL CACHE CLEAR - DELETING ALL OLD CACHES...');
   event.waitUntil(
     caches.keys().then(cacheNames => {
-      console.log('Found existing caches:', cacheNames);
+      console.log('🗑️ FORCE DELETING ALL CACHES:', cacheNames);
       return Promise.all(
         cacheNames.map(cacheName => {
-          console.log('Deleting old cache:', cacheName);
+          console.log('💥 DELETING CACHE:', cacheName);
           return caches.delete(cacheName);
         })
       );
     }).then(() => {
-      console.log('Old caches cleared, creating new cache...');
+      console.log('✅ ALL OLD CACHES DELETED - CREATING NEW CACHE');
       return caches.open(CACHE_NAME);
-    }).then(cache => {
-      console.log('New cache created successfully');
-      return cache.addAll(urlsToCache);
+    }).then(() => {
+      console.log('🎉 NEW CACHE v100 CREATED SUCCESSFULLY');
+      return self.skipWaiting();
     })
   );
-  // Let the new service worker activate naturally
-  self.skipWaiting();
 });
 
 // Activate event - take control immediately
