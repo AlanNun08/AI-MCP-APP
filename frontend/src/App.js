@@ -2582,6 +2582,18 @@ function App() {
     }
   };
 
+  // Show loading screen while checking authentication
+  if (isLoadingAuth) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-red-50 to-pink-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-6xl mb-4 animate-bounce">👨‍🍳</div>
+          <div className="text-xl text-gray-600">Loading AI Chef...</div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="relative">
       {renderScreen()}
