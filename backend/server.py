@@ -30,10 +30,18 @@ from email_service import email_service
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
-# MongoDB connection
+# MongoDB connection - NO CACHING, FRESH CONNECTIONS
 mongo_url = os.environ['MONGO_URL']
+db_name = os.environ.get('DB_NAME', 'test_database')
+
+def get_db():
+    """Get fresh database connection - NO CACHING"""
+    fresh_client = AsyncIOMotorClient(mongo_url)
+    return fresh_client[db_name]
+
+# Use fresh connection for immediate operations
 client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ.get('DB_NAME', 'test_database')]
+db = client[db_name]
 
 # Custom JSON encoder for MongoDB documents
 def mongo_to_dict(obj):
