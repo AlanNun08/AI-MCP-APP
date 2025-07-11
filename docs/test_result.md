@@ -142,7 +142,20 @@ All previous test files have been deleted. The application is ready for fresh co
 - Focus on critical functionality
 - Always ask user before frontend testing
 
-user_problem_statement: "Fresh start - All tests deleted. Application updated for new preview URL: https://4a624c76-fc66-4a7c-91df-de079314ff82.preview.emergentagent.com. Ready for new comprehensive testing when needed."
+user_problem_statement: "User wants all features to work perfectly, user authentication to stay persistent (user stays signed in), all current registered users deleted from database, and application ready for preview deployment."
+
+backend:
+  - task: "Database Reset and Authentication Persistence"
+    implemented: true
+    working: "needs_testing"
+    file: "clear_database.py, server.py"
+    stuck_count: 0
+    priority: "critical"
+    needs_retesting: true
+    status_history:
+      - working: "needs_testing"
+        agent: "main"
+        comment: "✅ CRITICAL DATABASE RESET COMPLETED! Successfully cleared all user data from database for fresh start. Cleared 66 documents total: 4 users, 5 verification codes, 11 password reset codes, 37 recipes, 9 starbucks recipes. Database is now clean and ready for new user registrations and testing."
 
 backend:
   - task: "Starbucks Drinks Feature"
