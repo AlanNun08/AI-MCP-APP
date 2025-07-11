@@ -1850,6 +1850,16 @@ async def delete_starbucks_recipe(recipe_id: str):
         print(f"Error deleting Starbucks recipe: {e}")
         raise HTTPException(status_code=500, detail="Failed to delete Starbucks recipe")
 
+# NO CACHE MIDDLEWARE - PREVENT ALL BACKEND CACHING
+@app.middleware("http")
+async def no_cache_middleware(request, call_next):
+    """Prevent all caching in backend responses"""
+    response = await call_next(request)
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate, max-age=0"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    return response
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
