@@ -348,24 +348,41 @@ Respond with JSON in this exact format:
 }}"""
 
         elif request.drink_type == "refresher":
-            prompt = f"""Invent a **fresh, colorful Starbucks-style Refresher** that can be easily ordered at the **drive-thru** using Starbucks ingredients{flavor_context}.
+            prompt = f"""Generate a drink based on a totally random aesthetic concept or scene. Do not use past drink structures. Be creative, strange, or playful — like a barista daydreaming.
 
-Include:
-* A punchy name (e.g., "Galaxy Bloom Refresher", "Electric Sunset Splash")
-* Choose a Starbucks refresher base: Strawberry Açaí, Mango Dragonfruit, or Pineapple Passionfruit
-* Add-ins like fruit inclusions, cold foam, tea add-ons, or layered matcha/milk
-* **Clear drive-thru order instructions** (e.g., "Hi, can I get a grande Strawberry Açaí Refresher with lemonade, light ice, and matcha cold foam on top?")
-* A vibe line (e.g., "Like a fruit punch kissed by the stars")
+**STEP 1: Choose a theme or aesthetic for the drink from this list:**
+- fantasy (e.g., fairy forest, moonlight sorcery)
+- color-inspired (e.g., neon green, cosmic purple, gold)
+- mood-based (e.g., 'cozy rainy day', 'after-school energy boost')
+- seasonal (e.g., autumn bonfire, spring bloom)
+- nostalgic (e.g., '90s mall treat, childhood cereal, birthday cake)
+
+**STEP 2: Invent a fresh, colorful Starbucks-style Refresher**{flavor_context}.
+
+**Name Requirements:**
+- Invent a completely new and original name that's catchy, poetic, or trend-worthy
+- Do NOT use existing Starbucks or secret menu names
+- Avoid repeating patterns like 'splash', 'burst', or 'fizz' unless essential to theme
+- Use uncommon words, symbols, or emotional cues (e.g., 'Coral Dream', 'Mystic Bloom', 'Ember Rush')
+
+**Surprise Ingredient Rule:**
+Each recipe MUST include one unexpected twist:
+- Layer of matcha or cold foam
+- Hint of coconut milk or alternative milk
+- A tea add-on (green tea, passion tea)
+- A syrup not typically used in refreshers
+
+Choose refresher base: Strawberry Açaí, Mango Dragonfruit, or Pineapple Passionfruit
 
 Respond with JSON in this exact format:
 {{
-  "drink_name": "Creative punchy name",
-  "description": "Short vibe description (e.g., 'Like a fruit punch kissed by the stars')",
+  "drink_name": "Completely original poetic name",
+  "description": "Theme-based vibe description matching your chosen aesthetic",
   "base_drink": "Base refresher to order",
-  "modifications": ["ingredient 1", "ingredient 2", "ingredient 3"],
+  "modifications": ["ingredient 1", "ingredient 2", "surprise twist ingredient"],
   "ordering_script": "Complete drive-thru order: 'Hi, can I get a...'",
   "category": "refresher",
-  "vibe": "Short poetic vibe line"
+  "vibe": "Poetic mood line matching your theme"
 }}"""
 
         elif request.drink_type == "iced_matcha_latte":
