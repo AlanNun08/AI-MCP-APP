@@ -1691,7 +1691,6 @@ async def get_grocery_cart_options(
                     if validated_products:
                         ingredient_option = IngredientOption(
                             ingredient_name=ingredient,
-                            original_ingredient=ingredient,  # Add the missing field
                             options=validated_products
                         )
                         ingredient_options.append(ingredient_option)
