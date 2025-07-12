@@ -464,10 +464,7 @@ const StarbucksGeneratorScreen = ({ showNotification, setCurrentScreen, user, AP
   );
 };
 
-// Helper Components
-
-// Reusable Drink Card Component
-const DrinkCard = ({ drink, showFullDetails, onCopyOrder, onShare, onGenerateAnother, onBackToDashboard, showActionButtons }) => (
+export default StarbucksGeneratorScreen;
   <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
     {/* Drink Header */}
     <div className="bg-gradient-to-r from-green-600 to-green-700 text-white p-6">
