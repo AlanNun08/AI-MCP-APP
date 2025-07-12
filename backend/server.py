@@ -1657,24 +1657,23 @@ async def get_grocery_cart_options(
         logging.info(f"🔍 PRODUCTION: Processing {total_ingredients} ingredients for real Walmart products")
         
         for i, ingredient in enumerate(shopping_list, 1):
+            logging.info(f"🔍 PRODUCTION: Processing ingredient {i}/{total_ingredients}: '{ingredient}'")
+            
+            # Get Walmart products for this ingredient
             try:
-                logging.info(f"🔍 PRODUCTION: Processing ingredient {i}/{total_ingredients}: '{ingredient}'")
+                walmart_products = await _get_walmart_product_options(ingredient, max_options=3)
                 
-                # PRODUCTION: Get Walmart product options - ONLY REAL PRODUCTS
-                product_options = await _get_walmart_product_options(ingredient, max_options=3)
-                
-                if product_options:
-                    # Additional validation: ensure all products are real
+                if walmart_products:
+                    # Create ingredient option with validated products
                     validated_products = []
-                    for product in product_options:
-                        # Strict validation for production
+                    for product in walmart_products:
+                        # Additional filtering to ensure only real products
                         if (product.product_id and 
-                            product.product_id.isdigit() and
-                            len(product.product_id) >= 6 and
+                            product.name and 
                             product.price > 0 and
-                            product.name and
-                            len(product.name) > 3 and
-                            not any(mock_term in product.name.lower() for mock_term in ['mock', 'test', 'sample', 'demo'])):
+                            not product.product_id.startswith('10315') and
+                            not product.product_id.startswith('mock-') and
+                            not product.product_id.startswith('walmart-')):
                             validated_products.append(product)
                         else:
                             logging.warning(f"⚠️ PRODUCTION: Filtered out invalid product: {product.name} (ID: {product.product_id})")
@@ -1682,22 +1681,21 @@ async def get_grocery_cart_options(
                     if validated_products:
                         ingredient_option = IngredientOption(
                             ingredient_name=ingredient,
-                            original_ingredient=ingredient,
                             options=validated_products
                         )
                         ingredient_options.append(ingredient_option)
                         successful_ingredients += 1
-                        logging.info(f"✅ PRODUCTION: Found {len(validated_products)} validated products for '{ingredient}'")
                         
-                        # Log sample products for verification
+                        logging.info(f"✅ PRODUCTION: Found {len(validated_products)} validated products for '{ingredient}'")
+                        # Log first 2 products as examples
                         for j, product in enumerate(validated_products[:2]):
                             logging.info(f"   Product {j+1}: {product.name} - ${product.price} (ID: {product.product_id})")
                     else:
-                        failed_ingredients.append(ingredient)
                         logging.warning(f"❌ PRODUCTION: No valid products after filtering for ingredient: '{ingredient}'")
+                        failed_ingredients.append(ingredient)
                 else:
+                    logging.warning(f"❌ PRODUCTION: No products returned from Walmart API for ingredient: '{ingredient}'")
                     failed_ingredients.append(ingredient)
-                    logging.warning(f"❌ PRODUCTION: No products found for ingredient: '{ingredient}'")
                 
                 # Add delay to avoid rate limiting
                 if i < total_ingredients:
