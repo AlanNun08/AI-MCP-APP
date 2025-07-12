@@ -453,6 +453,472 @@ Respond with JSON in this exact format:
     except Exception as e:
         print(f"Error generating Starbucks drink: {e}")
         raise HTTPException(status_code=500, detail="Failed to generate Starbucks drink")
+
+@app.get("/api/curated-starbucks-recipes")
+async def get_curated_starbucks_recipes(category: Optional[str] = None):
+    """Get curated Starbucks recipes, optionally filtered by category"""
+    try:
+        # Build query
+        query = {}
+        if category and category != "all":
+            query["category"] = category
+        
+        # Get recipes from database
+        recipes = await db.curated_starbucks_recipes.find(query).to_list(100)
+        
+        if not recipes:
+            # If no recipes in database, initialize with default recipes
+            await initialize_curated_recipes()
+            recipes = await db.curated_starbucks_recipes.find(query).to_list(100)
+        
+        return {"recipes": recipes, "total": len(recipes)}
+    
+    except Exception as e:
+        logger.error(f"Error getting curated recipes: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to get curated recipes")
+
+async def initialize_curated_recipes():
+    """Initialize the database with curated Starbucks recipes"""
+    try:
+        # Check if recipes already exist
+        existing_count = await db.curated_starbucks_recipes.count_documents({})
+        if existing_count > 0:
+            return  # Already initialized
+        
+        # Categorize and add the curated recipes
+        curated_recipes = get_curated_recipes_data()
+        
+        recipes_to_insert = []
+        for recipe_data in curated_recipes:
+            # Determine category based on base
+            category = categorize_recipe(recipe_data["base"])
+            
+            recipe = CuratedStarbucksRecipe(
+                name=recipe_data["name"],
+                base=recipe_data["base"],
+                ingredients=recipe_data["ingredients"],
+                order_instructions=recipe_data["order_instructions"],
+                vibe=recipe_data["vibe"],
+                category=category
+            )
+            recipes_to_insert.append(recipe.dict())
+        
+        # Insert all recipes
+        await db.curated_starbucks_recipes.insert_many(recipes_to_insert)
+        logger.info(f"Initialized {len(recipes_to_insert)} curated Starbucks recipes")
+        
+    except Exception as e:
+        logger.error(f"Error initializing curated recipes: {str(e)}")
+
+def categorize_recipe(base: str) -> str:
+    """Categorize recipe based on its base type"""
+    base_lower = base.lower()
+    
+    if "frappuccino" in base_lower:
+        return "frappuccino"
+    elif "refresher" in base_lower:
+        return "refresher"
+    elif "matcha" in base_lower:
+        return "iced_matcha_latte"
+    elif "lemonade" in base_lower:
+        return "lemonade"
+    else:
+        return "random"  # For lattes, mochas, chai, etc.
+
+def get_curated_recipes_data():
+    """Return the curated recipes data"""
+    return [
+        {
+            "name": "Butterbeer Bliss",
+            "base": "Frappuccino",
+            "ingredients": [
+                "Vanilla Bean Frappuccino base",
+                "2 pumps caramel syrup",
+                "1 pump toffee nut syrup",
+                "Caramel drizzle",
+                "Whipped cream"
+            ],
+            "order_instructions": "Hi, can I get a grande Vanilla Bean Frappuccino with 2 pumps caramel syrup, 1 pump toffee nut syrup, caramel drizzle, and whipped cream?",
+            "vibe": "Sweet and buttery like a cozy wizard's delight."
+        },
+        {
+            "name": "Purple Haze Refresher",
+            "base": "Refresher",
+            "ingredients": [
+                "Strawberry Açaí Refresher base",
+                "1 pump raspberry syrup",
+                "Blackberry inclusions",
+                "Lemonade",
+                "Vanilla sweet cream cold foam"
+            ],
+            "order_instructions": "Hi, can I get a grande Strawberry Açaí Refresher with 1 pump raspberry syrup, blackberry inclusions, lemonade, and vanilla sweet cream cold foam?",
+            "vibe": "A mystical burst of berry sweetness with creamy cloud."
+        },
+        {
+            "name": "Caramel Moon Latte",
+            "base": "Iced Latte",
+            "ingredients": [
+                "Espresso shot",
+                "2% milk",
+                "2 pumps caramel syrup",
+                "Vanilla sweet cream cold foam",
+                "Caramel drizzle"
+            ],
+            "order_instructions": "Hi, can I get a grande iced latte with an espresso shot, 2% milk, 2 pumps caramel syrup, vanilla sweet cream cold foam, and caramel drizzle?",
+            "vibe": "Smooth caramel waves under a glowing moonlight."
+        },
+        {
+            "name": "Tropical Dream Refresher",
+            "base": "Refresher",
+            "ingredients": [
+                "Mango Dragonfruit Refresher base",
+                "Pineapple inclusions",
+                "Coconut milk",
+                "1 pump vanilla syrup",
+                "Freeze-dried lime"
+            ],
+            "order_instructions": "Hi, can I get a grande Mango Dragonfruit Refresher with pineapple inclusions, coconut milk, 1 pump vanilla syrup, and freeze-dried lime?",
+            "vibe": "Island vibes with a creamy tropical twist."
+        },
+        {
+            "name": "Matcha Berry Swirl",
+            "base": "Iced Matcha Latte",
+            "ingredients": [
+                "Matcha powder",
+                "Oat milk",
+                "Strawberry purée",
+                "1 pump brown sugar syrup",
+                "Whipped cream"
+            ],
+            "order_instructions": "Hi, can I get a grande iced matcha latte with oat milk, strawberry purée, 1 pump brown sugar syrup, and whipped cream?",
+            "vibe": "A green and red swirl of sweet delight."
+        },
+        {
+            "name": "Cotton Candy Clouds",
+            "base": "Frappuccino",
+            "ingredients": [
+                "Vanilla Bean Frappuccino base",
+                "2 pumps raspberry syrup",
+                "2 pumps vanilla syrup",
+                "Whipped cream",
+                "Pink powder topping"
+            ],
+            "order_instructions": "Hi, can I get a grande Vanilla Bean Frappuccino with 2 pumps raspberry syrup, 2 pumps vanilla syrup, whipped cream, and pink powder topping?",
+            "vibe": "Fluffy sweetness with a nostalgic carnival feel."
+        },
+        {
+            "name": "Sunset Citrus Refresher",
+            "base": "Refresher",
+            "ingredients": [
+                "Pineapple Passionfruit Refresher base",
+                "Lemonade",
+                "1 pump peach syrup",
+                "Orange inclusions",
+                "Vanilla sweet cream cold foam"
+            ],
+            "order_instructions": "Hi, can I get a grande Pineapple Passionfruit Refresher with lemonade, 1 pump peach syrup, orange inclusions, and vanilla sweet cream cold foam?",
+            "vibe": "A bright, tangy burst with creamy sunset hues."
+        },
+        {
+            "name": "Espresso Caramel Freeze",
+            "base": "Frappuccino",
+            "ingredients": [
+                "Coffee Frappuccino base",
+                "1 shot espresso",
+                "2 pumps caramel syrup",
+                "Oat milk",
+                "Caramel drizzle"
+            ],
+            "order_instructions": "Hi, can I get a grande Coffee Frappuccino with 1 shot espresso, 2 pumps caramel syrup, oat milk, and caramel drizzle?",
+            "vibe": "Rich caramel and coffee harmony with a cool kick."
+        },
+        {
+            "name": "Lavender Honey Lemonade",
+            "base": "Lemonade",
+            "ingredients": [
+                "Lemonade",
+                "1 pump honey blend syrup",
+                "Lavender syrup",
+                "Freeze-dried lemon",
+                "Vanilla sweet cream cold foam"
+            ],
+            "order_instructions": "Hi, can I get a grande lemonade with 1 pump honey blend syrup, lavender syrup, freeze-dried lemon, and vanilla sweet cream cold foam?",
+            "vibe": "A floral and sweet refreshment with creamy top notes."
+        },
+        {
+            "name": "Cookie Crumble Mocha",
+            "base": "Iced Mocha",
+            "ingredients": [
+                "Espresso shot",
+                "2% milk",
+                "Mocha sauce",
+                "Cookie crumble topping",
+                "Whipped cream"
+            ],
+            "order_instructions": "Hi, can I get a grande iced mocha with an espresso shot, 2% milk, mocha sauce, cookie crumble topping, and whipped cream?",
+            "vibe": "Decadent chocolate with a crunch of cookie magic."
+        },
+        {
+            "name": "Caramel Apple Refresher",
+            "base": "Refresher",
+            "ingredients": [
+                "Strawberry Açaí Refresher base",
+                "Apple inclusions",
+                "Caramel syrup",
+                "Lemonade",
+                "Vanilla sweet cream cold foam"
+            ],
+            "order_instructions": "Hi, can I get a grande Strawberry Açaí Refresher with apple inclusions, caramel syrup, lemonade, and vanilla sweet cream cold foam?",
+            "vibe": "Sweet orchard flavors meet creamy caramel comfort."
+        },
+        {
+            "name": "Maple Cinnamon Swirl",
+            "base": "Iced Latte",
+            "ingredients": [
+                "Espresso shot",
+                "2% milk",
+                "2 pumps cinnamon dolce syrup",
+                "Maple syrup",
+                "Whipped cream"
+            ],
+            "order_instructions": "Hi, can I get a grande iced latte with an espresso shot, 2% milk, 2 pumps cinnamon dolce syrup, maple syrup, and whipped cream?",
+            "vibe": "Warm spices and maple in a creamy embrace."
+        },
+        {
+            "name": "Dragonfruit Dream",
+            "base": "Refresher",
+            "ingredients": [
+                "Mango Dragonfruit Refresher base",
+                "Dragonfruit inclusions",
+                "1 pump vanilla syrup",
+                "Lemonade",
+                "Freeze-dried lime"
+            ],
+            "order_instructions": "Hi, can I get a grande Mango Dragonfruit Refresher with dragonfruit inclusions, 1 pump vanilla syrup, lemonade, and freeze-dried lime?",
+            "vibe": "Bright and fruity with a hint of tropical sweetness."
+        },
+        {
+            "name": "Chocolate Mint Chill",
+            "base": "Frappuccino",
+            "ingredients": [
+                "Mocha Frappuccino base",
+                "Peppermint syrup",
+                "2 pumps mocha sauce",
+                "Whipped cream",
+                "Chocolate drizzle"
+            ],
+            "order_instructions": "Hi, can I get a grande Mocha Frappuccino with peppermint syrup, 2 pumps mocha sauce, whipped cream, and chocolate drizzle?",
+            "vibe": "Cool minty chocolate bliss in every sip."
+        },
+        {
+            "name": "Strawberry Coconut Cooler",
+            "base": "Refresher",
+            "ingredients": [
+                "Strawberry Açaí Refresher base",
+                "Coconut milk",
+                "Strawberry inclusions",
+                "1 pump vanilla syrup",
+                "Vanilla sweet cream cold foam"
+            ],
+            "order_instructions": "Hi, can I get a grande Strawberry Açaí Refresher with coconut milk, strawberry inclusions, 1 pump vanilla syrup, and vanilla sweet cream cold foam?",
+            "vibe": "Tropical sweetness with creamy strawberry clouds."
+        },
+        {
+            "name": "Toffee Nut Latte Bliss",
+            "base": "Hot Latte",
+            "ingredients": [
+                "Espresso shot",
+                "2% milk",
+                "2 pumps toffee nut syrup",
+                "Whipped cream",
+                "Caramel drizzle"
+            ],
+            "order_instructions": "Hi, can I get a grande hot latte with an espresso shot, 2% milk, 2 pumps toffee nut syrup, whipped cream, and caramel drizzle?",
+            "vibe": "Buttery, nutty comfort in a warm cup."
+        },
+        {
+            "name": "Raspberry Mocha Freeze",
+            "base": "Frappuccino",
+            "ingredients": [
+                "Mocha Frappuccino base",
+                "2 pumps raspberry syrup",
+                "Whipped cream",
+                "Mocha drizzle",
+                "Chocolate chips"
+            ],
+            "order_instructions": "Hi, can I get a grande Mocha Frappuccino with 2 pumps raspberry syrup, whipped cream, mocha drizzle, and chocolate chips?",
+            "vibe": "Fruity chocolate decadence with a cool crunch."
+        },
+        {
+            "name": "Pumpkin Spice Refresher",
+            "base": "Refresher",
+            "ingredients": [
+                "Strawberry Açaí Refresher base",
+                "Pumpkin spice syrup",
+                "Lemonade",
+                "Vanilla sweet cream cold foam",
+                "Cinnamon powder"
+            ],
+            "order_instructions": "Hi, can I get a grande Strawberry Açaí Refresher with pumpkin spice syrup, lemonade, vanilla sweet cream cold foam, and cinnamon powder?",
+            "vibe": "Fall flavors meet fruity refreshment in harmony."
+        },
+        {
+            "name": "Chai Caramel Dream",
+            "base": "Iced Chai Latte",
+            "ingredients": [
+                "Chai tea concentrate",
+                "2% milk",
+                "2 pumps caramel syrup",
+                "Whipped cream",
+                "Caramel drizzle"
+            ],
+            "order_instructions": "Hi, can I get a grande iced chai latte with 2% milk, 2 pumps caramel syrup, whipped cream, and caramel drizzle?",
+            "vibe": "Spiced chai sweetness with buttery caramel warmth."
+        },
+        {
+            "name": "Coconut Matcha Breeze",
+            "base": "Iced Matcha Latte",
+            "ingredients": [
+                "Matcha powder",
+                "Coconut milk",
+                "1 pump vanilla syrup",
+                "Freeze-dried lime",
+                "Whipped cream"
+            ],
+            "order_instructions": "Hi, can I get a grande iced matcha latte with coconut milk, 1 pump vanilla syrup, freeze-dried lime, and whipped cream?",
+            "vibe": "Refreshing island breeze in a vibrant green cup."
+        },
+        {
+            "name": "Mocha Java Chip Crush",
+            "base": "Frappuccino",
+            "ingredients": [
+                "Mocha Frappuccino base",
+                "Java chips",
+                "Whipped cream",
+                "Mocha drizzle",
+                "Chocolate chips"
+            ],
+            "order_instructions": "Hi, can I get a grande Mocha Frappuccino with java chips, whipped cream, mocha drizzle, and chocolate chips?",
+            "vibe": "Chocolate overload with crunchy java surprises."
+        },
+        {
+            "name": "Peach Citrus Refresher",
+            "base": "Refresher",
+            "ingredients": [
+                "Mango Dragonfruit Refresher base",
+                "Peach syrup",
+                "Lemonade",
+                "Orange inclusions",
+                "Vanilla sweet cream cold foam"
+            ],
+            "order_instructions": "Hi, can I get a grande Mango Dragonfruit Refresher with peach syrup, lemonade, orange inclusions, and vanilla sweet cream cold foam?",
+            "vibe": "Bright peach and citrus sunshine with creamy top."
+        },
+        {
+            "name": "Honey Cinnamon Latte",
+            "base": "Hot Latte",
+            "ingredients": [
+                "Espresso shot",
+                "2% milk",
+                "Honey blend syrup",
+                "Cinnamon dolce syrup",
+                "Whipped cream"
+            ],
+            "order_instructions": "Hi, can I get a grande hot latte with espresso shot, 2% milk, honey blend syrup, cinnamon dolce syrup, and whipped cream?",
+            "vibe": "Sweet honey and spice wrapped in warmth."
+        },
+        {
+            "name": "Vanilla Berry Sparkler",
+            "base": "Lemonade",
+            "ingredients": [
+                "Lemonade",
+                "1 pump vanilla syrup",
+                "Strawberry inclusions",
+                "Freeze-dried lime",
+                "Vanilla sweet cream cold foam"
+            ],
+            "order_instructions": "Hi, can I get a grande lemonade with 1 pump vanilla syrup, strawberry inclusions, freeze-dried lime, and vanilla sweet cream cold foam?",
+            "vibe": "Bright vanilla and berry sparkle with creamy clouds."
+        },
+        {
+            "name": "Chocolate Orange Crush",
+            "base": "Iced Mocha",
+            "ingredients": [
+                "Espresso shot",
+                "2% milk",
+                "Mocha sauce",
+                "Orange inclusions",
+                "Whipped cream"
+            ],
+            "order_instructions": "Hi, can I get a grande iced mocha with espresso shot, 2% milk, mocha sauce, orange inclusions, and whipped cream?",
+            "vibe": "Zesty orange and rich chocolate collide."
+        },
+        {
+            "name": "Salted Caramel Matcha",
+            "base": "Iced Matcha Latte",
+            "ingredients": [
+                "Matcha powder",
+                "2% milk",
+                "Caramel syrup",
+                "Sea salt sprinkle",
+                "Whipped cream"
+            ],
+            "order_instructions": "Hi, can I get a grande iced matcha latte with 2% milk, caramel syrup, sea salt sprinkle, and whipped cream?",
+            "vibe": "Sweet and salty with earthy green tea depth."
+        },
+        {
+            "name": "Peppermint Mocha Chill",
+            "base": "Frappuccino",
+            "ingredients": [
+                "Mocha Frappuccino base",
+                "Peppermint syrup",
+                "Whipped cream",
+                "Chocolate drizzle",
+                "Mocha drizzle"
+            ],
+            "order_instructions": "Hi, can I get a grande Mocha Frappuccino with peppermint syrup, whipped cream, chocolate drizzle, and mocha drizzle?",
+            "vibe": "Minty chocolate bliss perfect for a cool day."
+        },
+        {
+            "name": "Gingerbread Latte Delight",
+            "base": "Hot Latte",
+            "ingredients": [
+                "Espresso shot",
+                "2% milk",
+                "Pumpkin spice syrup",
+                "Molasses syrup",
+                "Whipped cream"
+            ],
+            "order_instructions": "Hi, can I get a grande hot latte with espresso shot, 2% milk, pumpkin spice syrup, molasses syrup, and whipped cream?",
+            "vibe": "Holiday spices wrapped in cozy sweetness."
+        },
+        {
+            "name": "Peach Matcha Breeze",
+            "base": "Iced Matcha Latte",
+            "ingredients": [
+                "Matcha powder",
+                "Oat milk",
+                "Peach syrup",
+                "Freeze-dried lime",
+                "Vanilla sweet cream cold foam"
+            ],
+            "order_instructions": "Hi, can I get a grande iced matcha latte with oat milk, peach syrup, freeze-dried lime, and vanilla sweet cream cold foam?",
+            "vibe": "Light peach and matcha in creamy harmony."
+        },
+        {
+            "name": "Toffee Nut Refresher",
+            "base": "Refresher",
+            "ingredients": [
+                "Pineapple Passionfruit Refresher base",
+                "2 pumps toffee nut syrup",
+                "Lemonade",
+                "Vanilla sweet cream cold foam",
+                "Freeze-dried lime"
+            ],
+            "order_instructions": "Hi, can I get a grande Pineapple Passionfruit Refresher with 2 pumps toffee nut syrup, lemonade, vanilla sweet cream cold foam, and freeze-dried lime?",
+            "vibe": "Tropical tang meets nutty sweetness."
+        }
+    ]
 def hash_password(password: str) -> str:
     """Hash a password using bcrypt"""
     salt = bcrypt.gensalt()
