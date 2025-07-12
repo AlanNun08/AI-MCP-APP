@@ -274,35 +274,112 @@ async def generate_starbucks_drink(request: StarbucksRequest):
         if request.flavor_inspiration:
             flavor_context = f" inspired by {request.flavor_inspiration} flavors"
             
-        prompt_parts.append(f"""Create a viral-worthy Starbucks secret menu drink that's a creative {request.drink_type}{flavor_context}. This should be an Instagram-ready drink hack that TikTok users would love to try and share.
+        # Define specific prompts for each drink type
+        if request.drink_type == "frappuccino":
+            prompt = f"""Create a **whimsical and aesthetic Starbucks-style Frappuccino** recipe using only real or customizable ingredients found at Starbucks, crafted for **ordering at the drive-thru**{flavor_context}.
 
-IMPORTANT: Focus on creating a {request.drink_type} that's unique, visually appealing, and easy to order at any Starbucks location.
+Include the following:
+* A **magical or trendy name** (e.g., "Moonberry Frost", "Velvet Cookie Swirl")
+* Ingredients list using real Starbucks options: Frappuccino base, flavored syrups (e.g., raspberry, caramel, toffee nut), milk types, whipped cream, toppings (cookie crumble, mocha drizzle, etc.)
+* Optional creative layers (e.g., swirling fruit purées or color effects with matcha, dragonfruit, etc.)
+* **Simplified drive-thru ordering instructions** (e.g., "Hi, can I get a grande Vanilla Bean Frappuccino with raspberry syrup and cookie crumble on top?")
+* A short **vibe description** (e.g., "Tastes like a candy cloud on a starry night")
 
 Respond with JSON in this exact format:
 {{
-  "drink_name": "Creative catchy name (like 'Unicorn Dreams Frappuccino' or 'Sunset Mango Refresher')",
-  "description": "1-2 sentence description of taste and visual appeal",
-  "base_drink": "Base Starbucks drink to order (size and drink name)",
-  "modifications": [
-    "Specific modification 1",
-    "Specific modification 2",
-    "Specific modification 3"
-  ],
-  "ordering_script": "Complete sentence to say at drive-thru: 'Hi, can I get a...'",
-  "pro_tips": [
-    "Pro tip 1 for best results",
-    "Pro tip 2 for customization"
-  ],
-  "why_amazing": "Why this drink is special and Instagram-worthy",
-  "category": "{request.drink_type}",
-  "ingredients_breakdown": [
-    "Main ingredient 1",
-    "Main ingredient 2", 
-    "Main ingredient 3"
-  ]
-}}
+  "drink_name": "Creative magical name",
+  "description": "Short vibe description (e.g., 'Tastes like a candy cloud on a starry night')",
+  "base_drink": "Base Frappuccino to order",
+  "modifications": ["ingredient 1", "ingredient 2", "ingredient 3"],
+  "ordering_script": "Complete drive-thru order: 'Hi, can I get a...'",
+  "category": "frappuccino",
+  "vibe": "Short poetic mood line"
+}}"""
 
-Make this drink sound like a must-try secret menu item that would go viral on social media!""")
+        elif request.drink_type == "lemonade":
+            prompt = f"""Create a **creative and dreamy lemonade-based drink** using only Starbucks ingredients, customized for **drive-thru ordering**{flavor_context}.
+
+Include:
+* A fun or enchanting name (e.g., "Citrus Stardust", "Sunbeam Petal Lemonade")
+* Ingredients like: lemonade base, tea infusions (green, passion, black), fruit inclusions (strawberries, dragonfruit), syrups (raspberry, peach, vanilla), cold foams, etc.
+* Optional layering or aesthetic effects
+* A **clear drive-thru order script** (e.g., "Hi, can I get a Venti Lemonade with peach syrup and strawberry inclusions, topped with vanilla sweet cream cold foam?")
+* A final mood or **vibe description** (e.g., "Feels like golden hour in a garden")
+
+Respond with JSON in this exact format:
+{{
+  "drink_name": "Creative enchanting name",
+  "description": "Short vibe description (e.g., 'Feels like golden hour in a garden')",
+  "base_drink": "Base lemonade drink to order",
+  "modifications": ["ingredient 1", "ingredient 2", "ingredient 3"],
+  "ordering_script": "Complete drive-thru order: 'Hi, can I get a...'",
+  "category": "lemonade",
+  "vibe": "Short poetic mood line"
+}}"""
+
+        elif request.drink_type == "refresher":
+            prompt = f"""Invent a **fresh, colorful Starbucks-style Refresher** that can be easily ordered at the **drive-thru** using Starbucks ingredients{flavor_context}.
+
+Include:
+* A punchy name (e.g., "Galaxy Bloom Refresher", "Electric Sunset Splash")
+* Choose a Starbucks refresher base: Strawberry Açaí, Mango Dragonfruit, or Pineapple Passionfruit
+* Add-ins like fruit inclusions, cold foam, tea add-ons, or layered matcha/milk
+* **Clear drive-thru order instructions** (e.g., "Hi, can I get a grande Strawberry Açaí Refresher with lemonade, light ice, and matcha cold foam on top?")
+* A vibe line (e.g., "Like a fruit punch kissed by the stars")
+
+Respond with JSON in this exact format:
+{{
+  "drink_name": "Creative punchy name",
+  "description": "Short vibe description (e.g., 'Like a fruit punch kissed by the stars')",
+  "base_drink": "Base refresher to order",
+  "modifications": ["ingredient 1", "ingredient 2", "ingredient 3"],
+  "ordering_script": "Complete drive-thru order: 'Hi, can I get a...'",
+  "category": "refresher",
+  "vibe": "Short poetic vibe line"
+}}"""
+
+        elif request.drink_type == "iced_matcha_latte":
+            prompt = f"""Create a **magical and refreshing iced matcha drink** with dreamy flavors, made for **simple drive-thru ordering**{flavor_context}.
+
+Include:
+* A creative name (e.g., "Emerald Bloom Iced Matcha", "Lunar Lavender Latte")
+* Iced matcha with custom milk (oat, coconut, almond, etc.)
+* Flavor boosts: syrups (vanilla, brown sugar), strawberry purée, espresso, cold foam
+* Optional layering (e.g., matcha on top of milk or espresso)
+* **Drive-thru order example** (e.g., "Hi, can I get a Venti Iced Matcha Latte with oat milk, brown sugar syrup, and vanilla sweet cream cold foam?")
+* A vibe line (e.g., "Like sipping morning dew in a Zen garden")
+
+Respond with JSON in this exact format:
+{{
+  "drink_name": "Creative magical name",
+  "description": "Short vibe description (e.g., 'Like sipping morning dew in a Zen garden')",
+  "base_drink": "Base iced matcha drink to order",
+  "modifications": ["ingredient 1", "ingredient 2", "ingredient 3"],
+  "ordering_script": "Complete drive-thru order: 'Hi, can I get a...'",
+  "category": "iced_matcha_latte",
+  "vibe": "Short mood line"
+}}"""
+
+        else:  # This handles any other drink type as "random mystery"
+            prompt = f"""Create a **surprise combo drink** by blending different Starbucks drink types or ingredients into something wild and unique—but **still orderable at the drive-thru**{flavor_context}.
+
+Include:
+* A unique name (e.g., "Mystic Jungle Freeze", "Nebula Lemon Cloud")
+* A combo of categories: e.g., matcha + refresher, lemonade + cold foam, tea + frappuccino
+* Choose ingredients available at Starbucks only
+* **Drive-thru friendly phrasing** (e.g., "Hi, can I get a grande Mango Dragonfruit Refresher with coconut milk and matcha cold foam?")
+* A final vibe line (e.g., "Like sipping a tropical riddle")
+
+Respond with JSON in this exact format:
+{{
+  "drink_name": "Creative unique name",
+  "description": "Short vibe description (e.g., 'Like sipping a tropical riddle')",
+  "base_drink": "Base drink to order",
+  "modifications": ["ingredient 1", "ingredient 2", "ingredient 3"],
+  "ordering_script": "Complete drive-thru order: 'Hi, can I get a...'",
+  "category": "mystery",
+  "vibe": "Short mood line"
+}}"""
 
         # Generate the drink using OpenAI
         response = openai_client.chat.completions.create(
