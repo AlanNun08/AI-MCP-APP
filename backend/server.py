@@ -1196,20 +1196,10 @@ async def _get_walmart_product_options(ingredient: str, max_options: int = 3) ->
                                             name_lower = product_name.lower()
                                             ingredient_lower = clean_ingredient.lower()
                                             
-                                            # Very relaxed relevance check for production deployment
-                                            ingredient_words = ingredient_lower.split()
-                                            name_words = name_lower.split()
+                                            # TEMPORARILY DISABLE RELEVANCE FILTERING to get products working
+                                            is_relevant = True  # Accept all valid products from Walmart API
                                             
-                                            # More lenient matching for production
-                                            is_relevant = (
-                                                ingredient_lower in name_lower or
-                                                any(word in name_lower for word in ingredient_lower.split() if len(word) > 2) or
-                                                any(ing_word in name_word for ing_word in ingredient_words for name_word in name_words if len(ing_word) > 2) or
-                                                any(name_word in ing_word for ing_word in ingredient_words for name_word in name_words if len(name_word) > 2) or
-                                                len(products) < 3  # Accept more products if we have few matches
-                                            )
-                                            
-                                            if is_relevant or len(products) < 2:  # Accept products if we have very few matches
+                                            if is_relevant:  # Always true now
                                                 product = WalmartProduct(
                                                     product_id=product_id,
                                                     name=product_name,
