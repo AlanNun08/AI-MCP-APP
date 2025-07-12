@@ -474,6 +474,248 @@ class StarbucksAPITester:
         except Exception as e:
             self.log_test_result("Database Storage", False, f"Error: {str(e)}")
             return False
+
+    async def test_curated_recipes_all(self) -> bool:
+        """Test getting all curated Starbucks recipes"""
+        try:
+            async with httpx.AsyncClient(timeout=30.0) as client:
+                response = await client.get(f"{self.backend_url}/curated-starbucks-recipes")
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    
+                    # Validate response structure
+                    if "recipes" not in data or "total" not in data:
+                        self.log_test_result("Curated Recipes - All", False, "Missing 'recipes' or 'total' field in response")
+                        return False
+                    
+                    recipes = data["recipes"]
+                    total = data["total"]
+                    
+                    # Check that we have recipes
+                    if total == 0 or len(recipes) == 0:
+                        self.log_test_result("Curated Recipes - All", False, "No curated recipes found")
+                        return False
+                    
+                    # Validate recipe structure
+                    required_fields = ["name", "base", "ingredients", "order_instructions", "vibe", "category"]
+                    for i, recipe in enumerate(recipes[:3]):  # Check first 3 recipes
+                        missing_fields = [field for field in required_fields if field not in recipe]
+                        if missing_fields:
+                            self.log_test_result("Curated Recipes - All", False, f"Recipe {i} missing fields: {missing_fields}")
+                            return False
+                        
+                        # Validate ingredients is a list with 3-5 items
+                        ingredients = recipe.get("ingredients", [])
+                        if not isinstance(ingredients, list) or len(ingredients) < 3 or len(ingredients) > 5:
+                            self.log_test_result("Curated Recipes - All", False, f"Recipe {i} has invalid ingredients count: {len(ingredients)}")
+                            return False
+                        
+                        # Validate order instructions format
+                        order_instructions = recipe.get("order_instructions", "")
+                        if not order_instructions.lower().startswith("hi, can i get"):
+                            self.log_test_result("Curated Recipes - All", False, f"Recipe {i} has invalid order format: {order_instructions}")
+                            return False
+                    
+                    self.log_test_result(
+                        "Curated Recipes - All", 
+                        True, 
+                        f"Retrieved {total} curated recipes successfully. Sample recipes validated.",
+                        {"total_recipes": total, "sample_names": [r.get("name", "") for r in recipes[:3]]}
+                    )
+                    return True
+                else:
+                    self.log_test_result("Curated Recipes - All", False, f"HTTP {response.status_code}: {response.text}")
+                    return False
+        except Exception as e:
+            self.log_test_result("Curated Recipes - All", False, f"Error: {str(e)}")
+            return False
+
+    async def test_curated_recipes_by_category(self) -> bool:
+        """Test getting curated recipes by category"""
+        try:
+            categories = ["frappuccino", "refresher", "iced_matcha_latte", "lemonade", "random"]
+            all_passed = True
+            category_results = {}
+            
+            for category in categories:
+                async with httpx.AsyncClient(timeout=30.0) as client:
+                    response = await client.get(f"{self.backend_url}/curated-starbucks-recipes?category={category}")
+                    
+                    if response.status_code == 200:
+                        data = response.json()
+                        recipes = data.get("recipes", [])
+                        total = data.get("total", 0)
+                        
+                        # Validate that all recipes have the correct category
+                        for recipe in recipes:
+                            if recipe.get("category") != category:
+                                self.log_test_result(
+                                    f"Curated Recipes - {category.title()}", 
+                                    False, 
+                                    f"Recipe '{recipe.get('name', '')}' has wrong category: {recipe.get('category')} (expected: {category})"
+                                )
+                                all_passed = False
+                                break
+                        else:
+                            # Validate categorization logic based on base
+                            for recipe in recipes:
+                                base = recipe.get("base", "").lower()
+                                expected_category = self.get_expected_category(base)
+                                if expected_category != category:
+                                    self.log_test_result(
+                                        f"Curated Recipes - {category.title()}", 
+                                        False, 
+                                        f"Recipe '{recipe.get('name', '')}' with base '{base}' incorrectly categorized as '{category}' (expected: {expected_category})"
+                                    )
+                                    all_passed = False
+                                    break
+                            else:
+                                category_results[category] = {
+                                    "count": total,
+                                    "sample_names": [r.get("name", "") for r in recipes[:2]]
+                                }
+                                self.log_test_result(
+                                    f"Curated Recipes - {category.title()}", 
+                                    True, 
+                                    f"Found {total} {category} recipes with correct categorization"
+                                )
+                    else:
+                        self.log_test_result(f"Curated Recipes - {category.title()}", False, f"HTTP {response.status_code}")
+                        all_passed = False
+            
+            if all_passed:
+                self.log_test_result(
+                    "Curated Recipes - Category Filtering", 
+                    True, 
+                    f"All categories working correctly: {category_results}",
+                    category_results
+                )
+            
+            return all_passed
+        except Exception as e:
+            self.log_test_result("Curated Recipes - Category Filtering", False, f"Error: {str(e)}")
+            return False
+
+    def get_expected_category(self, base: str) -> str:
+        """Get expected category based on base type (matches backend logic)"""
+        base_lower = base.lower()
+        
+        if "frappuccino" in base_lower:
+            return "frappuccino"
+        elif "refresher" in base_lower:
+            return "refresher"
+        elif "matcha" in base_lower:
+            return "iced_matcha_latte"
+        elif "lemonade" in base_lower:
+            return "lemonade"
+        else:
+            return "random"  # For lattes, mochas, chai, etc.
+
+    async def test_curated_recipes_specific_examples(self) -> bool:
+        """Test that specific example recipes are present"""
+        try:
+            async with httpx.AsyncClient(timeout=30.0) as client:
+                response = await client.get(f"{self.backend_url}/curated-starbucks-recipes")
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    recipes = data.get("recipes", [])
+                    
+                    # Check for specific example recipes mentioned in the review request
+                    expected_recipes = ["Butterbeer Bliss", "Purple Haze Refresher"]
+                    found_recipes = []
+                    
+                    recipe_names = [recipe.get("name", "") for recipe in recipes]
+                    
+                    for expected in expected_recipes:
+                        if expected in recipe_names:
+                            found_recipes.append(expected)
+                    
+                    if len(found_recipes) == len(expected_recipes):
+                        self.log_test_result(
+                            "Curated Recipes - Specific Examples", 
+                            True, 
+                            f"Found all expected example recipes: {found_recipes}",
+                            {"found_recipes": found_recipes, "total_recipes": len(recipes)}
+                        )
+                        return True
+                    else:
+                        missing = [r for r in expected_recipes if r not in found_recipes]
+                        self.log_test_result(
+                            "Curated Recipes - Specific Examples", 
+                            False, 
+                            f"Missing expected recipes: {missing}. Found: {found_recipes}"
+                        )
+                        return False
+                else:
+                    self.log_test_result("Curated Recipes - Specific Examples", False, f"HTTP {response.status_code}")
+                    return False
+        except Exception as e:
+            self.log_test_result("Curated Recipes - Specific Examples", False, f"Error: {str(e)}")
+            return False
+
+    async def test_curated_recipes_initialization(self) -> bool:
+        """Test that curated recipes are properly initialized and no duplicates"""
+        try:
+            # Get all recipes multiple times to check for duplicates
+            async with httpx.AsyncClient(timeout=30.0) as client:
+                response1 = await client.get(f"{self.backend_url}/curated-starbucks-recipes")
+                await asyncio.sleep(1)
+                response2 = await client.get(f"{self.backend_url}/curated-starbucks-recipes")
+                
+                if response1.status_code == 200 and response2.status_code == 200:
+                    data1 = response1.json()
+                    data2 = response2.json()
+                    
+                    total1 = data1.get("total", 0)
+                    total2 = data2.get("total", 0)
+                    
+                    # Check that totals are consistent (no duplicates added)
+                    if total1 != total2:
+                        self.log_test_result(
+                            "Curated Recipes - Initialization", 
+                            False, 
+                            f"Inconsistent recipe counts: {total1} vs {total2} - possible duplicate initialization"
+                        )
+                        return False
+                    
+                    # Check that we have the expected number of recipes (around 30)
+                    if total1 < 25 or total1 > 35:
+                        self.log_test_result(
+                            "Curated Recipes - Initialization", 
+                            False, 
+                            f"Unexpected recipe count: {total1} (expected around 30)"
+                        )
+                        return False
+                    
+                    # Check for duplicate names
+                    recipes = data1.get("recipes", [])
+                    recipe_names = [recipe.get("name", "") for recipe in recipes]
+                    unique_names = set(recipe_names)
+                    
+                    if len(recipe_names) != len(unique_names):
+                        duplicates = [name for name in recipe_names if recipe_names.count(name) > 1]
+                        self.log_test_result(
+                            "Curated Recipes - Initialization", 
+                            False, 
+                            f"Duplicate recipe names found: {set(duplicates)}"
+                        )
+                        return False
+                    
+                    self.log_test_result(
+                        "Curated Recipes - Initialization", 
+                        True, 
+                        f"Initialization working correctly: {total1} unique recipes, no duplicates",
+                        {"total_recipes": total1, "unique_names": len(unique_names)}
+                    )
+                    return True
+                else:
+                    self.log_test_result("Curated Recipes - Initialization", False, "Failed to get recipes for initialization test")
+                    return False
+        except Exception as e:
+            self.log_test_result("Curated Recipes - Initialization", False, f"Error: {str(e)}")
+            return False
     
     async def test_api_health(self) -> bool:
         """Test basic API connectivity"""
