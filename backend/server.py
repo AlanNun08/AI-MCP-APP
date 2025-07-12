@@ -386,25 +386,39 @@ Respond with JSON in this exact format:
 }}"""
 
         elif request.drink_type == "iced_matcha_latte":
-            prompt = f"""Create a **magical and refreshing iced matcha drink** with dreamy flavors, made for **simple drive-thru ordering**{flavor_context}.
+            prompt = f"""Generate a drink based on a totally random aesthetic concept or scene. Do not use past drink structures. Be creative, strange, or playful — like a barista daydreaming.
 
-Include:
-* A creative name (e.g., "Emerald Bloom Iced Matcha", "Lunar Lavender Latte")
-* Iced matcha with custom milk (oat, coconut, almond, etc.)
-* Flavor boosts: syrups (vanilla, brown sugar), strawberry purée, espresso, cold foam
-* Optional layering (e.g., matcha on top of milk or espresso)
-* **Drive-thru order example** (e.g., "Hi, can I get a Venti Iced Matcha Latte with oat milk, brown sugar syrup, and vanilla sweet cream cold foam?")
-* A vibe line (e.g., "Like sipping morning dew in a Zen garden")
+**STEP 1: Choose a theme or aesthetic for the drink from this list:**
+- fantasy (e.g., fairy forest, moonlight sorcery)
+- color-inspired (e.g., neon green, cosmic purple, gold)
+- mood-based (e.g., 'cozy rainy day', 'after-school energy boost')
+- seasonal (e.g., autumn bonfire, spring bloom)
+- nostalgic (e.g., '90s mall treat, childhood cereal, birthday cake)
+
+**STEP 2: Create a magical iced matcha drink** with dreamy flavors{flavor_context}.
+
+**Name Requirements:**
+- Invent a completely new and original name that's catchy, poetic, or trend-worthy
+- Do NOT use existing Starbucks or secret menu names
+- Avoid repeating patterns like 'green', 'zen', or 'jade' unless essential to theme
+- Use uncommon words, symbols, or emotional cues (e.g., 'Sage Reverie', 'Mist Walker', 'Lunar Drift')
+
+**Surprise Ingredient Rule:**
+Each recipe MUST include one unexpected twist:
+- A shot of espresso (dirty matcha)
+- Unexpected syrup (toffee nut, raspberry, brown sugar)
+- Alternative milk combination (oat + coconut)
+- A fruit purée or cold foam topping
 
 Respond with JSON in this exact format:
 {{
-  "drink_name": "Creative magical name",
-  "description": "Short vibe description (e.g., 'Like sipping morning dew in a Zen garden')",
+  "drink_name": "Completely original poetic name",
+  "description": "Theme-based vibe description matching your chosen aesthetic",
   "base_drink": "Base iced matcha drink to order",
-  "modifications": ["ingredient 1", "ingredient 2", "ingredient 3"],
+  "modifications": ["ingredient 1", "ingredient 2", "surprise twist ingredient"],
   "ordering_script": "Complete drive-thru order: 'Hi, can I get a...'",
   "category": "iced_matcha_latte",
-  "vibe": "Short mood line"
+  "vibe": "Poetic mood line matching your theme"
 }}"""
 
         else:  # This handles any other drink type as "random mystery"
