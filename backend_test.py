@@ -494,9 +494,10 @@ class StarbucksAPITester:
         logger.info("🌟 Starting Starbucks Drink Generation API Testing Suite")
         logger.info(f"Backend URL: {self.backend_url}")
         
-        # Test sequence
+        # Test sequence - prioritizing streamlined prompts test
         tests = [
             ("API Health Check", self.test_api_health),
+            ("Streamlined Prompts Comprehensive Test", self.test_streamlined_prompts_comprehensive),
             ("Starbucks Frappuccino Generation", self.test_starbucks_frappuccino),
             ("Starbucks Lemonade Generation", self.test_starbucks_lemonade),
             ("Starbucks Refresher Generation", self.test_starbucks_refresher),
