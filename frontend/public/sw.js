@@ -1,5 +1,5 @@
-// Service Worker for PWA functionality - MANUAL SHOPPING MODE SUPPORT
-const CACHE_NAME = 'buildyoursmartcart-v110-manual-shopping-support';
+// Service Worker for PWA functionality - ITEM ID FIX
+const CACHE_NAME = 'buildyoursmartcart-v111-item-id-fix';
 const urlsToCache = [
   '/',
   '/static/js/bundle.js',
