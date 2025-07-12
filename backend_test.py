@@ -22,7 +22,7 @@ class StarbucksAPITester:
         # Get backend URL from frontend .env file
         self.backend_url = self.get_backend_url()
         self.test_results = []
-        self.test_user_id = "test-user-starbucks-2024"
+        self.test_user_id = "test-streamlined-prompts"
         
     def get_backend_url(self) -> str:
         """Get backend URL from frontend .env file"""
