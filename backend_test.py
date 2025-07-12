@@ -719,6 +719,518 @@ class StarbucksAPITester:
         except Exception as e:
             self.log_test_result("Curated Recipes - Initialization", False, f"Error: {str(e)}")
             return False
+
+    # ===== USER RECIPE SHARING SYSTEM TESTS =====
+    
+    async def create_test_user(self, user_id: str, email: str, first_name: str = "Test", last_name: str = "User") -> bool:
+        """Create a test user for recipe sharing tests"""
+        try:
+            # First register the user
+            register_data = {
+                "first_name": first_name,
+                "last_name": last_name,
+                "email": email,
+                "password": "testpass123",
+                "dietary_preferences": ["vegetarian"],
+                "allergies": [],
+                "favorite_cuisines": ["italian"]
+            }
+            
+            async with httpx.AsyncClient(timeout=30.0) as client:
+                response = await client.post(f"{self.backend_url}/auth/register", json=register_data)
+                
+                if response.status_code == 200:
+                    # Manually verify the user (skip email verification for testing)
+                    # We'll directly update the user in the database via debug endpoint
+                    return True
+                elif response.status_code == 400 and "already registered" in response.text:
+                    # User already exists, that's fine
+                    return True
+                else:
+                    logger.warning(f"Failed to create test user: {response.status_code} - {response.text}")
+                    return False
+        except Exception as e:
+            logger.warning(f"Error creating test user: {str(e)}")
+            return False
+
+    async def test_share_recipe_endpoint(self) -> bool:
+        """Test POST /api/share-recipe endpoint with different scenarios"""
+        try:
+            # Create test user first
+            test_email = "recipe.sharer@example.com"
+            await self.create_test_user(self.test_user_id, test_email)
+            
+            # Test Case 1: Valid frappuccino recipe with image
+            recipe_data_1 = {
+                "recipe_name": "Magical Unicorn Frappuccino",
+                "description": "A whimsical blend of vanilla and rainbow magic",
+                "ingredients": [
+                    "Vanilla Bean Frappuccino base",
+                    "2 pumps raspberry syrup",
+                    "Edible glitter",
+                    "Whipped cream",
+                    "Rainbow sprinkles"
+                ],
+                "order_instructions": "Hi, can I get a grande Vanilla Bean Frappuccino with 2 pumps raspberry syrup, edible glitter, whipped cream, and rainbow sprinkles?",
+                "category": "frappuccino",
+                "image_base64": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==",
+                "tags": ["sweet", "colorful", "magical"],
+                "difficulty_level": "easy",
+                "original_source": "custom"
+            }
+            
+            async with httpx.AsyncClient(timeout=30.0) as client:
+                response = await client.post(
+                    f"{self.backend_url}/share-recipe?user_id={self.test_user_id}", 
+                    json=recipe_data_1
+                )
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    if data.get("success") and "recipe_id" in data:
+                        recipe_id = data["recipe_id"]
+                        self.shared_recipe_ids.append(recipe_id)
+                        self.log_test_result(
+                            "Share Recipe - Valid Frappuccino", 
+                            True, 
+                            f"Successfully shared frappuccino recipe with ID: {recipe_id}",
+                            data
+                        )
+                    else:
+                        self.log_test_result("Share Recipe - Valid Frappuccino", False, f"Invalid response format: {data}")
+                        return False
+                else:
+                    self.log_test_result("Share Recipe - Valid Frappuccino", False, f"HTTP {response.status_code}: {response.text}")
+                    return False
+            
+            # Test Case 2: Valid refresher recipe
+            recipe_data_2 = {
+                "recipe_name": "Tropical Sunset Burst",
+                "description": "A vibrant refresher that tastes like paradise",
+                "ingredients": [
+                    "Mango Dragonfruit Refresher base",
+                    "Pineapple inclusions",
+                    "Coconut milk",
+                    "Vanilla sweet cream cold foam"
+                ],
+                "order_instructions": "Hi, can I get a grande Mango Dragonfruit Refresher with pineapple inclusions, coconut milk, and vanilla sweet cream cold foam?",
+                "category": "refresher",
+                "tags": ["tropical", "refreshing", "fruity"],
+                "difficulty_level": "medium"
+            }
+            
+            async with httpx.AsyncClient(timeout=30.0) as client:
+                response = await client.post(
+                    f"{self.backend_url}/share-recipe?user_id={self.test_user_id}", 
+                    json=recipe_data_2
+                )
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    if data.get("success"):
+                        self.shared_recipe_ids.append(data["recipe_id"])
+                        self.log_test_result(
+                            "Share Recipe - Valid Refresher", 
+                            True, 
+                            f"Successfully shared refresher recipe: {recipe_data_2['recipe_name']}"
+                        )
+                    else:
+                        self.log_test_result("Share Recipe - Valid Refresher", False, f"Invalid response: {data}")
+                        return False
+                else:
+                    self.log_test_result("Share Recipe - Valid Refresher", False, f"HTTP {response.status_code}: {response.text}")
+                    return False
+            
+            # Test Case 3: Test validation - missing required fields
+            invalid_recipe = {
+                "recipe_name": "",  # Empty name should fail
+                "description": "Test description",
+                "ingredients": ["ingredient1"],  # Too few ingredients
+                "order_instructions": "Test order",
+                "category": "lemonade"
+            }
+            
+            async with httpx.AsyncClient(timeout=30.0) as client:
+                response = await client.post(
+                    f"{self.backend_url}/share-recipe?user_id={self.test_user_id}", 
+                    json=invalid_recipe
+                )
+                
+                if response.status_code == 400:
+                    self.log_test_result(
+                        "Share Recipe - Validation Test", 
+                        True, 
+                        "Correctly rejected invalid recipe with missing/invalid fields"
+                    )
+                else:
+                    self.log_test_result("Share Recipe - Validation Test", False, f"Should have rejected invalid recipe: {response.status_code}")
+                    return False
+            
+            return True
+            
+        except Exception as e:
+            self.log_test_result("Share Recipe Endpoint", False, f"Error: {str(e)}")
+            return False
+
+    async def test_get_shared_recipes(self) -> bool:
+        """Test GET /api/shared-recipes endpoint with filtering"""
+        try:
+            # Test Case 1: Get all shared recipes
+            async with httpx.AsyncClient(timeout=30.0) as client:
+                response = await client.get(f"{self.backend_url}/shared-recipes")
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    
+                    # Validate response structure
+                    required_fields = ["recipes", "total", "limit", "offset", "has_more"]
+                    missing_fields = [field for field in required_fields if field not in data]
+                    if missing_fields:
+                        self.log_test_result("Get Shared Recipes - All", False, f"Missing fields: {missing_fields}")
+                        return False
+                    
+                    recipes = data["recipes"]
+                    total = data["total"]
+                    
+                    # Validate recipe structure
+                    if recipes:
+                        sample_recipe = recipes[0]
+                        recipe_required_fields = ["id", "recipe_name", "description", "ingredients", "order_instructions", "category", "shared_by_username", "likes_count", "created_at"]
+                        missing_recipe_fields = [field for field in recipe_required_fields if field not in sample_recipe]
+                        if missing_recipe_fields:
+                            self.log_test_result("Get Shared Recipes - All", False, f"Recipe missing fields: {missing_recipe_fields}")
+                            return False
+                    
+                    self.log_test_result(
+                        "Get Shared Recipes - All", 
+                        True, 
+                        f"Retrieved {total} shared recipes successfully",
+                        {"total": total, "returned": len(recipes)}
+                    )
+                else:
+                    self.log_test_result("Get Shared Recipes - All", False, f"HTTP {response.status_code}: {response.text}")
+                    return False
+            
+            # Test Case 2: Filter by category
+            categories_to_test = ["frappuccino", "refresher", "lemonade", "iced_matcha_latte", "random"]
+            
+            for category in categories_to_test:
+                async with httpx.AsyncClient(timeout=30.0) as client:
+                    response = await client.get(f"{self.backend_url}/shared-recipes?category={category}")
+                    
+                    if response.status_code == 200:
+                        data = response.json()
+                        recipes = data.get("recipes", [])
+                        
+                        # Validate that all returned recipes have the correct category
+                        for recipe in recipes:
+                            if recipe.get("category") != category:
+                                self.log_test_result(
+                                    f"Get Shared Recipes - Category {category}", 
+                                    False, 
+                                    f"Recipe has wrong category: {recipe.get('category')} (expected: {category})"
+                                )
+                                return False
+                        
+                        self.log_test_result(
+                            f"Get Shared Recipes - Category {category}", 
+                            True, 
+                            f"Found {len(recipes)} recipes in {category} category"
+                        )
+                    else:
+                        self.log_test_result(f"Get Shared Recipes - Category {category}", False, f"HTTP {response.status_code}")
+                        return False
+            
+            # Test Case 3: Filter by tags
+            async with httpx.AsyncClient(timeout=30.0) as client:
+                response = await client.get(f"{self.backend_url}/shared-recipes?tags=sweet,cold")
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    recipes = data.get("recipes", [])
+                    
+                    self.log_test_result(
+                        "Get Shared Recipes - Tags Filter", 
+                        True, 
+                        f"Tag filtering working: found {len(recipes)} recipes with sweet/cold tags"
+                    )
+                else:
+                    self.log_test_result("Get Shared Recipes - Tags Filter", False, f"HTTP {response.status_code}")
+                    return False
+            
+            # Test Case 4: Test pagination
+            async with httpx.AsyncClient(timeout=30.0) as client:
+                response = await client.get(f"{self.backend_url}/shared-recipes?limit=5&offset=0")
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    
+                    if data.get("limit") == 5 and len(data.get("recipes", [])) <= 5:
+                        self.log_test_result(
+                            "Get Shared Recipes - Pagination", 
+                            True, 
+                            f"Pagination working: limit={data.get('limit')}, returned={len(data.get('recipes', []))}"
+                        )
+                    else:
+                        self.log_test_result("Get Shared Recipes - Pagination", False, "Pagination not working correctly")
+                        return False
+                else:
+                    self.log_test_result("Get Shared Recipes - Pagination", False, f"HTTP {response.status_code}")
+                    return False
+            
+            return True
+            
+        except Exception as e:
+            self.log_test_result("Get Shared Recipes", False, f"Error: {str(e)}")
+            return False
+
+    async def test_like_unlike_system(self) -> bool:
+        """Test POST /api/like-recipe endpoint for like/unlike functionality"""
+        try:
+            # First, ensure we have a recipe to like
+            if not self.shared_recipe_ids:
+                # Create a test recipe if none exist
+                await self.test_share_recipe_endpoint()
+            
+            if not self.shared_recipe_ids:
+                self.log_test_result("Like/Unlike System", False, "No shared recipes available for testing")
+                return False
+            
+            recipe_id = self.shared_recipe_ids[0]
+            
+            # Test Case 1: Like a recipe
+            like_data = {
+                "recipe_id": recipe_id,
+                "user_id": self.test_user_id_2
+            }
+            
+            async with httpx.AsyncClient(timeout=30.0) as client:
+                response = await client.post(f"{self.backend_url}/like-recipe", json=like_data)
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    
+                    if data.get("success") and data.get("action") == "liked":
+                        likes_count = data.get("likes_count", 0)
+                        self.log_test_result(
+                            "Like Recipe", 
+                            True, 
+                            f"Successfully liked recipe. Likes count: {likes_count}",
+                            data
+                        )
+                    else:
+                        self.log_test_result("Like Recipe", False, f"Invalid like response: {data}")
+                        return False
+                else:
+                    self.log_test_result("Like Recipe", False, f"HTTP {response.status_code}: {response.text}")
+                    return False
+            
+            # Test Case 2: Unlike the same recipe
+            async with httpx.AsyncClient(timeout=30.0) as client:
+                response = await client.post(f"{self.backend_url}/like-recipe", json=like_data)
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    
+                    if data.get("success") and data.get("action") == "unliked":
+                        likes_count = data.get("likes_count", 0)
+                        self.log_test_result(
+                            "Unlike Recipe", 
+                            True, 
+                            f"Successfully unliked recipe. Likes count: {likes_count}",
+                            data
+                        )
+                    else:
+                        self.log_test_result("Unlike Recipe", False, f"Invalid unlike response: {data}")
+                        return False
+                else:
+                    self.log_test_result("Unlike Recipe", False, f"HTTP {response.status_code}: {response.text}")
+                    return False
+            
+            # Test Case 3: Like again to verify toggle functionality
+            async with httpx.AsyncClient(timeout=30.0) as client:
+                response = await client.post(f"{self.backend_url}/like-recipe", json=like_data)
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    
+                    if data.get("success") and data.get("action") == "liked":
+                        self.log_test_result(
+                            "Like Toggle Functionality", 
+                            True, 
+                            "Like/unlike toggle working correctly"
+                        )
+                    else:
+                        self.log_test_result("Like Toggle Functionality", False, f"Toggle not working: {data}")
+                        return False
+                else:
+                    self.log_test_result("Like Toggle Functionality", False, f"HTTP {response.status_code}")
+                    return False
+            
+            # Test Case 4: Test with invalid recipe ID
+            invalid_like_data = {
+                "recipe_id": "invalid-recipe-id",
+                "user_id": self.test_user_id_2
+            }
+            
+            async with httpx.AsyncClient(timeout=30.0) as client:
+                response = await client.post(f"{self.backend_url}/like-recipe", json=invalid_like_data)
+                
+                if response.status_code == 404:
+                    self.log_test_result(
+                        "Like Recipe - Invalid ID", 
+                        True, 
+                        "Correctly rejected like request for non-existent recipe"
+                    )
+                else:
+                    self.log_test_result("Like Recipe - Invalid ID", False, f"Should have returned 404: {response.status_code}")
+                    return False
+            
+            return True
+            
+        except Exception as e:
+            self.log_test_result("Like/Unlike System", False, f"Error: {str(e)}")
+            return False
+
+    async def test_recipe_stats(self) -> bool:
+        """Test GET /api/recipe-stats endpoint"""
+        try:
+            async with httpx.AsyncClient(timeout=30.0) as client:
+                response = await client.get(f"{self.backend_url}/recipe-stats")
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    
+                    # Validate response structure
+                    required_fields = ["total_shared_recipes", "category_breakdown", "top_tags", "most_liked"]
+                    missing_fields = [field for field in required_fields if field not in data]
+                    if missing_fields:
+                        self.log_test_result("Recipe Stats", False, f"Missing fields: {missing_fields}")
+                        return False
+                    
+                    total_shared = data.get("total_shared_recipes", 0)
+                    category_breakdown = data.get("category_breakdown", {})
+                    top_tags = data.get("top_tags", [])
+                    most_liked = data.get("most_liked", [])
+                    
+                    # Validate category breakdown
+                    expected_categories = ["frappuccino", "refresher", "lemonade", "iced_matcha_latte", "random"]
+                    for category in expected_categories:
+                        if category in category_breakdown:
+                            count = category_breakdown[category]
+                            if not isinstance(count, int) or count < 0:
+                                self.log_test_result("Recipe Stats", False, f"Invalid count for {category}: {count}")
+                                return False
+                    
+                    # Validate top tags structure
+                    for tag_info in top_tags:
+                        if not isinstance(tag_info, dict) or "tag" not in tag_info or "count" not in tag_info:
+                            self.log_test_result("Recipe Stats", False, f"Invalid tag structure: {tag_info}")
+                            return False
+                    
+                    # Validate most liked structure
+                    for recipe in most_liked:
+                        required_recipe_fields = ["recipe_name", "shared_by_username", "likes_count"]
+                        missing_recipe_fields = [field for field in required_recipe_fields if field not in recipe]
+                        if missing_recipe_fields:
+                            self.log_test_result("Recipe Stats", False, f"Most liked recipe missing fields: {missing_recipe_fields}")
+                            return False
+                    
+                    self.log_test_result(
+                        "Recipe Stats", 
+                        True, 
+                        f"Stats retrieved successfully: {total_shared} total recipes, {len(category_breakdown)} categories, {len(top_tags)} top tags, {len(most_liked)} most liked",
+                        {
+                            "total_shared_recipes": total_shared,
+                            "categories": list(category_breakdown.keys()),
+                            "top_tags_count": len(top_tags),
+                            "most_liked_count": len(most_liked)
+                        }
+                    )
+                    return True
+                else:
+                    self.log_test_result("Recipe Stats", False, f"HTTP {response.status_code}: {response.text}")
+                    return False
+                    
+        except Exception as e:
+            self.log_test_result("Recipe Stats", False, f"Error: {str(e)}")
+            return False
+
+    async def test_recipe_structure_validation(self) -> bool:
+        """Test that shared recipes have the correct structure and fields"""
+        try:
+            # Get some shared recipes to validate structure
+            async with httpx.AsyncClient(timeout=30.0) as client:
+                response = await client.get(f"{self.backend_url}/shared-recipes?limit=5")
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    recipes = data.get("recipes", [])
+                    
+                    if not recipes:
+                        self.log_test_result("Recipe Structure Validation", True, "No recipes to validate (empty database)")
+                        return True
+                    
+                    # Validate each recipe structure
+                    for i, recipe in enumerate(recipes):
+                        # Required fields
+                        required_fields = [
+                            "id", "recipe_name", "description", "ingredients", 
+                            "order_instructions", "category", "shared_by_user_id", 
+                            "shared_by_username", "likes_count", "liked_by_users", 
+                            "created_at", "is_public"
+                        ]
+                        
+                        missing_fields = [field for field in required_fields if field not in recipe]
+                        if missing_fields:
+                            self.log_test_result("Recipe Structure Validation", False, f"Recipe {i} missing fields: {missing_fields}")
+                            return False
+                        
+                        # Validate field types and values
+                        if not isinstance(recipe.get("ingredients"), list) or len(recipe.get("ingredients", [])) < 2:
+                            self.log_test_result("Recipe Structure Validation", False, f"Recipe {i} has invalid ingredients")
+                            return False
+                        
+                        if recipe.get("category") not in ["frappuccino", "refresher", "lemonade", "iced_matcha_latte", "random"]:
+                            self.log_test_result("Recipe Structure Validation", False, f"Recipe {i} has invalid category: {recipe.get('category')}")
+                            return False
+                        
+                        if not isinstance(recipe.get("likes_count"), int) or recipe.get("likes_count") < 0:
+                            self.log_test_result("Recipe Structure Validation", False, f"Recipe {i} has invalid likes_count")
+                            return False
+                        
+                        if not isinstance(recipe.get("liked_by_users"), list):
+                            self.log_test_result("Recipe Structure Validation", False, f"Recipe {i} has invalid liked_by_users")
+                            return False
+                        
+                        # Validate optional fields if present
+                        if "image_base64" in recipe and recipe["image_base64"]:
+                            if not recipe["image_base64"].startswith("data:image/"):
+                                self.log_test_result("Recipe Structure Validation", False, f"Recipe {i} has invalid image_base64 format")
+                                return False
+                        
+                        if "tags" in recipe and not isinstance(recipe["tags"], list):
+                            self.log_test_result("Recipe Structure Validation", False, f"Recipe {i} has invalid tags")
+                            return False
+                        
+                        if "difficulty_level" in recipe and recipe["difficulty_level"] not in ["easy", "medium", "hard"]:
+                            self.log_test_result("Recipe Structure Validation", False, f"Recipe {i} has invalid difficulty_level")
+                            return False
+                    
+                    self.log_test_result(
+                        "Recipe Structure Validation", 
+                        True, 
+                        f"All {len(recipes)} recipes have valid structure and required fields",
+                        {"validated_recipes": len(recipes)}
+                    )
+                    return True
+                else:
+                    self.log_test_result("Recipe Structure Validation", False, f"HTTP {response.status_code}: {response.text}")
+                    return False
+                    
+        except Exception as e:
+            self.log_test_result("Recipe Structure Validation", False, f"Error: {str(e)}")
+            return False
     
     async def test_api_health(self) -> bool:
         """Test basic API connectivity"""
