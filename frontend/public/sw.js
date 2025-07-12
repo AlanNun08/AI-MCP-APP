@@ -7,12 +7,12 @@ const urlsToCache = [
   '/manifest.json'
 ];
 
-// Install event - PERSISTENT AUTH FIX
+// Install event - MANUAL SHOPPING MODE SUPPORT
 self.addEventListener('install', (event) => {
-  console.log('🔄 PERSISTENT AUTH FIX - CLEARING ALL CACHES...');
+  console.log('🔄 MANUAL SHOPPING MODE SUPPORT - CLEARING ALL CACHES...');
   event.waitUntil(
     caches.keys().then(cacheNames => {
-      console.log('🗑️ DELETING OLD CACHES FOR PERSISTENT AUTH FIX:', cacheNames);
+      console.log('🗑️ DELETING OLD CACHES FOR MANUAL SHOPPING SUPPORT:', cacheNames);
       return Promise.all(
         cacheNames.map(cacheName => {
           console.log('💥 DELETING CACHE:', cacheName);
@@ -20,10 +20,10 @@ self.addEventListener('install', (event) => {
         })
       );
     }).then(() => {
-      console.log('✅ CACHES DELETED - CREATING PERSISTENT AUTH CACHE');
+      console.log('✅ CACHES DELETED - CREATING MANUAL SHOPPING CACHE');
       return caches.open(CACHE_NAME);
     }).then(() => {
-      console.log('🎉 PERSISTENT AUTH CACHE v109 CREATED');
+      console.log('🎉 MANUAL SHOPPING CACHE v110 CREATED');
       return self.skipWaiting();
     })
   );
