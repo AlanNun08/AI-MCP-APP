@@ -220,7 +220,6 @@ class WalmartProduct(BaseModel):
 
 class IngredientOption(BaseModel):
     ingredient_name: str
-    original_ingredient: str
     options: List[WalmartProduct]
 
 class GroceryCartOptions(BaseModel):
