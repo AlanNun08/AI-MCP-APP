@@ -5,7 +5,7 @@
 ### Environment Setup
 ```bash
 # Preview Environment (Always Working)
-PREVIEW_URL="https://4a624c76-fc66-4a7c-91df-de079314ff82.preview.emergentagent.com"
+PREVIEW_URL="https://310d9b8e-d018-47c6-9b14-e763b8dfbeb2.preview.emergentagent.com"
 
 # Deployment Environment  
 DEPLOY_URL="https://recipe-cart-app-1.emergent.host"
@@ -107,7 +107,7 @@ echo "starbucks: $STARBUCKS"
 
 ```bash
 # Complete test in one command
-curl -X POST https://4a624c76-fc66-4a7c-91df-de079314ff82.preview.emergentagent.com/api/recipes/generate -H "Content-Type: application/json" -d '{"user_id":"test","recipe_category":"snacks","cuisine_type":"cookies","servings":1,"difficulty":"easy"}' -s | jq -r '.id' | xargs -I {} curl -X POST "https://4a624c76-fc66-4a7c-91df-de079314ff82.preview.emergentagent.com/api/grocery/cart-options?recipe_id={}&user_id=test" -H "Content-Type: application/json" -d '{}' -s | jq -r '.ingredient_options[0].options[0].product_id // "FAILED"'
+curl -X POST https://310d9b8e-d018-47c6-9b14-e763b8dfbeb2.preview.emergentagent.com/api/grocery/cart-options?recipe_id={}&user_id=test" -H "Content-Type: application/json" -d '{}' -s | jq -r '.ingredient_options[0].options[0].product_id // "FAILED"'
 ```
 
 **Expected Output**: A real Walmart product ID like `10403017` (SUCCESS) or `FAILED`/`manual` (BROKEN)
@@ -168,7 +168,7 @@ API_STATUS=$(curl -s https://recipe-cart-app-1.emergent.host/api/ | jq -r '.stat
 echo "API Status: $API_STATUS"
 
 # Test Recipe + Walmart Integration  
-WALMART_TEST=$(curl -X POST https://4a624c76-fc66-4a7c-91df-de079314ff82.preview.emergentagent.com/api/recipes/generate -H "Content-Type: application/json" -d '{"user_id":"test","recipe_category":"snacks","cuisine_type":"cookies","servings":1,"difficulty":"easy"}' -s | jq -r '.id' | xargs -I {} curl -X POST "https://4a624c76-fc66-4a7c-91df-de079314ff82.preview.emergentagent.com/api/grocery/cart-options?recipe_id={}&user_id=test" -H "Content-Type: application/json" -d '{}' -s | jq -r '.ingredient_options[0].options[0].product_id // "manual"')
+WALMART_TEST=$(curl -X POST https://310d9b8e-d018-47c6-9b14-e763b8dfbeb2.preview.emergentagent.com/api/grocery/cart-options?recipe_id={}&user_id=test" -H "Content-Type: application/json" -d '{}' -s | jq -r '.ingredient_options[0].options[0].product_id // "manual"')
 
 if [ "$WALMART_TEST" != "manual" ] && [ "$WALMART_TEST" != "null" ]; then
     echo "✅ WALMART INTEGRATION: WORKING ($WALMART_TEST)"

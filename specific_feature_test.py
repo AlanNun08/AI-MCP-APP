@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 class SpecificFeatureTester:
     def __init__(self):
-        self.backend_url = "https://4a624c76-fc66-4a7c-91df-de079314ff82.preview.emergentagent.com/api"
+        self.backend_url = "https://310d9b8e-d018-47c6-9b14-e763b8dfbeb2.preview.emergentagent.com/api"
         self.test_results = []
         self.test_user_data = {
             "email": "specific_test_2024@example.com",

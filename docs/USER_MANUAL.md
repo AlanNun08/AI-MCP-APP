@@ -9,7 +9,7 @@
 
 ### 📱 **Accessing the App**
 1. **Open your web browser** (Chrome, Firefox, Safari, Edge)
-2. **Navigate to**: https://4a624c76-fc66-4a7c-91df-de079314ff82.preview.emergentagent.com
+2. **Navigate to**: https://310d9b8e-d018-47c6-9b14-e763b8dfbeb2.preview.emergentagent.com
 3. **You'll see the beautiful AI Chef landing page** with gradient background and chef emoji
 
 ### 🎯 **Main Features**

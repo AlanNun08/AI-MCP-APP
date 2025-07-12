@@ -9,7 +9,7 @@ sudo supervisorctl status
 # Expected: All services RUNNING
 
 # Verify API health
-curl -s https://4a624c76-fc66-4a7c-91df-de079314ff82.preview.emergentagent.com/api/ | jq .
+curl -s https://310d9b8e-d018-47c6-9b14-e763b8dfbeb2.preview.emergentagent.com/api/ | jq .
 # Expected: {"status": "running", "version": "2.0.0"}
 ```
 
@@ -76,7 +76,7 @@ cd /app && python tests/backend_test.py
 #### **Authentication Flow**
 ```bash
 # Register new user
-curl -X POST https://4a624c76-fc66-4a7c-91df-de079314ff82.preview.emergentagent.com/api/auth/register \
+curl -X POST https://310d9b8e-d018-47c6-9b14-e763b8dfbeb2.preview.emergentagent.com/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{
     "first_name": "Production",
@@ -89,15 +89,15 @@ curl -X POST https://4a624c76-fc66-4a7c-91df-de079314ff82.preview.emergentagent.
   }'
 
 # Get verification code
-curl https://4a624c76-fc66-4a7c-91df-de079314ff82.preview.emergentagent.com/api/debug/verification-codes/prod.test@example.com
+curl https://310d9b8e-d018-47c6-9b14-e763b8dfbeb2.preview.emergentagent.com/api/debug/verification-codes/prod.test@example.com
 
 # Verify email (use code from above)
-curl -X POST https://4a624c76-fc66-4a7c-91df-de079314ff82.preview.emergentagent.com/api/auth/verify \
+curl -X POST https://310d9b8e-d018-47c6-9b14-e763b8dfbeb2.preview.emergentagent.com/api/auth/verify \
   -H "Content-Type: application/json" \
   -d '{"email": "prod.test@example.com", "code": "VERIFICATION_CODE"}'
 
 # Test login
-curl -X POST https://4a624c76-fc66-4a7c-91df-de079314ff82.preview.emergentagent.com/api/auth/login \
+curl -X POST https://310d9b8e-d018-47c6-9b14-e763b8dfbeb2.preview.emergentagent.com/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email": "prod.test@example.com", "password": "ProdTest123!"}'
 ```
@@ -105,7 +105,7 @@ curl -X POST https://4a624c76-fc66-4a7c-91df-de079314ff82.preview.emergentagent.
 #### **Recipe Generation**
 ```bash
 # Test cuisine recipe
-curl -X POST https://4a624c76-fc66-4a7c-91df-de079314ff82.preview.emergentagent.com/api/recipes/generate \
+curl -X POST https://310d9b8e-d018-47c6-9b14-e763b8dfbeb2.preview.emergentagent.com/api/recipes/generate \
   -H "Content-Type: application/json" \
   -d '{
     "recipe_category": "cuisine",
@@ -117,7 +117,7 @@ curl -X POST https://4a624c76-fc66-4a7c-91df-de079314ff82.preview.emergentagent.
   }' | jq .
 
 # Test beverage recipe
-curl -X POST https://4a624c76-fc66-4a7c-91df-de079314ff82.preview.emergentagent.com/api/recipes/generate \
+curl -X POST https://310d9b8e-d018-47c6-9b14-e763b8dfbeb2.preview.emergentagent.com/api/recipes/generate \
   -H "Content-Type: application/json" \
   -d '{
     "recipe_category": "beverage",
@@ -129,7 +129,7 @@ curl -X POST https://4a624c76-fc66-4a7c-91df-de079314ff82.preview.emergentagent.
   }' | jq .
 
 # Test Starbucks recipe
-curl -X POST https://4a624c76-fc66-4a7c-91df-de079314ff82.preview.emergentagent.com/api/recipes/generate \
+curl -X POST https://310d9b8e-d018-47c6-9b14-e763b8dfbeb2.preview.emergentagent.com/api/recipes/generate \
   -H "Content-Type: application/json" \
   -d '{
     "recipe_category": "starbucks", 
@@ -142,16 +142,16 @@ curl -X POST https://4a624c76-fc66-4a7c-91df-de079314ff82.preview.emergentagent.
 #### **Walmart Integration**
 ```bash
 # Test cart options (use recipe_id from above)
-curl -X POST "https://4a624c76-fc66-4a7c-91df-de079314ff82.preview.emergentagent.com/api/grocery/cart-options?recipe_id=RECIPE_ID&user_id=USER_ID" | jq .
+curl -X POST "https://310d9b8e-d018-47c6-9b14-e763b8dfbeb2.preview.emergentagent.com/api/grocery/cart-options?recipe_id=RECIPE_ID&user_id=USER_ID" | jq .
 ```
 
 ### **7. Frontend Testing**
 ```bash
 # Test frontend loads
-curl -s https://4a624c76-fc66-4a7c-91df-de079314ff82.preview.emergentagent.com/ | head -10
+curl -s https://310d9b8e-d018-47c6-9b14-e763b8dfbeb2.preview.emergentagent.com/ | head -10
 
 # Test service worker
-curl -s https://4a624c76-fc66-4a7c-91df-de079314ff82.preview.emergentagent.com/sw.js | head -5
+curl -s https://310d9b8e-d018-47c6-9b14-e763b8dfbeb2.preview.emergentagent.com/sw.js | head -5
 ```
 
 ## ✅ PERFORMANCE VALIDATION
@@ -159,10 +159,10 @@ curl -s https://4a624c76-fc66-4a7c-91df-de079314ff82.preview.emergentagent.com/s
 ### **8. Response Time Testing**
 ```bash
 # API health check timing
-curl -w "Total time: %{time_total}s\n" -o /dev/null -s https://4a624c76-fc66-4a7c-91df-de079314ff82.preview.emergentagent.com/api/
+curl -w "Total time: %{time_total}s\n" -o /dev/null -s https://310d9b8e-d018-47c6-9b14-e763b8dfbeb2.preview.emergentagent.com/api/
 
 # Recipe generation timing
-time curl -X POST https://4a624c76-fc66-4a7c-91df-de079314ff82.preview.emergentagent.com/api/recipes/generate \
+time curl -X POST https://310d9b8e-d018-47c6-9b14-e763b8dfbeb2.preview.emergentagent.com/api/recipes/generate \
   -H "Content-Type: application/json" \
   -d '{"recipe_category": "cuisine", "cuisine_type": "italian", "servings": 2, "user_id": "test"}' \
   -o /dev/null -s
@@ -172,7 +172,7 @@ time curl -X POST https://4a624c76-fc66-4a7c-91df-de079314ff82.preview.emergenta
 ```bash
 # Test 10 concurrent requests
 for i in {1..10}; do
-  curl -s https://4a624c76-fc66-4a7c-91df-de079314ff82.preview.emergentagent.com/api/ &
+  curl -s https://310d9b8e-d018-47c6-9b14-e763b8dfbeb2.preview.emergentagent.com/api/ &
 done
 wait
 echo "Concurrent test completed"
@@ -183,15 +183,15 @@ echo "Concurrent test completed"
 ### **10. Security Checks**
 ```bash
 # Check CORS headers
-curl -I -X OPTIONS https://4a624c76-fc66-4a7c-91df-de079314ff82.preview.emergentagent.com/api/auth/login
+curl -I -X OPTIONS https://310d9b8e-d018-47c6-9b14-e763b8dfbeb2.preview.emergentagent.com/api/auth/login
 
 # Test input validation
-curl -X POST https://4a624c76-fc66-4a7c-91df-de079314ff82.preview.emergentagent.com/api/auth/register \
+curl -X POST https://310d9b8e-d018-47c6-9b14-e763b8dfbeb2.preview.emergentagent.com/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{"invalid": "data"}' | jq .
 
 # Verify no sensitive data in responses
-curl https://4a624c76-fc66-4a7c-91df-de079314ff82.preview.emergentagent.com/api/ | grep -i "password\|key\|secret"
+curl https://310d9b8e-d018-47c6-9b14-e763b8dfbeb2.preview.emergentagent.com/api/ | grep -i "password\|key\|secret"
 ```
 
 ## ✅ MONITORING & LOGGING
@@ -286,7 +286,7 @@ If any critical issues are found after deployment:
    sudo supervisorctl restart all
    
    # Verify rollback
-   curl -s https://4a624c76-fc66-4a7c-91df-de079314ff82.preview.emergentagent.com/api/ | jq .
+   curl -s https://310d9b8e-d018-47c6-9b14-e763b8dfbeb2.preview.emergentagent.com/api/ | jq .
    ```
 
 2. **Communication**
