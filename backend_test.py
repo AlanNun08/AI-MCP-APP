@@ -776,7 +776,15 @@ class StarbucksAPITester:
         try:
             # Create test user first
             test_email = "recipe.sharer@example.com"
-            await self.create_test_user(self.test_user_id, test_email)
+            user_created = await self.create_test_user(self.test_user_id, test_email)
+            
+            if not user_created:
+                self.log_test_result("Share Recipe Endpoint", False, "Failed to create test user")
+                return False
+            
+            # Also create second test user for like/unlike tests
+            test_email_2 = "recipe.liker@example.com"
+            await self.create_test_user(self.test_user_id_2, test_email_2, "Liker", "User")
             
             # Test Case 1: Valid frappuccino recipe with image
             recipe_data_1 = {
