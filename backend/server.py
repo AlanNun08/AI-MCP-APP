@@ -973,6 +973,192 @@ def get_curated_recipes_data():
             "vibe": "Tropical tang meets nutty sweetness."
         }
     ]
+
+# User Recipe Sharing Endpoints
+@app.post("/api/share-recipe")
+async def share_recipe(recipe_request: ShareRecipeRequest, user_id: str):
+    """Allow users to share their favorite recipes with the community"""
+    try:
+        # Get user information
+        user = await db.users.find_one({"id": user_id})
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        username = f"{user.get('first_name', 'User')} {user.get('last_name', '')[:1]}".strip()
+        
+        # Validate required fields
+        if not recipe_request.recipe_name or not recipe_request.description:
+            raise HTTPException(status_code=400, detail="Recipe name and description are required")
+        
+        if not recipe_request.ingredients or len(recipe_request.ingredients) < 2:
+            raise HTTPException(status_code=400, detail="At least 2 ingredients are required")
+        
+        # Create shared recipe
+        shared_recipe = UserSharedRecipe(
+            recipe_name=recipe_request.recipe_name,
+            description=recipe_request.description,
+            ingredients=recipe_request.ingredients,
+            order_instructions=recipe_request.order_instructions,
+            category=recipe_request.category,
+            shared_by_user_id=user_id,
+            shared_by_username=username,
+            image_base64=recipe_request.image_base64,
+            tags=recipe_request.tags,
+            difficulty_level=recipe_request.difficulty_level,
+            original_source=recipe_request.original_source,
+            original_recipe_id=recipe_request.original_recipe_id
+        )
+        
+        # Save to database
+        recipe_dict = shared_recipe.dict()
+        result = await db.user_shared_recipes.insert_one(recipe_dict)
+        
+        logger.info(f"User {username} shared recipe: {recipe_request.recipe_name}")
+        
+        return {
+            "success": True,
+            "message": "Recipe shared successfully!",
+            "recipe_id": shared_recipe.id,
+            "shared_by": username
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error sharing recipe: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to share recipe")
+
+@app.get("/api/shared-recipes")
+async def get_shared_recipes(
+    category: Optional[str] = None,
+    user_id: Optional[str] = None,
+    tags: Optional[str] = None,
+    limit: int = 20,
+    offset: int = 0
+):
+    """Get community shared recipes with optional filtering"""
+    try:
+        # Build query
+        query = {"is_public": True}
+        
+        if category and category != "all":
+            query["category"] = category
+        
+        if user_id:
+            query["shared_by_user_id"] = user_id
+            
+        if tags:
+            tag_list = [tag.strip() for tag in tags.split(",")]
+            query["tags"] = {"$in": tag_list}
+        
+        # Get recipes with pagination
+        recipes = await db.user_shared_recipes.find(query).sort("created_at", -1).skip(offset).limit(limit).to_list(limit)
+        total_count = await db.user_shared_recipes.count_documents(query)
+        
+        # Convert to clean dictionaries
+        clean_recipes = [mongo_to_dict(recipe) for recipe in recipes]
+        
+        return {
+            "recipes": clean_recipes,
+            "total": total_count,
+            "limit": limit,
+            "offset": offset,
+            "has_more": (offset + limit) < total_count
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting shared recipes: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to get shared recipes")
+
+@app.post("/api/like-recipe")
+async def like_recipe(like_request: LikeRecipeRequest):
+    """Like or unlike a shared recipe"""
+    try:
+        # Find the recipe
+        recipe = await db.user_shared_recipes.find_one({"id": like_request.recipe_id})
+        if not recipe:
+            raise HTTPException(status_code=404, detail="Recipe not found")
+        
+        liked_by_users = recipe.get("liked_by_users", [])
+        likes_count = recipe.get("likes_count", 0)
+        
+        # Check if user already liked this recipe
+        if like_request.user_id in liked_by_users:
+            # Unlike the recipe
+            liked_by_users.remove(like_request.user_id)
+            likes_count = max(0, likes_count - 1)
+            action = "unliked"
+        else:
+            # Like the recipe
+            liked_by_users.append(like_request.user_id)
+            likes_count += 1
+            action = "liked"
+        
+        # Update the recipe
+        await db.user_shared_recipes.update_one(
+            {"id": like_request.recipe_id},
+            {
+                "$set": {
+                    "liked_by_users": liked_by_users,
+                    "likes_count": likes_count,
+                    "updated_at": datetime.utcnow()
+                }
+            }
+        )
+        
+        return {
+            "success": True,
+            "action": action,
+            "likes_count": likes_count,
+            "message": f"Recipe {action} successfully!"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error liking recipe: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to like recipe")
+
+@app.get("/api/recipe-stats")
+async def get_recipe_stats():
+    """Get statistics about shared recipes"""
+    try:
+        total_shared = await db.user_shared_recipes.count_documents({"is_public": True})
+        
+        # Get category breakdown
+        pipeline = [
+            {"$match": {"is_public": True}},
+            {"$group": {"_id": "$category", "count": {"$sum": 1}}}
+        ]
+        category_stats = await db.user_shared_recipes.aggregate(pipeline).to_list(100)
+        
+        # Get top tags
+        pipeline = [
+            {"$match": {"is_public": True}},
+            {"$unwind": "$tags"},
+            {"$group": {"_id": "$tags", "count": {"$sum": 1}}},
+            {"$sort": {"count": -1}},
+            {"$limit": 10}
+        ]
+        top_tags = await db.user_shared_recipes.aggregate(pipeline).to_list(10)
+        
+        # Get most liked recipes
+        most_liked = await db.user_shared_recipes.find(
+            {"is_public": True}, 
+            {"recipe_name": 1, "shared_by_username": 1, "likes_count": 1}
+        ).sort("likes_count", -1).limit(5).to_list(5)
+        
+        return {
+            "total_shared_recipes": total_shared,
+            "category_breakdown": {stat["_id"]: stat["count"] for stat in category_stats},
+            "top_tags": [{"tag": stat["_id"], "count": stat["count"]} for stat in top_tags],
+            "most_liked": [mongo_to_dict(recipe) for recipe in most_liked]
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting recipe stats: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to get recipe stats")
+
 def hash_password(password: str) -> str:
     """Hash a password using bcrypt"""
     salt = bcrypt.gensalt()
