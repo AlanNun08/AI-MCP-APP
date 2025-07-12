@@ -173,6 +173,18 @@ backend:
         agent: "testing"
         comment: "Mailjet email service integration working. Configured with proper API keys and sender email. Sends both verification and password reset emails."
 
+  - task: "Curated Starbucks Recipes System"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "CURATED STARBUCKS RECIPES SYSTEM FULLY OPERATIONAL: ✅ GET /api/curated-starbucks-recipes endpoint working (returns 30 recipes). ✅ Category filtering working for all categories: frappuccino (7), refresher (9), iced_matcha_latte (4), lemonade (2), random (8). ✅ Recipe structure validated: all recipes have name, base, ingredients (3-5 items), order_instructions ('Hi, can I get...' format), vibe, category. ✅ Categorization logic working correctly based on base type. ✅ Specific example recipes present: 'Butterbeer Bliss', 'Purple Haze Refresher'. ✅ Database initialization working: 30 unique recipes, no duplicates. ✅ MongoDB storage with proper JSON serialization (fixed ObjectId issue). All 5 test categories passed with 100% success rate. System ready for production."
+
 frontend:
   - task: "Frontend Testing"
     implemented: true
