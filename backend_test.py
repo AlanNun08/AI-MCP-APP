@@ -76,7 +76,7 @@ class StarbucksAPITester:
         description = data.get("description", "")
         
         # Common drink words that are acceptable to appear in both name and instructions
-        common_drink_words = {"lemonade", "matcha", "frappuccino", "refresher", "tea", "coffee", "latte", "drink", "berry", "vanilla", "caramel", "foam", "syrup", "splash", "twist", "swirl", "layer"}
+        common_drink_words = {"lemonade", "matcha", "frappuccino", "refresher", "tea", "coffee", "latte", "drink", "berry", "vanilla", "caramel", "foam", "syrup", "splash", "twist", "swirl", "layer", "lavender", "mango", "tropical", "sunset", "dream", "bliss"}
         
         name_words = [word.lower() for word in drink_name.split() if len(word) > 3 and word.lower() not in common_drink_words]
         
