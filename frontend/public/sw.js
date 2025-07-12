@@ -1,5 +1,5 @@
-// Service Worker for PWA functionality - ITEM ID FIX
-const CACHE_NAME = 'buildyoursmartcart-v111-item-id-fix';
+// Service Worker for PWA functionality - USING WORKING PREVIEW BACKEND
+const CACHE_NAME = 'buildyoursmartcart-v112-preview-backend';
 const urlsToCache = [
   '/',
   '/static/js/bundle.js',
