@@ -471,7 +471,10 @@ async def get_curated_starbucks_recipes(category: Optional[str] = None):
             await initialize_curated_recipes()
             recipes = await db.curated_starbucks_recipes.find(query).to_list(100)
         
-        return {"recipes": recipes, "total": len(recipes)}
+        # Convert MongoDB documents to clean dictionaries
+        clean_recipes = [mongo_to_dict(recipe) for recipe in recipes]
+        
+        return {"recipes": clean_recipes, "total": len(clean_recipes)}
     
     except Exception as e:
         logger.error(f"Error getting curated recipes: {str(e)}")
