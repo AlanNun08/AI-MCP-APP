@@ -266,13 +266,13 @@ async def generate_starbucks_drink(request: StarbucksRequest):
             drink_types = ["frappuccino", "refresher", "lemonade", "iced_matcha_latte"]
             request.drink_type = random.choice(drink_types)
             
-        # Build specialized prompt for Starbucks drinks
+        # Build specialized prompts for each drink type
         prompt_parts = []
         
         # Add flavor inspiration if provided
         flavor_context = ""
         if request.flavor_inspiration:
-            flavor_context = f" with {request.flavor_inspiration} flavors"
+            flavor_context = f" inspired by {request.flavor_inspiration} flavors"
             
         prompt_parts.append(f"""Create a viral-worthy Starbucks secret menu drink that's a creative {request.drink_type}{flavor_context}. This should be an Instagram-ready drink hack that TikTok users would love to try and share.
 
