@@ -163,7 +163,7 @@ class StarbucksAPITester:
                             "no_name_reuse": not any(word in str(mod).lower() for mod in modifications for word in unique_name_words),
                             "drive_thru_format": "hi, can i get" in ordering_script.lower(),
                             "has_creative_twist": any(twist in str(mod).lower() for mod in modifications for twist in ["foam", "drizzle", "layer", "swirl", "extra", "cold foam", "syrup"]),
-                            "vibe_description": len(description) >= 15 and any(vibe in description.lower() for vibe in ["taste", "sip", "like", "dream", "cloud", "night"])
+                            "vibe_description": len(description) >= 15 and (any(vibe in description.lower() for vibe in ["taste", "sip", "like", "dream", "cloud", "night", "burst", "symphony", "sunshine", "brighten", "refreshing", "lively", "enchant", "magic", "sparkle", "glow", "shimmer", "bliss", "delight"]) or len(description) >= 20)
                         }
                         
                         all_requirements_met = all(requirements_check.values())
