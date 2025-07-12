@@ -740,12 +740,30 @@ class StarbucksAPITester:
                 response = await client.post(f"{self.backend_url}/auth/register", json=register_data)
                 
                 if response.status_code == 200:
-                    # Manually verify the user (skip email verification for testing)
-                    # We'll directly update the user in the database via debug endpoint
-                    return True
+                    data = response.json()
+                    # Get the actual user_id from registration response
+                    actual_user_id = data.get("user_id")
+                    if actual_user_id:
+                        # Update our test user ID to the actual one
+                        self.test_user_id = actual_user_id
+                        logger.info(f"Created test user with ID: {actual_user_id}")
+                        return True
+                    return False
                 elif response.status_code == 400 and "already registered" in response.text:
-                    # User already exists, that's fine
-                    return True
+                    # User already exists, try to get user ID via debug endpoint
+                    try:
+                        debug_response = await client.get(f"{self.backend_url}/debug/user/{email}")
+                        if debug_response.status_code == 200:
+                            debug_data = debug_response.json()
+                            user_data = debug_data.get("user", {})
+                            actual_user_id = user_data.get("id")
+                            if actual_user_id:
+                                self.test_user_id = actual_user_id
+                                logger.info(f"Found existing test user with ID: {actual_user_id}")
+                                return True
+                    except:
+                        pass
+                    return True  # User exists, assume it's fine
                 else:
                     logger.warning(f"Failed to create test user: {response.status_code} - {response.text}")
                     return False
