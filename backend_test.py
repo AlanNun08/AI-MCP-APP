@@ -113,6 +113,110 @@ class StarbucksAPITester:
         
         return True, "All streamlined requirements validated successfully"
     
+    async def test_streamlined_prompts_comprehensive(self) -> bool:
+        """Comprehensive test of all streamlined prompt requirements"""
+        try:
+            test_cases = [
+                {"drink_type": "frappuccino", "flavor_inspiration": None},
+                {"drink_type": "lemonade", "flavor_inspiration": None},
+                {"drink_type": "refresher", "flavor_inspiration": None},
+                {"drink_type": "iced_matcha_latte", "flavor_inspiration": None},
+                {"drink_type": "random", "flavor_inspiration": None},
+                {"drink_type": "frappuccino", "flavor_inspiration": "vanilla dreams"}
+            ]
+            
+            all_passed = True
+            detailed_results = []
+            
+            for i, test_case in enumerate(test_cases, 1):
+                request_data = {
+                    "user_id": self.test_user_id,
+                    "drink_type": test_case["drink_type"]
+                }
+                
+                if test_case["flavor_inspiration"]:
+                    request_data["flavor_inspiration"] = test_case["flavor_inspiration"]
+                
+                async with httpx.AsyncClient(timeout=60.0) as client:
+                    response = await client.post(f"{self.backend_url}/generate-starbucks-drink", json=request_data)
+                    
+                    if response.status_code == 200:
+                        data = response.json()
+                        is_valid, validation_msg = self.validate_starbucks_response(data, test_case["drink_type"])
+                        
+                        # Additional streamlined requirements check
+                        drink_name = data.get("drink_name", "")
+                        modifications = data.get("modifications", [])
+                        ordering_script = data.get("ordering_script", "")
+                        description = data.get("description", "")
+                        
+                        # Check specific streamlined requirements
+                        requirements_check = {
+                            "3-5_ingredients": 3 <= len(modifications) <= 5,
+                            "no_name_reuse": not any(word.lower() in ordering_script.lower() for word in drink_name.split() if len(word) > 3),
+                            "drive_thru_format": "hi, can i get" in ordering_script.lower(),
+                            "has_creative_twist": any(twist in str(mod).lower() for mod in modifications for twist in ["foam", "drizzle", "layer", "swirl", "extra", "cold foam", "syrup"]),
+                            "vibe_description": len(description) >= 15 and any(vibe in description.lower() for vibe in ["taste", "sip", "like", "dream", "cloud", "night"])
+                        }
+                        
+                        all_requirements_met = all(requirements_check.values())
+                        
+                        result_detail = {
+                            "test_case": i,
+                            "drink_type": test_case["drink_type"],
+                            "flavor_inspiration": test_case["flavor_inspiration"],
+                            "drink_name": drink_name,
+                            "validation_passed": is_valid,
+                            "requirements_met": requirements_check,
+                            "all_requirements_met": all_requirements_met,
+                            "modifications_count": len(modifications),
+                            "ordering_script_format": "hi, can i get" in ordering_script.lower(),
+                            "description_length": len(description)
+                        }
+                        
+                        detailed_results.append(result_detail)
+                        
+                        if not is_valid or not all_requirements_met:
+                            all_passed = False
+                            logger.warning(f"Test case {i} failed: {validation_msg}")
+                            logger.warning(f"Requirements check: {requirements_check}")
+                        else:
+                            logger.info(f"✅ Test case {i} passed: {drink_name}")
+                    else:
+                        all_passed = False
+                        logger.error(f"Test case {i} HTTP error: {response.status_code}")
+                        detailed_results.append({
+                            "test_case": i,
+                            "error": f"HTTP {response.status_code}",
+                            "drink_type": test_case["drink_type"]
+                        })
+                
+                # Small delay between requests
+                await asyncio.sleep(1)
+            
+            # Calculate success metrics
+            successful_tests = sum(1 for r in detailed_results if r.get("all_requirements_met", False))
+            total_tests = len(detailed_results)
+            success_rate = (successful_tests / total_tests * 100) if total_tests > 0 else 0
+            
+            self.log_test_result(
+                "Streamlined Prompts Comprehensive Test",
+                all_passed,
+                f"Tested {total_tests} cases, {successful_tests} passed all requirements ({success_rate:.1f}% success rate)",
+                {
+                    "total_tests": total_tests,
+                    "successful_tests": successful_tests,
+                    "success_rate": f"{success_rate:.1f}%",
+                    "detailed_results": detailed_results
+                }
+            )
+            
+            return all_passed
+            
+        except Exception as e:
+            self.log_test_result("Streamlined Prompts Comprehensive Test", False, f"Error: {str(e)}")
+            return False
+
     async def test_starbucks_frappuccino(self) -> bool:
         """Test Frappuccino generation with creative prompts"""
         try:
