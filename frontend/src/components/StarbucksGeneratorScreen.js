@@ -225,227 +225,240 @@ const StarbucksGeneratorScreen = ({ showNotification, setCurrentScreen, user, AP
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-green-100 to-green-200 p-4">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         
         {/* Header */}
         <div className="text-center mb-8">
           <div className="text-6xl mb-4">☕</div>
           <h1 className="text-4xl font-bold text-green-800 mb-2">Starbucks Secret Menu</h1>
-          <p className="text-lg text-green-700">Generate viral TikTok-worthy drink hacks</p>
+          <p className="text-lg text-green-700">Generate, discover, and share viral drink hacks</p>
         </div>
 
-        {/* Generator Form */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Create Your Secret Drink</h2>
-          
-          {/* Drink Type Selection */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-3">Choose Your Drink Type</label>
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-              {drinkTypes.map((type) => (
-                <button
-                  key={type.value}
-                  onClick={() => setDrinkType(type.value)}
-                  className={`p-4 rounded-xl border-2 transition-all duration-200 ${
-                    drinkType === type.value 
-                      ? 'border-green-500 bg-green-50 text-green-700' 
-                      : 'border-gray-200 hover:border-green-300 text-gray-700'
-                  }`}
-                >
-                  <div className="text-2xl mb-1">{type.emoji}</div>
-                  <div className="font-medium text-sm">{type.label}</div>
-                </button>
-              ))}
-            </div>
+        {/* Tab Navigation */}
+        <div className="flex justify-center mb-8">
+          <div className="bg-white rounded-2xl shadow-lg p-2 flex space-x-2">
+            <button
+              onClick={() => setCurrentTab('generator')}
+              className={`px-6 py-3 rounded-xl font-bold transition-all duration-200 ${
+                currentTab === 'generator'
+                  ? 'bg-green-500 text-white shadow-md'
+                  : 'text-gray-600 hover:text-green-600'
+              }`}
+            >
+              ✨ AI Generator
+            </button>
+            <button
+              onClick={() => setCurrentTab('curated')}
+              className={`px-6 py-3 rounded-xl font-bold transition-all duration-200 ${
+                currentTab === 'curated'
+                  ? 'bg-purple-500 text-white shadow-md'
+                  : 'text-gray-600 hover:text-purple-600'
+              }`}
+            >
+              📚 Curated Recipes
+            </button>
+            <button
+              onClick={() => setCurrentTab('community')}
+              className={`px-6 py-3 rounded-xl font-bold transition-all duration-200 ${
+                currentTab === 'community'
+                  ? 'bg-blue-500 text-white shadow-md'
+                  : 'text-gray-600 hover:text-blue-600'
+              }`}
+            >
+              👥 Community
+            </button>
           </div>
-
-          {/* Flavor Inspiration */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">Flavor Inspiration (Optional)</label>
-            <input
-              type="text"
-              value={flavorInspiration}
-              onChange={(e) => setFlavorInspiration(e.target.value)}
-              placeholder='e.g., "tres leches", "ube", "mango tajin", "birthday cake"'
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent"
-            />
-            <p className="text-xs text-gray-500 mt-1">Add a flavor twist to inspire your drink creation!</p>
-          </div>
-
-          {/* Generate Button */}
-          <button
-            onClick={generateDrink}
-            disabled={isGenerating}
-            className={`w-full py-4 rounded-xl font-bold text-lg transition-all duration-200 ${
-              isGenerating 
-                ? 'bg-gray-400 text-gray-600 cursor-not-allowed' 
-                : 'bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white shadow-lg hover:shadow-xl'
-            }`}
-          >
-            {isGenerating ? (
-              <span className="flex items-center justify-center">
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
-                Brewing Your Secret Drink...
-              </span>
-            ) : (
-              <span>✨ Generate My Secret Drink ✨</span>
-            )}
-          </button>
         </div>
 
-        {/* Generated Drink Display */}
-        {generatedDrink && (
-          <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-            
-            {/* Drink Header */}
-            <div className="bg-gradient-to-r from-green-600 to-green-700 text-white p-6">
-              <div className="text-center">
-                <div className="text-4xl mb-2">🎉</div>
-                <h2 className="text-3xl font-bold mb-2">{generatedDrink.drink_name}</h2>
-                <p className="text-green-100 text-lg">{generatedDrink.description}</p>
-              </div>
-            </div>
-
-            {/* Drive-Thru Order Section */}
-            <div className="p-6 bg-gray-900 text-green-400 font-mono">
-              <div className="bg-black rounded-lg p-4 border border-green-400">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center">
-                    <div className="w-3 h-3 bg-green-400 rounded-full mr-2 animate-pulse"></div>
-                    <span className="text-sm">DRIVE-THRU ORDER READY</span>
-                  </div>
-                  <div className="text-xs text-gray-400">#{Math.floor(Math.random() * 1000)}</div>
-                </div>
-                
-                <div className="text-lg mb-4 leading-relaxed">
-                  "{generatedDrink.ordering_script}"
-                </div>
-                
-                <div className="flex space-x-3">
-                  <button
-                    onClick={copyOrderScript}
-                    className={`flex-1 py-2 px-4 rounded-lg font-bold transition-all duration-200 ${
-                      showCopySuccess 
-                        ? 'bg-green-500 text-white' 
-                        : 'bg-green-400 hover:bg-green-500 text-black'
-                    }`}
-                  >
-                    {showCopySuccess ? '✅ Copied!' : '📋 Copy Order Script'}
-                  </button>
-                  
-                  <button
-                    onClick={shareDrink}
-                    className="flex-1 py-2 px-4 rounded-lg bg-purple-500 hover:bg-purple-600 text-white font-bold transition-all duration-200"
-                  >
-                    📱 Share on TikTok
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Drink Details */}
-            <div className="p-6 space-y-6">
+        {/* AI Generator Tab */}
+        {currentTab === 'generator' && (
+          <>
+            {/* Generator Form */}
+            <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
+              <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Create Your Secret Drink</h2>
               
-              {/* Base Drink */}
-              <div>
-                <h3 className="text-xl font-bold text-gray-800 mb-3 flex items-center">
-                  <span className="mr-2">☕</span>
-                  Start With
-                </h3>
-                <div className="bg-green-50 rounded-lg p-4">
-                  <p className="text-lg font-medium text-gray-800">{generatedDrink.base_drink}</p>
-                </div>
-              </div>
-
-              {/* Modifications */}
-              <div>
-                <h3 className="text-xl font-bold text-gray-800 mb-3 flex items-center">
-                  <span className="mr-2">🎨</span>
-                  Add These Modifications
-                </h3>
-                <div className="space-y-2">
-                  {generatedDrink.modifications?.map((mod, index) => (
-                    <div key={index} className="flex items-center p-3 bg-gray-50 rounded-lg">
-                      <span className="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center font-bold text-sm mr-3">
-                        {index + 1}
-                      </span>
-                      <span className="text-gray-800">{mod}</span>
-                    </div>
+              {/* Drink Type Selection */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-3">Choose Your Drink Type</label>
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                  {drinkTypes.map((type) => (
+                    <button
+                      key={type.value}
+                      onClick={() => setDrinkType(type.value)}
+                      className={`p-4 rounded-xl border-2 transition-all duration-200 ${
+                        drinkType === type.value 
+                          ? 'border-green-500 bg-green-50 text-green-700' 
+                          : 'border-gray-200 hover:border-green-300 text-gray-700'
+                      }`}
+                    >
+                      <div className="text-2xl mb-1">{type.emoji}</div>
+                      <div className="font-medium text-sm">{type.label}</div>
+                    </button>
                   ))}
                 </div>
               </div>
 
-              {/* Ingredients Breakdown */}
-              {generatedDrink.ingredients_breakdown && generatedDrink.ingredients_breakdown.length > 0 && (
-                <div>
-                  <h3 className="text-xl font-bold text-gray-800 mb-3 flex items-center">
-                    <span className="mr-2">📝</span>
-                    What's Inside
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {generatedDrink.ingredients_breakdown.map((ingredient, index) => (
-                      <span key={index} className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium">
-                        {ingredient}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Pro Tips */}
-              {generatedDrink.pro_tips && generatedDrink.pro_tips.length > 0 && (
-                <div>
-                  <h3 className="text-xl font-bold text-gray-800 mb-3 flex items-center">
-                    <span className="mr-2">💡</span>
-                    Pro Tips
-                  </h3>
-                  <div className="space-y-2">
-                    {generatedDrink.pro_tips.map((tip, index) => (
-                      <div key={index} className="flex items-start p-3 bg-blue-50 rounded-lg">
-                        <span className="text-blue-500 mr-2 mt-1">•</span>
-                        <span className="text-gray-800">{tip}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Why Amazing */}
-              <div>
-                <h3 className="text-xl font-bold text-gray-800 mb-3 flex items-center">
-                  <span className="mr-2">🔥</span>
-                  Why This Drink Slaps
-                </h3>
-                <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-4">
-                  <p className="text-gray-800 leading-relaxed">{generatedDrink.why_amazing}</p>
-                </div>
+              {/* Flavor Inspiration */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Flavor Inspiration (Optional)</label>
+                <input
+                  type="text"
+                  value={flavorInspiration}
+                  onChange={(e) => setFlavorInspiration(e.target.value)}
+                  placeholder='e.g., "tres leches", "ube", "mango tajin", "birthday cake"'
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                />
+                <p className="text-xs text-gray-500 mt-1">Add a flavor twist to inspire your drink creation!</p>
               </div>
+
+              {/* Generate Button */}
+              <button
+                onClick={generateDrink}
+                disabled={isGenerating}
+                className={`w-full py-4 rounded-xl font-bold text-lg transition-all duration-200 ${
+                  isGenerating 
+                    ? 'bg-gray-400 text-gray-600 cursor-not-allowed' 
+                    : 'bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white shadow-lg hover:shadow-xl'
+                }`}
+              >
+                {isGenerating ? (
+                  <span className="flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
+                    Brewing Your Secret Drink...
+                  </span>
+                ) : (
+                  <span>✨ Generate My Secret Drink ✨</span>
+                )}
+              </button>
             </div>
 
-            {/* Action Buttons */}
-            <div className="p-6 bg-gray-50 border-t">
-              <div className="flex space-x-4">
-                <button
-                  onClick={() => {
-                    setGeneratedDrink(null);
-                    setDrinkType('');
-                    setFlavorInspiration('');
-                  }}
-                  className="flex-1 py-3 px-6 rounded-xl bg-gray-500 hover:bg-gray-600 text-white font-bold transition-colors"
-                >
-                  🔄 Generate Another
-                </button>
-                
-                <button
-                  onClick={() => setCurrentScreen('dashboard')}
-                  className="flex-1 py-3 px-6 rounded-xl bg-green-500 hover:bg-green-600 text-white font-bold transition-colors"
-                >
-                  ← Back to Dashboard
-                </button>
-              </div>
-            </div>
-          </div>
+            {/* Generated Drink Display */}
+            {generatedDrink && (
+              <DrinkCard 
+                drink={generatedDrink} 
+                showFullDetails={true}
+                onCopyOrder={() => copyOrderScript(generatedDrink.ordering_script)}
+                onShare={() => shareDrink(generatedDrink)}
+                onGenerateAnother={() => {
+                  setGeneratedDrink(null);
+                  setDrinkType('');
+                  setFlavorInspiration('');
+                }}
+                onBackToDashboard={() => setCurrentScreen('dashboard')}
+                showActionButtons={true}
+              />
+            )}
+          </>
         )}
+
+        {/* Curated & Community Recipes Tabs */}
+        {(currentTab === 'curated' || currentTab === 'community') && (
+          <>
+            {/* Category Filter */}
+            <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
+              <div className="flex flex-wrap justify-between items-center gap-4">
+                <div>
+                  <h3 className="text-xl font-bold text-gray-800">
+                    {currentTab === 'curated' ? '📚 Curated Recipes' : '👥 Community Recipes'}
+                  </h3>
+                  <p className="text-gray-600">
+                    {currentTab === 'curated' 
+                      ? 'Hand-picked favorites from our team' 
+                      : 'Amazing creations shared by our community'
+                    }
+                  </p>
+                </div>
+                
+                {currentTab === 'community' && (
+                  <button
+                    onClick={() => setShowShareModal(true)}
+                    className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white px-6 py-3 rounded-xl font-bold transition-all duration-200 shadow-lg hover:shadow-xl"
+                  >
+                    📸 Share Your Recipe
+                  </button>
+                )}
+              </div>
+              
+              {/* Category Pills */}
+              <div className="flex flex-wrap gap-2 mt-4">
+                {categories.map((category) => (
+                  <button
+                    key={category.value}
+                    onClick={() => setSelectedCategory(category.value)}
+                    className={`px-4 py-2 rounded-full font-medium transition-all duration-200 ${
+                      selectedCategory === category.value
+                        ? 'bg-blue-500 text-white shadow-md'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    {category.emoji} {category.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Recipes Grid */}
+            {isLoadingRecipes ? (
+              <div className="text-center py-12">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+                <p className="text-gray-600">Loading delicious recipes...</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {(currentTab === 'curated' ? curatedRecipes : communityRecipes).map((recipe, index) => (
+                  <RecipeCard
+                    key={recipe.id || index}
+                    recipe={recipe}
+                    isCommunity={currentTab === 'community'}
+                    onLike={currentTab === 'community' ? () => likeRecipe(recipe.id) : null}
+                    isLiked={currentTab === 'community' && recipe.liked_by_users?.includes(user?.id)}
+                    onCopyOrder={() => copyOrderScript(recipe.order_instructions || recipe.ordering_script)}
+                    onShare={() => shareDrink(recipe)}
+                    user={user}
+                  />
+                ))}
+              </div>
+            )}
+
+            {(currentTab === 'curated' ? curatedRecipes : communityRecipes).length === 0 && !isLoadingRecipes && (
+              <div className="text-center py-12">
+                <div className="text-6xl mb-4">🔍</div>
+                <h3 className="text-xl font-bold text-gray-800 mb-2">No recipes found</h3>
+                <p className="text-gray-600">
+                  {currentTab === 'curated' 
+                    ? 'Try selecting a different category'
+                    : 'Be the first to share a recipe in this category!'
+                  }
+                </p>
+              </div>
+            )}
+          </>
+        )}
+
+        {/* Share Recipe Modal */}
+        {showShareModal && (
+          <ShareRecipeModal
+            isOpen={showShareModal}
+            onClose={() => setShowShareModal(false)}
+            formData={shareFormData}
+            setFormData={setShareFormData}
+            onImageUpload={handleImageUpload}
+            imagePreview={imagePreview}
+            onShare={shareRecipe}
+            isSharing={isSharing}
+            categories={drinkTypes}
+          />
+        )}
+
+        {/* Back Button */}
+        <div className="text-center mt-8">
+          <button
+            onClick={() => setCurrentScreen('dashboard')}
+            className="bg-gray-500 hover:bg-gray-600 text-white px-8 py-3 rounded-xl font-bold transition-all duration-200"
+          >
+            ← Back to Dashboard
+          </button>
+        </div>
       </div>
     </div>
   );
