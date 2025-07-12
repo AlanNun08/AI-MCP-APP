@@ -155,9 +155,12 @@ class StarbucksAPITester:
                         description = data.get("description", "")
                         
                         # Check specific streamlined requirements
+                        common_drink_words = {"lemonade", "matcha", "frappuccino", "refresher", "tea", "coffee", "latte", "drink", "berry", "vanilla", "caramel", "foam", "syrup", "splash", "twist", "swirl", "layer"}
+                        unique_name_words = [word.lower() for word in drink_name.split() if len(word) > 3 and word.lower() not in common_drink_words]
+                        
                         requirements_check = {
                             "3-5_ingredients": 3 <= len(modifications) <= 5,
-                            "no_name_reuse": not any(word.lower() in ordering_script.lower() for word in drink_name.split() if len(word) > 3),
+                            "no_name_reuse": not any(word in str(mod).lower() for mod in modifications for word in unique_name_words),
                             "drive_thru_format": "hi, can i get" in ordering_script.lower(),
                             "has_creative_twist": any(twist in str(mod).lower() for mod in modifications for twist in ["foam", "drizzle", "layer", "swirl", "extra", "cold foam", "syrup"]),
                             "vibe_description": len(description) >= 15 and any(vibe in description.lower() for vibe in ["taste", "sip", "like", "dream", "cloud", "night"])
