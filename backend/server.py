@@ -212,6 +212,57 @@ class CuratedStarbucksRecipe(BaseModel):
             datetime: lambda v: v.isoformat()
         }
 
+class UserSharedRecipe(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    recipe_name: str
+    description: str
+    ingredients: List[str]
+    order_instructions: str
+    category: str  # frappuccino, refresher, lemonade, iced_matcha_latte, random
+    
+    # User information
+    shared_by_user_id: str
+    shared_by_username: str
+    
+    # Media and extras
+    image_base64: Optional[str] = None  # Store image as base64
+    tags: List[str] = []  # Additional tags like "sweet", "caffeinated", "cold", etc.
+    difficulty_level: Optional[str] = "easy"  # easy, medium, hard
+    
+    # Social features
+    likes_count: int = 0
+    liked_by_users: List[str] = []  # List of user IDs who liked this recipe
+    
+    # Recipe source
+    original_source: Optional[str] = None  # "ai_generated", "curated", "custom"
+    original_recipe_id: Optional[str] = None  # Link to original if from AI/curated
+    
+    # Metadata
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    is_public: bool = True  # Allow private recipes
+    
+    class Config:
+        json_encoders = {
+            datetime: lambda v: v.isoformat()
+        }
+
+class ShareRecipeRequest(BaseModel):
+    recipe_name: str
+    description: str
+    ingredients: List[str]
+    order_instructions: str
+    category: str
+    image_base64: Optional[str] = None
+    tags: List[str] = []
+    difficulty_level: Optional[str] = "easy"
+    original_source: Optional[str] = None
+    original_recipe_id: Optional[str] = None
+
+class LikeRecipeRequest(BaseModel):
+    recipe_id: str
+    user_id: str
+
 class StarbucksRecipe(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     drink_name: str
