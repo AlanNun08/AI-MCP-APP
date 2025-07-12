@@ -1697,19 +1697,20 @@ async def get_grocery_cart_options(
                     logging.warning(f"❌ PRODUCTION: No products returned from Walmart API for ingredient: '{ingredient}'")
                     failed_ingredients.append(ingredient)
                 
-                # Add delay to avoid rate limiting
-                if i < total_ingredients:
-                    await asyncio.sleep(0.8)  # Slightly longer delay for production
                     
-            except Exception as ingredient_error:
+            except Exception as e:
+                logging.error(f"❌ PRODUCTION: Error processing ingredient '{ingredient}': {str(e)}")
                 failed_ingredients.append(ingredient)
-                logging.error(f"❌ PRODUCTION: Error processing ingredient '{ingredient}': {str(ingredient_error)}")
-                continue
         
-        # PRODUCTION: Log final results
+        # PRODUCTION: Enhanced logging
         logging.info(f"📊 PRODUCTION: Cart options completed: {successful_ingredients}/{total_ingredients} ingredients successful")
         if failed_ingredients:
             logging.warning(f"⚠️ PRODUCTION: Failed ingredients: {failed_ingredients}")
+        
+        # CRITICAL DEBUG: Log the state before checking
+        logging.warning(f"🚨 DEBUG: ingredient_options length = {len(ingredient_options)}")
+        logging.warning(f"🚨 DEBUG: successful_ingredients = {successful_ingredients}")
+        logging.warning(f"🚨 DEBUG: failed_ingredients = {failed_ingredients}")
         
         # PRODUCTION: Check if we have any ingredient options BEFORE creating cart
         if not ingredient_options:
