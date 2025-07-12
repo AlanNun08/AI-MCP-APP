@@ -1713,21 +1713,7 @@ async def get_grocery_cart_options(
         if failed_ingredients:
             logging.warning(f"⚠️ PRODUCTION: Failed ingredients: {failed_ingredients}")
         
-        # PRODUCTION: Create cart options object - ONLY REAL DATA
-        cart_options = GroceryCartOptions(
-            id=str(uuid.uuid4()),
-            user_id=user_id,
-            recipe_id=recipe_id,
-            ingredient_options=ingredient_options,
-            created_at=datetime.utcnow()
-        )
-        
-        # Save to database
-        await db.grocery_cart_options.insert_one(cart_options.dict())
-        
-        cart_dict = cart_options.dict()
-        
-        # PRODUCTION: Enhanced logging and error handling
+        # PRODUCTION: Check if we have any ingredient options BEFORE creating cart
         if not ingredient_options:
             logging.warning(f"🚨 EMERGENCY: Creating basic shopping cart without Walmart integration for recipe {recipe_id}")
             
@@ -1743,11 +1729,25 @@ async def get_grocery_cart_options(
             }
             
             return basic_cart
-        else:
-            logging.info(f"✅ PRODUCTION: Successfully created cart options with {len(ingredient_options)} ingredient groups")
-            # Also log total products found
-            total_products = sum(len(opt.options) for opt in ingredient_options)
-            logging.info(f"🛒 PRODUCTION: Total products found: {total_products}")
+        
+        # PRODUCTION: Create cart options object - ONLY REAL DATA
+        cart_options = GroceryCartOptions(
+            id=str(uuid.uuid4()),
+            user_id=user_id,
+            recipe_id=recipe_id,
+            ingredient_options=ingredient_options,
+            created_at=datetime.utcnow()
+        )
+        
+        # Save to database
+        await db.grocery_cart_options.insert_one(cart_options.dict())
+        
+        cart_dict = cart_options.dict()
+        
+        logging.info(f"✅ PRODUCTION: Successfully created cart options with {len(ingredient_options)} ingredient groups")
+        # Also log total products found
+        total_products = sum(len(opt.options) for opt in ingredient_options)
+        logging.info(f"🛒 PRODUCTION: Total products found: {total_products}")
         
         return cart_dict
         
