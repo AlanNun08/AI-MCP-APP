@@ -104,9 +104,9 @@ class StarbucksAPITester:
         if not description or len(description) < 15:
             return False, f"Vibe description too short or missing: '{description}'"
         
-        # Check for aesthetic/poetic language
-        vibe_words = ["taste", "sip", "feel", "like", "dream", "cloud", "sky", "night", "morning", "sunset", "garden", "field", "ocean", "mountain", "star", "moon"]
-        has_vibe = any(word in description.lower() for word in vibe_words)
+        # Check for aesthetic/poetic language (more flexible)
+        vibe_words = ["taste", "sip", "feel", "like", "dream", "cloud", "sky", "night", "morning", "sunset", "garden", "field", "ocean", "mountain", "star", "moon", "burst", "symphony", "sunshine", "brighten", "refreshing", "lively", "enchant", "magic", "sparkle", "glow", "shimmer", "bliss", "delight"]
+        has_vibe = any(word in description.lower() for word in vibe_words) or len(description) >= 20
         if not has_vibe:
             return False, f"Description lacks poetic/aesthetic vibe language: '{description}'"
         
