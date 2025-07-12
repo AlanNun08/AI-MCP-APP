@@ -312,24 +312,39 @@ Respond with JSON in this exact format:
 }}"""
 
         elif request.drink_type == "lemonade":
-            prompt = f"""Create a **creative and dreamy lemonade-based drink** using only Starbucks ingredients, customized for **drive-thru ordering**{flavor_context}.
+            prompt = f"""Generate a drink based on a totally random aesthetic concept or scene. Do not use past drink structures. Be creative, strange, or playful — like a barista daydreaming.
 
-Include:
-* A fun or enchanting name (e.g., "Citrus Stardust", "Sunbeam Petal Lemonade")
-* Ingredients like: lemonade base, tea infusions (green, passion, black), fruit inclusions (strawberries, dragonfruit), syrups (raspberry, peach, vanilla), cold foams, etc.
-* Optional layering or aesthetic effects
-* A **clear drive-thru order script** (e.g., "Hi, can I get a Venti Lemonade with peach syrup and strawberry inclusions, topped with vanilla sweet cream cold foam?")
-* A final mood or **vibe description** (e.g., "Feels like golden hour in a garden")
+**STEP 1: Choose a theme or aesthetic for the drink from this list:**
+- fantasy (e.g., fairy forest, moonlight sorcery)
+- color-inspired (e.g., neon green, cosmic purple, gold)
+- mood-based (e.g., 'cozy rainy day', 'after-school energy boost')
+- seasonal (e.g., autumn bonfire, spring bloom)
+- nostalgic (e.g., '90s mall treat, childhood cereal, birthday cake)
+
+**STEP 2: Create a dreamy lemonade-based drink** using only Starbucks ingredients{flavor_context}.
+
+**Name Requirements:**
+- Invent a completely new and original name that's catchy, poetic, or trend-worthy
+- Do NOT use existing Starbucks or secret menu names
+- Avoid repeating patterns like 'sunset', 'citrus', or 'sparkle' unless essential to theme
+- Use uncommon words, symbols, or emotional cues (e.g., 'Amber Whisper', 'Prism Fizz', 'Velvet Zing')
+
+**Surprise Ingredient Rule:**
+Each recipe MUST include one unexpected twist:
+- Layer of matcha or espresso
+- A surprise cold foam (e.g., vanilla sweet cream on lemonade)
+- Unexpected fruit inclusion (dragonfruit, strawberries)
+- A syrup usually not used in lemonades
 
 Respond with JSON in this exact format:
 {{
-  "drink_name": "Creative enchanting name",
-  "description": "Short vibe description (e.g., 'Feels like golden hour in a garden')",
+  "drink_name": "Completely original poetic name",
+  "description": "Theme-based vibe description matching your chosen aesthetic",
   "base_drink": "Base lemonade drink to order",
-  "modifications": ["ingredient 1", "ingredient 2", "ingredient 3"],
+  "modifications": ["ingredient 1", "ingredient 2", "surprise twist ingredient"],
   "ordering_script": "Complete drive-thru order: 'Hi, can I get a...'",
   "category": "lemonade",
-  "vibe": "Short poetic mood line"
+  "vibe": "Poetic mood line matching your theme"
 }}"""
 
         elif request.drink_type == "refresher":
