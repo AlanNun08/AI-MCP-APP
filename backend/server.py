@@ -297,39 +297,23 @@ Respond with JSON in this exact format:
 }"""
 
         elif request.drink_type == "lemonade":
-            prompt = f"""Generate a drink based on a totally random aesthetic concept or scene. Do not use past drink structures. Be creative, strange, or playful — like a barista daydreaming.
+            prompt = f"""Create a **creative lemonade-based drink** using only Starbucks ingredients, optimized for **drive-thru ordering**{flavor_context}.
 
-**STEP 1: Choose a theme or aesthetic for the drink from this list:**
-- fantasy (e.g., fairy forest, moonlight sorcery)
-- color-inspired (e.g., neon green, cosmic purple, gold)
-- mood-based (e.g., 'cozy rainy day', 'after-school energy boost')
-- seasonal (e.g., autumn bonfire, spring bloom)
-- nostalgic (e.g., '90s mall treat, childhood cereal, birthday cake)
-
-**STEP 2: Create a dreamy lemonade-based drink** using only Starbucks ingredients{flavor_context}.
-
-**Name Requirements:**
-- Invent a completely new and original name that's catchy, poetic, or trend-worthy
-- Do NOT use existing Starbucks or secret menu names
-- Avoid repeating patterns like 'sunset', 'citrus', or 'sparkle' unless essential to theme
-- Use uncommon words, symbols, or emotional cues (e.g., 'Amber Whisper', 'Prism Fizz', 'Velvet Zing')
-
-**Surprise Ingredient Rule:**
-Each recipe MUST include one unexpected twist:
-- Layer of matcha or espresso
-- A surprise cold foam (e.g., vanilla sweet cream on lemonade)
-- Unexpected fruit inclusion (dragonfruit, strawberries)
-- A syrup usually not used in lemonades
+Requirements:
+* Use **3 to 5 ingredients**, such as: lemonade, fruit inclusions, cold foam, tea base, or flavored syrup
+* Choose **a fresh or playful aesthetic** (no reused names in the steps)
+* Include a **clearly worded order line**
+* End with a **vibe line**
 
 Respond with JSON in this exact format:
 {{
-  "drink_name": "Completely original poetic name",
-  "description": "Theme-based vibe description matching your chosen aesthetic",
+  "drink_name": "Creative unique name",
+  "description": "Vibe description",
   "base_drink": "Base lemonade drink to order",
-  "modifications": ["ingredient 1", "ingredient 2", "surprise twist ingredient"],
-  "ordering_script": "Complete drive-thru order: 'Hi, can I get a...'",
+  "modifications": ["ingredient 1", "ingredient 2", "ingredient 3"],
+  "ordering_script": "Hi, can I get a grande Lemonade with [ingredient 1], [ingredient 2], [ingredient 3]...",
   "category": "lemonade",
-  "vibe": "Poetic mood line matching your theme"
+  "vibe": "Short description"
 }}"""
 
         elif request.drink_type == "refresher":
