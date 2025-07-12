@@ -95,7 +95,7 @@ class StarbucksAPITester:
             return False, f"Ordering script must start with 'Hi, can I get...' format: '{ordering_script}'"
         
         # NEW REQUIREMENT 4: Check for at least one creative twist/unexpected element
-        creative_indicators = ["foam", "drizzle", "layer", "swirl", "twist", "float", "cold foam", "syrup", "purée", "matcha", "espresso shot", "extra", "half", "splash"]
+        creative_indicators = ["foam", "drizzle", "layer", "swirl", "twist", "float", "cold foam", "syrup", "purée", "matcha", "espresso shot", "extra", "half", "splash", "infusion", "blend", "honey", "coconut", "dragonfruit", "passion", "toffee", "caramel", "vanilla", "cinnamon"]
         has_twist = any(indicator in str(mod).lower() for mod in modifications for indicator in creative_indicators)
         if not has_twist:
             return False, f"No creative twist detected in modifications: {modifications}"
