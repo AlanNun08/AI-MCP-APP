@@ -1729,22 +1729,20 @@ async def get_grocery_cart_options(
         
         # PRODUCTION: Enhanced logging and error handling
         if not ingredient_options:
-            logging.error(f"🚨 PRODUCTION: CRITICAL - No ingredient options found for recipe '{recipe_title}'")
-            logging.error(f"   Shopping list: {shopping_list}")
-            logging.error(f"   Failed ingredients: {failed_ingredients}")
+            logging.warning(f"🚨 EMERGENCY: Creating basic shopping cart without Walmart integration for recipe {recipe_id}")
             
-            # Return detailed error response for debugging
-            return {
-                "error": "No Walmart products found for any ingredients",
-                "debug_info": {
-                    "recipe_id": recipe_id,
-                    "recipe_title": recipe_title,
-                    "shopping_list": shopping_list,
-                    "failed_ingredients": failed_ingredients,
-                    "total_ingredients": total_ingredients,
-                    "message": "All Walmart API calls failed or returned invalid products"
-                }
+            # Create basic ingredient list for manual shopping
+            basic_cart = {
+                "recipe_id": recipe_id,
+                "recipe_title": recipe_title,
+                "ingredients_list": shopping_list,
+                "shopping_mode": "manual",
+                "message": "Shopping list ready - visit Walmart.com to purchase these ingredients",
+                "walmart_search_url": f"https://www.walmart.com/search?q={'+'.join(shopping_list)}",
+                "manual_shopping_instructions": "Copy this ingredient list and search for these items on Walmart.com or visit your local store."
             }
+            
+            return basic_cart
         else:
             logging.info(f"✅ PRODUCTION: Successfully created cart options with {len(ingredient_options)} ingredient groups")
             # Also log total products found
