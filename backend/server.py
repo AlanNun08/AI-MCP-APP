@@ -276,40 +276,25 @@ async def generate_starbucks_drink(request: StarbucksRequest):
             
         # Define specific prompts for each drink type
         if request.drink_type == "frappuccino":
-            prompt = f"""Generate a drink based on a totally random aesthetic concept or scene. Do not use past drink structures. Be creative, strange, or playful — like a barista daydreaming.
+            prompt = f"""Create a **whimsical and aesthetic Starbucks-style Frappuccino** recipe using only real or customizable ingredients found at Starbucks, crafted for **ordering at the drive-thru**{flavor_context}.
 
-**STEP 1: Choose a theme or aesthetic for the drink from this list:**
-- fantasy (e.g., fairy forest, moonlight sorcery)
-- color-inspired (e.g., neon green, cosmic purple, gold)
-- mood-based (e.g., 'cozy rainy day', 'after-school energy boost')
-- seasonal (e.g., autumn bonfire, spring bloom)
-- nostalgic (e.g., '90s mall treat', childhood cereal, birthday cake)
-
-**STEP 2: Create a whimsical Starbucks-style Frappuccino** using only real ingredients{flavor_context}.
-
-**Name Requirements:**
-- Invent a completely new and original name that's catchy, poetic, or trend-worthy
-- Do NOT use existing Starbucks or secret menu names
-- Avoid repeating patterns like 'unicorn', 'sunset', or 'cloud' unless essential to theme
-- Use uncommon words, symbols, or emotional cues (e.g., 'Lavender Mirage', 'Sugar Eclipse', 'Crimson Drift')
-
-**Surprise Ingredient Rule:**
-Each recipe MUST include one unexpected twist:
-- Layer of tea (black, green, or passion)
-- A surprise foam (e.g., brown sugar cold foam on frappuccino)
-- Hint of espresso
-- A drizzle or topping usually not used in frappuccinos
+Requirements:
+* A **creative name** (do not reuse the name in the recipe steps)
+* Use exactly **3 to 5 Starbucks ingredients** (e.g., caramel syrup, oat milk, cookie topping, espresso shot, vanilla sweet cream foam)
+* Include at least **one twist or aesthetic effect** (e.g., blended espresso layer, raspberry syrup swirl, matcha drizzle)
+* Provide a **clear order line** the user can say at the drive-thru
+* End with a **vibe description** (e.g., "Tastes like a candy cloud on a starry night")
 
 Respond with JSON in this exact format:
-{{
-  "drink_name": "Completely original poetic name",
-  "description": "Theme-based vibe description matching your chosen aesthetic",
+{
+  "drink_name": "Creative unique name",
+  "description": "Vibe description (e.g., 'Tastes like a candy cloud on a starry night')",
   "base_drink": "Base Frappuccino to order",
-  "modifications": ["ingredient 1", "ingredient 2", "surprise twist ingredient"],
-  "ordering_script": "Complete drive-thru order: 'Hi, can I get a...'",
+  "modifications": ["ingredient 1", "ingredient 2", "ingredient 3"],
+  "ordering_script": "Hi, can I get a grande [frappuccino base], with [ingredient 1], [ingredient 2], [ingredient 3]...",
   "category": "frappuccino",
-  "vibe": "Poetic mood line matching your theme"
-}}"""
+  "vibe": "Poetic one-liner"
+}"""
 
         elif request.drink_type == "lemonade":
             prompt = f"""Generate a drink based on a totally random aesthetic concept or scene. Do not use past drink structures. Be creative, strange, or playful — like a barista daydreaming.
