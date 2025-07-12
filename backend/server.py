@@ -1250,11 +1250,21 @@ async def _get_walmart_product_options(ingredient: str, max_options: int = 3) ->
                         break  # Don't retry auth errors
                     
                     else:
-                        logging.warning(f"⚠️ PRODUCTION: Walmart API error for '{clean_ingredient}': {response.status_code}")
-                        logging.warning(f"Response: {response.text}")
-                        if attempt < 2 and response.status_code >= 500:  # Retry server errors
-                            await asyncio.sleep(2)
+                        # Log error response details
+                        logging.error(f"❌ WALMART API: HTTP {response.status_code} - {response.text[:500]}")
+                        if response.status_code == 401:
+                            logging.error("❌ WALMART API: Authentication failed - check credentials and timestamp")
+                        elif response.status_code == 403:
+                            logging.error("❌ WALMART API: Forbidden - check API permissions")
+                        elif response.status_code == 429:
+                            logging.error("❌ WALMART API: Rate limited - too many requests")
+                        
+                        if attempt < 2:
+                            await asyncio.sleep(3)  # Wait longer between attempts
                             continue
+                        else:
+                            logging.error(f"❌ WALMART API: Final attempt failed with status {response.status_code}")
+                            break
                 
                 # If we get here, the attempt failed
                 break
