@@ -7,12 +7,12 @@ const urlsToCache = [
   '/manifest.json'
 ];
 
-// Install event - DEPLOYED URL FIX
+// Install event - PERSISTENT AUTH FIX
 self.addEventListener('install', (event) => {
-  console.log('🔄 DEPLOYED URL FIX - CLEARING ALL CACHES...');
+  console.log('🔄 PERSISTENT AUTH FIX - CLEARING ALL CACHES...');
   event.waitUntil(
     caches.keys().then(cacheNames => {
-      console.log('🗑️ DELETING OLD CACHES FOR NEW DEPLOYED URL:', cacheNames);
+      console.log('🗑️ DELETING OLD CACHES FOR PERSISTENT AUTH FIX:', cacheNames);
       return Promise.all(
         cacheNames.map(cacheName => {
           console.log('💥 DELETING CACHE:', cacheName);
@@ -20,10 +20,10 @@ self.addEventListener('install', (event) => {
         })
       );
     }).then(() => {
-      console.log('✅ CACHES DELETED - CREATING DEPLOYED URL CACHE');
+      console.log('✅ CACHES DELETED - CREATING PERSISTENT AUTH CACHE');
       return caches.open(CACHE_NAME);
     }).then(() => {
-      console.log('🎉 DEPLOYED URL CACHE v108 CREATED');
+      console.log('🎉 PERSISTENT AUTH CACHE v109 CREATED');
       return self.skipWaiting();
     })
   );
