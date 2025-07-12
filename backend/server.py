@@ -1209,7 +1209,7 @@ async def _get_walmart_product_options(ingredient: str, max_options: int = 3) ->
                                                 len(products) < 3  # Accept more products if we have few matches
                                             )
                                             
-                                            if is_relevant or attempt >= 1 or len(products) < 1:  # Accept more products after first attempt
+                                            if is_relevant or len(products) < 2:  # Accept products if we have very few matches
                                                 product = WalmartProduct(
                                                     product_id=product_id,
                                                     name=product_name,
