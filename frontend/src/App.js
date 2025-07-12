@@ -1608,6 +1608,31 @@ function App() {
         .then(response => {
           console.log('✅ Cart options response:', response.data);
           
+          // Check for manual shopping mode (fallback)
+          if (response.data && response.data.shopping_mode === 'manual') {
+            console.log('📝 Manual shopping mode detected');
+            
+            // Create manual shopping list display
+            const manualIngredients = response.data.ingredients_list || [];
+            setProductOptions({});
+            setSelectedProducts({});
+            setCartItems([]);
+            
+            // Set the manual shopping URL
+            if (response.data.walmart_search_url) {
+              setFinalWalmartUrl(response.data.walmart_search_url);
+              console.log('✅ Manual Walmart search URL set');
+            }
+            
+            // Show manual shopping instructions
+            if (manualIngredients.length > 0) {
+              console.log('📋 Manual shopping list:', manualIngredients);
+              // Could add a state to show manual ingredients if needed
+            }
+            
+            return; // Exit early for manual mode
+          }
+          
           if (response.data && response.data.ingredient_options) {
             // Store all product options per ingredient
             const options = {};
