@@ -1,5 +1,5 @@
-// Service Worker for PWA functionality - DEPLOYED URL FIX
-const CACHE_NAME = 'buildyoursmartcart-v108-deployed-url';
+// Service Worker for PWA functionality - PERSISTENT AUTH FIX
+const CACHE_NAME = 'buildyoursmartcart-v109-persistent-auth-fix';
 const urlsToCache = [
   '/',
   '/static/js/bundle.js',
