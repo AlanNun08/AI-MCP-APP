@@ -1196,15 +1196,17 @@ async def _get_walmart_product_options(ingredient: str, max_options: int = 3) ->
                                             name_lower = product_name.lower()
                                             ingredient_lower = clean_ingredient.lower()
                                             
-                                            # Relaxed relevance check for deployment
+                                            # Very relaxed relevance check for production deployment
                                             ingredient_words = ingredient_lower.split()
                                             name_words = name_lower.split()
                                             
+                                            # More lenient matching for production
                                             is_relevant = (
                                                 ingredient_lower in name_lower or
                                                 any(word in name_lower for word in ingredient_lower.split() if len(word) > 2) or
                                                 any(ing_word in name_word for ing_word in ingredient_words for name_word in name_words if len(ing_word) > 2) or
-                                                len(products) < 2  # Accept more products if we have few matches
+                                                any(name_word in ing_word for ing_word in ingredient_words for name_word in name_words if len(name_word) > 2) or
+                                                len(products) < 3  # Accept more products if we have few matches
                                             )
                                             
                                             if is_relevant or attempt >= 1 or len(products) < 1:  # Accept more products after first attempt
