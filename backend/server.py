@@ -385,7 +385,7 @@ Respond with JSON in this exact format:
         response = openai_client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
-                {"role": "system", "content": "You are a creative Starbucks drink expert who creates viral secret menu items. Always respond with valid JSON only."},
+                {"role": "system", "content": "You are a creative Starbucks drink expert who creates whimsical, aesthetic drinks with drive-thru friendly ordering instructions. Always respond with valid JSON only."},
                 {"role": "user", "content": prompt}
             ],
             max_tokens=1000,
