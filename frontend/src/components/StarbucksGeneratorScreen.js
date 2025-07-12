@@ -1,13 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-// Starbucks Secret Menu Generator Screen
+// Starbucks Secret Menu Generator Screen with Community Features
 const StarbucksGeneratorScreen = ({ showNotification, setCurrentScreen, user, API }) => {
   const [drinkType, setDrinkType] = useState('');
   const [flavorInspiration, setFlavorInspiration] = useState('');
   const [generatedDrink, setGeneratedDrink] = useState(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [showCopySuccess, setShowCopySuccess] = useState(false);
+  
+  // New state for community features
+  const [currentTab, setCurrentTab] = useState('generator'); // generator, curated, community
+  const [curatedRecipes, setCuratedRecipes] = useState([]);
+  const [communityRecipes, setCommunityRecipes] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [isLoadingRecipes, setIsLoadingRecipes] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [shareFormData, setShareFormData] = useState({
+    recipe_name: '',
+    description: '',
+    ingredients: ['', '', ''],
+    order_instructions: '',
+    category: 'frappuccino',
+    tags: [],
+    difficulty_level: 'easy',
+    image_base64: null
+  });
+  const [isSharing, setIsSharing] = useState(false);
+  const [imagePreview, setImagePreview] = useState(null);
 
   const drinkTypes = [
     { value: 'frappuccino', label: 'Frappuccino', emoji: '🥤' },
@@ -16,6 +36,40 @@ const StarbucksGeneratorScreen = ({ showNotification, setCurrentScreen, user, AP
     { value: 'iced_matcha_latte', label: 'Iced Matcha Latte', emoji: '🍵' },
     { value: 'random', label: 'Surprise Me!', emoji: '🎲' }
   ];
+
+  const categories = [
+    { value: 'all', label: 'All Recipes', emoji: '🌟' },
+    { value: 'frappuccino', label: 'Frappuccino', emoji: '🥤' },
+    { value: 'refresher', label: 'Refresher', emoji: '🧊' },
+    { value: 'lemonade', label: 'Lemonade', emoji: '🍋' },
+    { value: 'iced_matcha_latte', label: 'Iced Matcha', emoji: '🍵' },
+    { value: 'random', label: 'Other', emoji: '🎲' }
+  ];
+
+  // Load curated and community recipes
+  useEffect(() => {
+    if (currentTab === 'curated' || currentTab === 'community') {
+      loadRecipes();
+    }
+  }, [currentTab, selectedCategory]);
+
+  const loadRecipes = async () => {
+    setIsLoadingRecipes(true);
+    try {
+      if (currentTab === 'curated') {
+        const response = await axios.get(`${API}/api/curated-starbucks-recipes?category=${selectedCategory}`);
+        setCuratedRecipes(response.data.recipes || []);
+      } else if (currentTab === 'community') {
+        const response = await axios.get(`${API}/api/shared-recipes?category=${selectedCategory}&limit=20`);
+        setCommunityRecipes(response.data.recipes || []);
+      }
+    } catch (error) {
+      console.error('Error loading recipes:', error);
+      showNotification('Failed to load recipes', 'error');
+    } finally {
+      setIsLoadingRecipes(false);
+    }
+  };
 
   const generateDrink = async () => {
     if (!drinkType) {
@@ -42,27 +96,130 @@ const StarbucksGeneratorScreen = ({ showNotification, setCurrentScreen, user, AP
     }
   };
 
-  const copyOrderScript = () => {
-    if (generatedDrink?.ordering_script) {
-      navigator.clipboard.writeText(generatedDrink.ordering_script);
+  const copyOrderScript = (orderScript) => {
+    if (orderScript) {
+      navigator.clipboard.writeText(orderScript);
       setShowCopySuccess(true);
       setTimeout(() => setShowCopySuccess(false), 2000);
       showNotification('📋 Order script copied to clipboard!', 'success');
     }
   };
 
-  const shareDrink = () => {
-    const shareText = `Check out this amazing Starbucks secret menu drink: ${generatedDrink.drink_name}! 🤩\n\nOrder it like this: "${generatedDrink.ordering_script}"\n\n#StarbucksSecretMenu #DrinkHack`;
+  const shareDrink = (drink) => {
+    const drinkName = drink.drink_name || drink.name || drink.recipe_name;
+    const orderScript = drink.ordering_script || drink.order_instructions;
+    const shareText = `Check out this amazing Starbucks secret menu drink: ${drinkName}! 🤩\n\nOrder it like this: "${orderScript}"\n\n#StarbucksSecretMenu #DrinkHack`;
     
     if (navigator.share) {
       navigator.share({
-        title: `${generatedDrink.drink_name} - Starbucks Secret Menu`,
+        title: `${drinkName} - Starbucks Secret Menu`,
         text: shareText,
         url: window.location.href
       });
     } else {
       navigator.clipboard.writeText(shareText);
       showNotification('📱 Drink details copied for sharing!', 'success');
+    }
+  };
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        showNotification('Image size should be less than 5MB', 'error');
+        return;
+      }
+      
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const base64 = e.target.result;
+        setShareFormData(prev => ({ ...prev, image_base64: base64 }));
+        setImagePreview(base64);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const shareRecipe = async () => {
+    if (!user?.id) {
+      showNotification('Please sign in to share recipes', 'error');
+      return;
+    }
+
+    if (!shareFormData.recipe_name || !shareFormData.description) {
+      showNotification('Please fill in recipe name and description', 'error');
+      return;
+    }
+
+    const nonEmptyIngredients = shareFormData.ingredients.filter(ing => ing.trim());
+    if (nonEmptyIngredients.length < 2) {
+      showNotification('Please add at least 2 ingredients', 'error');
+      return;
+    }
+
+    setIsSharing(true);
+    try {
+      await axios.post(`${API}/api/share-recipe?user_id=${user.id}`, {
+        ...shareFormData,
+        ingredients: nonEmptyIngredients,
+        tags: shareFormData.tags.filter(tag => tag.trim())
+      });
+
+      showNotification('🎉 Recipe shared successfully!', 'success');
+      setShowShareModal(false);
+      setShareFormData({
+        recipe_name: '',
+        description: '',
+        ingredients: ['', '', ''],
+        order_instructions: '',
+        category: 'frappuccino',
+        tags: [],
+        difficulty_level: 'easy',
+        image_base64: null
+      });
+      setImagePreview(null);
+      
+      // Reload community recipes if on that tab
+      if (currentTab === 'community') {
+        loadRecipes();
+      }
+    } catch (error) {
+      console.error('Error sharing recipe:', error);
+      showNotification('Failed to share recipe. Please try again.', 'error');
+    } finally {
+      setIsSharing(false);
+    }
+  };
+
+  const likeRecipe = async (recipeId) => {
+    if (!user?.id) {
+      showNotification('Please sign in to like recipes', 'error');
+      return;
+    }
+
+    try {
+      const response = await axios.post(`${API}/api/like-recipe`, {
+        recipe_id: recipeId,
+        user_id: user.id
+      });
+
+      // Update the recipe in the local state
+      setCommunityRecipes(prev => prev.map(recipe => 
+        recipe.id === recipeId 
+          ? {
+              ...recipe,
+              likes_count: response.data.likes_count,
+              liked_by_users: response.data.action === 'liked' 
+                ? [...(recipe.liked_by_users || []), user.id]
+                : (recipe.liked_by_users || []).filter(uid => uid !== user.id)
+            }
+          : recipe
+      ));
+
+      showNotification(`Recipe ${response.data.action}! ❤️`, 'success');
+    } catch (error) {
+      console.error('Error liking recipe:', error);
+      showNotification('Failed to like recipe', 'error');
     }
   };
 
