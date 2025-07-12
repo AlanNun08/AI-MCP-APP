@@ -1272,7 +1272,13 @@ class StarbucksAPITester:
             ("Starbucks Iced Matcha Latte Generation", self.test_starbucks_iced_matcha_latte),
             ("Starbucks Random Generation", self.test_starbucks_random),
             ("Starbucks Flavor Inspiration", self.test_starbucks_with_flavor_inspiration),
-            ("Database Storage", self.test_database_storage)
+            ("Database Storage", self.test_database_storage),
+            # NEW: User Recipe Sharing System Tests
+            ("Share Recipe Endpoint", self.test_share_recipe_endpoint),
+            ("Get Shared Recipes", self.test_get_shared_recipes),
+            ("Like/Unlike System", self.test_like_unlike_system),
+            ("Recipe Stats", self.test_recipe_stats),
+            ("Recipe Structure Validation", self.test_recipe_structure_validation)
         ]
         
         # Run tests
