@@ -1153,10 +1153,13 @@ async def _get_walmart_product_options(ingredient: str, max_options: int = 3) ->
                     "User-Agent": "BuildYourSmartCart/1.0"
                 }
                 
-                logging.info(f"🌐 PRODUCTION: Walmart API call attempt {attempt + 1} for '{clean_ingredient}' -> {url}")
+                logging.info(f"🌐 WALMART API: Calling {url}")
+                logging.info(f"🔑 WALMART API: Headers - Consumer ID: {WALMART_CONSUMER_ID}, Timestamp: {timestamp}, Key Version: {WALMART_KEY_VERSION}")
                 
                 async with httpx.AsyncClient() as client:
                     response = await client.get(url, headers=headers, timeout=45)  # Longer timeout for production
+                    
+                    logging.info(f"📡 WALMART API: Response status: {response.status_code}")
                     
                     if response.status_code == 200:
                         data = response.json()
