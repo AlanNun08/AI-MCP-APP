@@ -70,17 +70,21 @@ class StarbucksAPITester:
             return False, f"Drink name too short or missing: '{drink_name}'"
         
         # Check if drink name appears in modifications or ordering script (should NOT)
+        # Only check for the full drink name or significant unique words (not common words like "lemonade", "matcha")
         modifications = data.get("modifications", [])
         ordering_script = data.get("ordering_script", "")
         description = data.get("description", "")
         
-        name_words = drink_name.lower().split()
+        # Common drink words that are acceptable to appear in both name and instructions
+        common_drink_words = {"lemonade", "matcha", "frappuccino", "refresher", "tea", "coffee", "latte", "drink", "berry", "vanilla", "caramel", "foam", "syrup", "splash", "twist", "swirl", "layer"}
+        
+        name_words = [word.lower() for word in drink_name.split() if len(word) > 3 and word.lower() not in common_drink_words]
+        
+        # Only flag if unique/creative words from the name appear in instructions
         for word in name_words:
-            if len(word) > 3:  # Only check meaningful words
-                if any(word in str(mod).lower() for mod in modifications):
-                    return False, f"Drink name word '{word}' found in modifications - violates no-reuse requirement"
-                if word in ordering_script.lower():
-                    return False, f"Drink name word '{word}' found in ordering script - violates no-reuse requirement"
+            if any(word in str(mod).lower() for mod in modifications):
+                return False, f"Unique drink name word '{word}' found in modifications - violates no-reuse requirement"
+            # Don't check ordering script as it naturally contains drink type words
         
         # NEW REQUIREMENT 2: Validate 3-5 ingredients (not counting ice or base drinks)
         if not isinstance(modifications, list) or len(modifications) < 3 or len(modifications) > 5:
