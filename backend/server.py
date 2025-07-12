@@ -192,6 +192,21 @@ class StarbucksRequest(BaseModel):
     drink_type: str  # frappuccino, refresher, lemonade, iced_matcha_latte, random
     flavor_inspiration: Optional[str] = None  # Optional flavor inspiration like "tres leches", "ube", "mango tajin"
 
+class CuratedStarbucksRecipe(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    base: str
+    ingredients: List[str]
+    order_instructions: str
+    vibe: str
+    category: str  # frappuccino, refresher, lemonade, iced_matcha_latte, random
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+    class Config:
+        json_encoders = {
+            datetime: lambda v: v.isoformat()
+        }
+
 class StarbucksRecipe(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     drink_name: str
