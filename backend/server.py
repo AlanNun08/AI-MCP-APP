@@ -1711,7 +1711,7 @@ async def get_grocery_cart_options(
                 
                     
             except Exception as e:
-                logging.error(f"❌ PRODUCTION: Error processing ingredient '{ingredient}': {str(e)}")
+                logging.error(f"❌ PRODUCTION: FIXED VERSION - Error processing ingredient '{ingredient}': {str(e)}")
                 failed_ingredients.append(ingredient)
         
         # PRODUCTION: Enhanced logging
