@@ -386,7 +386,7 @@ Respond with JSON in this exact format:
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": "You are a creative Starbucks drink expert who creates viral secret menu items. Always respond with valid JSON only."},
-                {"role": "user", "content": " ".join(prompt_parts)}
+                {"role": "user", "content": prompt}
             ],
             max_tokens=1000,
             temperature=0.8  # Higher temperature for more creativity
