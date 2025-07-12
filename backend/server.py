@@ -965,14 +965,20 @@ def _get_walmart_signature():
     try:
         import base64
         import time
+        from datetime import datetime
         from cryptography.hazmat.primitives import hashes, serialization
         from cryptography.hazmat.primitives.asymmetric import padding
         
-        # Generate timestamp
-        timestamp = str(int(time.time() * 1000))
+        # Generate timestamp in milliseconds (UTC)
+        current_utc = datetime.utcnow()
+        timestamp = str(int(current_utc.timestamp() * 1000))
+        
+        logging.info(f"🕐 WALMART AUTH: Generating signature with UTC timestamp: {timestamp}")
+        logging.info(f"🕐 WALMART AUTH: Current UTC time: {current_utc.isoformat()}")
         
         # Create string to sign
         string_to_sign = f"{WALMART_CONSUMER_ID}\n{timestamp}\n{WALMART_KEY_VERSION}\n"
+        logging.info(f"🔑 WALMART AUTH: String to sign: {repr(string_to_sign)}")
         
         # Load private key
         private_key = serialization.load_pem_private_key(
@@ -990,12 +996,12 @@ def _get_walmart_signature():
         # Encode to base64
         signature = base64.b64encode(signature_bytes).decode('utf-8')
         
-        logging.info(f"Generated Walmart signature - timestamp: {timestamp}, signature length: {len(signature)}")
+        logging.info(f"✅ WALMART AUTH: Generated signature - timestamp: {timestamp}, signature length: {len(signature)}")
         
         return timestamp, signature
         
     except ImportError:
-        logging.error("Missing cryptography library - falling back to HMAC")
+        logging.error("❌ WALMART AUTH: Missing cryptography library - falling back to HMAC")
         # Fallback to HMAC (incorrect but for debugging)
         import hashlib
         import hmac
@@ -1014,7 +1020,7 @@ def _get_walmart_signature():
         return timestamp, signature
         
     except Exception as e:
-        logging.error(f"Error generating Walmart signature: {str(e)}")
+        logging.error(f"❌ WALMART AUTH: Error generating signature: {str(e)}")
         raise HTTPException(status_code=500, detail="Walmart API authentication error")
 
 def _extract_core_ingredient(ingredient: str) -> str:
