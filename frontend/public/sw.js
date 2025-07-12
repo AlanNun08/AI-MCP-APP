@@ -1,5 +1,5 @@
-// Service Worker for PWA functionality - PERSISTENT AUTH FIX
-const CACHE_NAME = 'buildyoursmartcart-v109-persistent-auth-fix';
+// Service Worker for PWA functionality - MANUAL SHOPPING MODE SUPPORT
+const CACHE_NAME = 'buildyoursmartcart-v110-manual-shopping-support';
 const urlsToCache = [
   '/',
   '/static/js/bundle.js',
