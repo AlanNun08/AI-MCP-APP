@@ -23,6 +23,9 @@ class StarbucksAPITester:
         self.backend_url = self.get_backend_url()
         self.test_results = []
         self.test_user_id = "test-streamlined-prompts"
+        # Test data for recipe sharing
+        self.test_user_id_2 = "test-recipe-sharing-user"
+        self.shared_recipe_ids = []  # Track created recipes for cleanup
         
     def get_backend_url(self) -> str:
         """Get backend URL from frontend .env file"""
