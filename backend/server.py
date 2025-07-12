@@ -1648,7 +1648,7 @@ async def get_grocery_cart_options(
                 }
             }
         
-        # PRODUCTION: Create cart options with enhanced error handling - NO MOCK DATA
+        # PRODUCTION: Create ingredient options - ONLY REAL DATA  
         ingredient_options = []
         total_ingredients = len(shopping_list)
         successful_ingredients = 0
