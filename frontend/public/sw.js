@@ -1,5 +1,5 @@
 // Service Worker for PWA functionality - USING WORKING PREVIEW BACKEND
-const CACHE_NAME = 'buildyoursmartcart-v112-preview-backend';
+const CACHE_NAME = 'buildyoursmartcart-v113-community-features';
 const urlsToCache = [
   '/',
   '/static/js/bundle.js',
