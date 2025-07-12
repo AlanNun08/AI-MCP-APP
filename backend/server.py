@@ -359,39 +359,23 @@ Respond with JSON in this exact format:
 }}"""
 
         else:  # This handles any other drink type as "random mystery"
-            prompt = f"""Generate a drink based on a totally random aesthetic concept or scene. Do not use past drink structures. Be creative, strange, or playful — like a barista daydreaming.
+            prompt = f"""Create a **hybrid or mystery drink** using a mix of Starbucks drink types and ingredients. Make it unique, surprising, and drive-thru ready{flavor_context}.
 
-**STEP 1: Choose a theme or aesthetic for the drink from this list:**
-- fantasy (e.g., fairy forest, moonlight sorcery)
-- color-inspired (e.g., neon green, cosmic purple, gold)
-- mood-based (e.g., 'cozy rainy day', 'after-school energy boost')
-- seasonal (e.g., autumn bonfire, spring bloom)
-- nostalgic (e.g., '90s mall treat, childhood cereal, birthday cake)
-
-**STEP 2: Create a surprise combo drink** by blending different Starbucks drink types{flavor_context}.
-
-**Name Requirements:**
-- Invent a completely new and original name that's catchy, poetic, or trend-worthy
-- Do NOT use existing Starbucks or secret menu names
-- Avoid repeating patterns like 'mystery', 'surprise', or 'magic' unless essential to theme
-- Use uncommon words, symbols, or emotional cues (e.g., 'Phantom Drift', 'Echo Chamber', 'Kaleidoscope Mist')
-
-**Surprise Ingredient Rule:**
-Each recipe MUST include one unexpected combo:
-- Matcha + refresher base
-- Lemonade + espresso shot
-- Frappuccino base + tea infusion
-- Cold foam + unexpected syrup combination
+Requirements:
+* Pick 3 to 5 ingredients from across drink categories (e.g., refresher base + matcha + foam)
+* Invent a **fun, mysterious name** that isn't referenced again
+* Include a **clearly spoken drive-thru order line**
+* Finish with a poetic **vibe summary**
 
 Respond with JSON in this exact format:
 {{
-  "drink_name": "Completely original poetic name",
-  "description": "Theme-based vibe description matching your chosen aesthetic",
+  "drink_name": "Creative unique name",
+  "description": "Vibe description",
   "base_drink": "Base drink combination to order",
-  "modifications": ["ingredient 1", "ingredient 2", "surprise combo ingredient"],
-  "ordering_script": "Complete drive-thru order: 'Hi, can I get a...'",
+  "modifications": ["ingredient 1", "ingredient 2", "ingredient 3"],
+  "ordering_script": "Hi, can I get a grande [base drink] with [ingredient 1], [ingredient 2], [ingredient 3]...",
   "category": "mystery",
-  "vibe": "Poetic mood line matching your theme"
+  "vibe": "Short mood line"
 }}"""
 
         # Generate the drink using OpenAI
