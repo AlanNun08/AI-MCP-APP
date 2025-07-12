@@ -410,8 +410,8 @@ Respond with JSON in this exact format:
             base_drink=recipe_data['base_drink'],
             modifications=recipe_data['modifications'],
             ordering_script=recipe_data['ordering_script'],
-            pro_tips=recipe_data['pro_tips'],
-            why_amazing=recipe_data['why_amazing'],
+            pro_tips=[],  # Empty list since we're not using pro_tips anymore
+            why_amazing=recipe_data.get('vibe', ''),  # Use vibe as why_amazing
             category=recipe_data['category'],
             user_id=request.user_id
         )
