@@ -1256,11 +1256,15 @@ async def _get_walmart_product_options(ingredient: str, max_options: int = 3) ->
                     await asyncio.sleep(2)
                     continue
                 
-            except Exception as api_error:
-                logging.error(f"💥 PRODUCTION: Walmart API call failed for '{clean_ingredient}' on attempt {attempt + 1}: {str(api_error)}")
-                if attempt < 2:
-                    await asyncio.sleep(2)
-                    continue
+            except httpx.RequestError as e:
+                logging.error(f"❌ PRODUCTION: Walmart API Request Error for '{clean_ingredient}': {str(e)}")
+                continue
+            except httpx.HTTPStatusError as e:
+                logging.error(f"❌ PRODUCTION: Walmart API HTTP Error for '{clean_ingredient}': {e.response.status_code} - {e.response.text}")
+                continue
+            except Exception as e:
+                logging.error(f"❌ PRODUCTION: Walmart API Unexpected Error for '{clean_ingredient}': {str(e)}")
+                continue
         
         # If all attempts failed, return empty list
         logging.error(f"❌ PRODUCTION: All attempts failed for '{clean_ingredient}' - returning empty list")
