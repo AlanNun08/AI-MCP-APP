@@ -746,6 +746,10 @@ class StarbucksAPITester:
         # Test sequence - prioritizing streamlined prompts test
         tests = [
             ("API Health Check", self.test_api_health),
+            ("Curated Recipes - All", self.test_curated_recipes_all),
+            ("Curated Recipes - Category Filtering", self.test_curated_recipes_by_category),
+            ("Curated Recipes - Specific Examples", self.test_curated_recipes_specific_examples),
+            ("Curated Recipes - Initialization", self.test_curated_recipes_initialization),
             ("Streamlined Prompts Comprehensive Test", self.test_streamlined_prompts_comprehensive),
             ("Starbucks Frappuccino Generation", self.test_starbucks_frappuccino),
             ("Starbucks Lemonade Generation", self.test_starbucks_lemonade),
