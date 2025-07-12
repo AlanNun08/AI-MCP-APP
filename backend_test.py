@@ -1319,7 +1319,7 @@ async def main():
         
         # Print summary
         print("\n" + "="*80)
-        print("🌟 STARBUCKS DRINK GENERATION API TESTING SUMMARY")
+        print("🌟 STARBUCKS DRINK GENERATION & RECIPE SHARING API TESTING SUMMARY")
         print("="*80)
         print(f"Backend URL: {summary['backend_url']}")
         print(f"Total Tests: {summary['total_tests']}")
@@ -1339,19 +1339,28 @@ async def main():
         
         # Check for critical failures
         critical_failures = []
+        recipe_sharing_failures = []
         for result in summary['test_results']:
             if not result['success']:
                 if any(critical in result['test'].lower() for critical in ['api health', 'generation', 'database']):
                     critical_failures.append(result['test'])
+                elif any(sharing in result['test'].lower() for sharing in ['share recipe', 'shared recipes', 'like', 'recipe stats']):
+                    recipe_sharing_failures.append(result['test'])
         
         if critical_failures:
             print("🚨 CRITICAL ISSUES DETECTED:")
             for failure in critical_failures:
                 print(f"   - {failure}")
             print("\n❌ STARBUCKS API NOT READY")
+        elif recipe_sharing_failures:
+            print("⚠️  RECIPE SHARING ISSUES DETECTED:")
+            for failure in recipe_sharing_failures:
+                print(f"   - {failure}")
+            print("\n🔶 RECIPE SHARING SYSTEM NEEDS ATTENTION")
         else:
-            print("🎉 ALL STARBUCKS API TESTS PASSED")
-            print("✅ NEW CREATIVE PROMPTS WORKING CORRECTLY")
+            print("🎉 ALL API TESTS PASSED")
+            print("✅ STARBUCKS DRINK GENERATION WORKING CORRECTLY")
+            print("✅ USER RECIPE SHARING SYSTEM WORKING CORRECTLY")
         
         return summary
         
