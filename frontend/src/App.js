@@ -2577,11 +2577,17 @@ function App() {
       return <DashboardScreen />;
     }
     
-    // If user is not logged in and trying to access protected screens, redirect to landing
+    // DON'T redirect if user is temporarily null during navigation - let the session restore first
+    // Only redirect to landing if we're sure there's no saved session and user is on protected screen
     if (!user && !['landing', 'register', 'verify-email', 'login', 'forgot-password', 'reset-password'].includes(currentScreen)) {
-      console.log('User not logged in, redirecting to landing from:', currentScreen);
-      setCurrentScreen('landing');
-      return <LandingScreen />;
+      const savedUser = localStorage.getItem('ai_chef_user');
+      if (!savedUser) {
+        console.log('No saved session found, redirecting to landing from:', currentScreen);
+        setCurrentScreen('landing');
+        return <LandingScreen />;
+      }
+      // If there is a saved session, don't redirect - let the useEffect restore it
+      console.log('User session exists in localStorage, waiting for restoration...');
     }
     
     switch (currentScreen) {
