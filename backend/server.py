@@ -338,39 +338,24 @@ Respond with JSON in this exact format:
 }}"""
 
         elif request.drink_type == "iced_matcha_latte":
-            prompt = f"""Generate a drink based on a totally random aesthetic concept or scene. Do not use past drink structures. Be creative, strange, or playful — like a barista daydreaming.
+            prompt = f"""Design a **unique iced matcha latte** using Starbucks ingredients. Keep it drive-thru friendly{flavor_context}.
 
-**STEP 1: Choose a theme or aesthetic for the drink from this list:**
-- fantasy (e.g., fairy forest, moonlight sorcery)
-- color-inspired (e.g., neon green, cosmic purple, gold)
-- mood-based (e.g., 'cozy rainy day', 'after-school energy boost')
-- seasonal (e.g., autumn bonfire, spring bloom)
-- nostalgic (e.g., '90s mall treat, childhood cereal, birthday cake)
-
-**STEP 2: Create a magical iced matcha drink** with dreamy flavors{flavor_context}.
-
-**Name Requirements:**
-- Invent a completely new and original name that's catchy, poetic, or trend-worthy
-- Do NOT use existing Starbucks or secret menu names
-- Avoid repeating patterns like 'green', 'zen', or 'jade' unless essential to theme
-- Use uncommon words, symbols, or emotional cues (e.g., 'Sage Reverie', 'Mist Walker', 'Lunar Drift')
-
-**Surprise Ingredient Rule:**
-Each recipe MUST include one unexpected twist:
-- A shot of espresso (dirty matcha)
-- Unexpected syrup (toffee nut, raspberry, brown sugar)
-- Alternative milk combination (oat + coconut)
-- A fruit purée or cold foam topping
+Requirements:
+* Base of iced matcha + 2 to 4 additional ingredients (oat milk, brown sugar, espresso, cold foam, syrup, etc.)
+* Include one **uncommon pairing or visual effect** (e.g., strawberry purée swirl, espresso float)
+* Give **drive-thru phrasing**
+* Do not use the drink's name in instructions
+* End with a **vibe description**
 
 Respond with JSON in this exact format:
 {{
-  "drink_name": "Completely original poetic name",
-  "description": "Theme-based vibe description matching your chosen aesthetic",
+  "drink_name": "Creative unique name",
+  "description": "Vibe description",
   "base_drink": "Base iced matcha drink to order",
-  "modifications": ["ingredient 1", "ingredient 2", "surprise twist ingredient"],
-  "ordering_script": "Complete drive-thru order: 'Hi, can I get a...'",
+  "modifications": ["ingredient 1", "ingredient 2", "ingredient 3"],
+  "ordering_script": "Hi, can I get a grande Iced Matcha Latte with [ingredient 1], [ingredient 2], [ingredient 3]...",
   "category": "iced_matcha_latte",
-  "vibe": "Poetic mood line matching your theme"
+  "vibe": "Mood line"
 }}"""
 
         else:  # This handles any other drink type as "random mystery"
