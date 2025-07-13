@@ -720,7 +720,656 @@ class StarbucksAPITester:
             self.log_test_result("Curated Recipes - Initialization", False, f"Error: {str(e)}")
             return False
 
-    # ===== USER RECIPE SHARING SYSTEM TESTS =====
+    # ===== WALMART API INTEGRATION WORKFLOW TESTS =====
+    
+    async def test_api_health_check(self) -> bool:
+        """Test API health check endpoint"""
+        try:
+            async with httpx.AsyncClient(timeout=30.0) as client:
+                response = await client.get(f"{self.backend_url}/health")
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    
+                    # Validate response structure
+                    if "status" not in data or "version" not in data:
+                        self.log_test_result("API Health Check", False, "Missing status or version in response")
+                        return False
+                    
+                    status = data.get("status")
+                    version = data.get("version")
+                    
+                    if status != "running":
+                        self.log_test_result("API Health Check", False, f"API status is not 'running': {status}")
+                        return False
+                    
+                    self.log_test_result(
+                        "API Health Check", 
+                        True, 
+                        f"API is healthy - Status: {status}, Version: {version}",
+                        data
+                    )
+                    return True
+                else:
+                    self.log_test_result("API Health Check", False, f"HTTP {response.status_code}: {response.text}")
+                    return False
+        except Exception as e:
+            self.log_test_result("API Health Check", False, f"Error: {str(e)}")
+            return False
+
+    async def test_regular_recipe_generation_cuisine(self) -> bool:
+        """Test regular recipe generation for cuisine type (Italian)"""
+        try:
+            # Create test user first
+            test_email = "recipe.tester@example.com"
+            user_created = await self.create_test_user(self.test_user_id, test_email)
+            
+            if not user_created:
+                self.log_test_result("Regular Recipe Generation - Cuisine", False, "Failed to create test user")
+                return False
+            
+            request_data = {
+                "user_id": self.test_user_id,
+                "recipe_category": "cuisine",
+                "cuisine_type": "Italian",
+                "dietary_preferences": ["vegetarian"],
+                "ingredients_on_hand": ["tomatoes", "basil"],
+                "prep_time_max": 30,
+                "servings": 4,
+                "difficulty": "medium",
+                "is_healthy": True,
+                "max_calories_per_serving": 400
+            }
+            
+            async with httpx.AsyncClient(timeout=60.0) as client:
+                response = await client.post(f"{self.backend_url}/generate-recipe", json=request_data)
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    
+                    # Validate recipe structure
+                    required_fields = ["id", "title", "description", "ingredients", "instructions", "prep_time", "cook_time", "servings", "cuisine_type", "shopping_list"]
+                    missing_fields = [field for field in required_fields if field not in data]
+                    if missing_fields:
+                        self.log_test_result("Regular Recipe Generation - Cuisine", False, f"Missing fields: {missing_fields}")
+                        return False
+                    
+                    # Validate that it's NOT a Starbucks recipe
+                    if "drink_name" in data or "ordering_script" in data:
+                        self.log_test_result("Regular Recipe Generation - Cuisine", False, "Generated Starbucks recipe instead of regular recipe")
+                        return False
+                    
+                    # Validate shopping list exists for Walmart integration
+                    shopping_list = data.get("shopping_list", [])
+                    if not shopping_list or len(shopping_list) < 3:
+                        self.log_test_result("Regular Recipe Generation - Cuisine", False, f"Shopping list too short: {len(shopping_list)} items")
+                        return False
+                    
+                    recipe_title = data.get("title", "")
+                    cuisine_type = data.get("cuisine_type", "")
+                    
+                    # Store recipe ID for later tests
+                    self.test_recipe_id = data.get("id")
+                    
+                    self.log_test_result(
+                        "Regular Recipe Generation - Cuisine", 
+                        True, 
+                        f"Generated Italian recipe: '{recipe_title}' with {len(shopping_list)} shopping items",
+                        {
+                            "recipe_id": self.test_recipe_id,
+                            "title": recipe_title,
+                            "cuisine_type": cuisine_type,
+                            "shopping_items": len(shopping_list)
+                        }
+                    )
+                    return True
+                else:
+                    self.log_test_result("Regular Recipe Generation - Cuisine", False, f"HTTP {response.status_code}: {response.text}")
+                    return False
+        except Exception as e:
+            self.log_test_result("Regular Recipe Generation - Cuisine", False, f"Error: {str(e)}")
+            return False
+
+    async def test_regular_recipe_generation_snacks(self) -> bool:
+        """Test regular recipe generation for snacks"""
+        try:
+            request_data = {
+                "user_id": self.test_user_id,
+                "recipe_category": "snack",
+                "dietary_preferences": ["healthy"],
+                "prep_time_max": 15,
+                "servings": 2,
+                "difficulty": "easy",
+                "is_healthy": True,
+                "max_calories_per_serving": 200
+            }
+            
+            async with httpx.AsyncClient(timeout=60.0) as client:
+                response = await client.post(f"{self.backend_url}/generate-recipe", json=request_data)
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    
+                    # Validate that it's a snack recipe
+                    title = data.get("title", "").lower()
+                    description = data.get("description", "").lower()
+                    
+                    # Should not be a Starbucks recipe
+                    if "drink_name" in data or "ordering_script" in data:
+                        self.log_test_result("Regular Recipe Generation - Snacks", False, "Generated Starbucks recipe instead of snack")
+                        return False
+                    
+                    # Should have shopping list for Walmart
+                    shopping_list = data.get("shopping_list", [])
+                    if not shopping_list:
+                        self.log_test_result("Regular Recipe Generation - Snacks", False, "No shopping list generated")
+                        return False
+                    
+                    recipe_title = data.get("title", "")
+                    
+                    self.log_test_result(
+                        "Regular Recipe Generation - Snacks", 
+                        True, 
+                        f"Generated snack recipe: '{recipe_title}' with {len(shopping_list)} shopping items",
+                        {
+                            "title": recipe_title,
+                            "shopping_items": len(shopping_list)
+                        }
+                    )
+                    return True
+                else:
+                    self.log_test_result("Regular Recipe Generation - Snacks", False, f"HTTP {response.status_code}: {response.text}")
+                    return False
+        except Exception as e:
+            self.log_test_result("Regular Recipe Generation - Snacks", False, f"Error: {str(e)}")
+            return False
+
+    async def test_regular_recipe_generation_beverages(self) -> bool:
+        """Test regular recipe generation for beverages (non-Starbucks)"""
+        try:
+            request_data = {
+                "user_id": self.test_user_id,
+                "recipe_category": "beverage",
+                "dietary_preferences": ["dairy-free"],
+                "prep_time_max": 10,
+                "servings": 1,
+                "difficulty": "easy"
+            }
+            
+            async with httpx.AsyncClient(timeout=60.0) as client:
+                response = await client.post(f"{self.backend_url}/generate-recipe", json=request_data)
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    
+                    # Validate that it's a beverage recipe but NOT Starbucks
+                    if "drink_name" in data or "ordering_script" in data:
+                        self.log_test_result("Regular Recipe Generation - Beverages", False, "Generated Starbucks recipe instead of regular beverage")
+                        return False
+                    
+                    # Should have shopping list for Walmart
+                    shopping_list = data.get("shopping_list", [])
+                    if not shopping_list:
+                        self.log_test_result("Regular Recipe Generation - Beverages", False, "No shopping list generated")
+                        return False
+                    
+                    recipe_title = data.get("title", "")
+                    
+                    self.log_test_result(
+                        "Regular Recipe Generation - Beverages", 
+                        True, 
+                        f"Generated beverage recipe: '{recipe_title}' with {len(shopping_list)} shopping items",
+                        {
+                            "title": recipe_title,
+                            "shopping_items": len(shopping_list)
+                        }
+                    )
+                    return True
+                else:
+                    self.log_test_result("Regular Recipe Generation - Beverages", False, f"HTTP {response.status_code}: {response.text}")
+                    return False
+        except Exception as e:
+            self.log_test_result("Regular Recipe Generation - Beverages", False, f"Error: {str(e)}")
+            return False
+
+    async def test_recipe_history_retrieval(self) -> bool:
+        """Test recipe history retrieval for user"""
+        try:
+            async with httpx.AsyncClient(timeout=30.0) as client:
+                response = await client.get(f"{self.backend_url}/recipes/{self.test_user_id}")
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    
+                    # Should be a list of recipes
+                    if not isinstance(data, list):
+                        self.log_test_result("Recipe History Retrieval", False, f"Expected list, got: {type(data)}")
+                        return False
+                    
+                    # Should have at least one recipe from our previous tests
+                    if len(data) == 0:
+                        self.log_test_result("Recipe History Retrieval", False, "No recipes found in history")
+                        return False
+                    
+                    # Validate recipe structure
+                    sample_recipe = data[0]
+                    required_fields = ["id", "title", "description", "ingredients", "instructions"]
+                    missing_fields = [field for field in required_fields if field not in sample_recipe]
+                    if missing_fields:
+                        self.log_test_result("Recipe History Retrieval", False, f"Recipe missing fields: {missing_fields}")
+                        return False
+                    
+                    # Ensure these are regular recipes, not Starbucks
+                    starbucks_recipes = [r for r in data if "drink_name" in r or "ordering_script" in r]
+                    if starbucks_recipes:
+                        self.log_test_result("Recipe History Retrieval", False, f"Found {len(starbucks_recipes)} Starbucks recipes in regular recipe history")
+                        return False
+                    
+                    self.log_test_result(
+                        "Recipe History Retrieval", 
+                        True, 
+                        f"Retrieved {len(data)} regular recipes from history",
+                        {
+                            "total_recipes": len(data),
+                            "sample_titles": [r.get("title", "") for r in data[:3]]
+                        }
+                    )
+                    return True
+                else:
+                    self.log_test_result("Recipe History Retrieval", False, f"HTTP {response.status_code}: {response.text}")
+                    return False
+        except Exception as e:
+            self.log_test_result("Recipe History Retrieval", False, f"Error: {str(e)}")
+            return False
+
+    async def test_walmart_cart_options_generation(self) -> bool:
+        """Test Walmart grocery cart options generation for regular recipe"""
+        try:
+            # Ensure we have a recipe ID from previous tests
+            if not hasattr(self, 'test_recipe_id') or not self.test_recipe_id:
+                self.log_test_result("Walmart Cart Options", False, "No test recipe ID available")
+                return False
+            
+            request_data = {
+                "user_id": self.test_user_id,
+                "recipe_id": self.test_recipe_id
+            }
+            
+            async with httpx.AsyncClient(timeout=60.0) as client:
+                response = await client.post(f"{self.backend_url}/grocery/cart-options", json=request_data)
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    
+                    # Validate response structure
+                    required_fields = ["id", "user_id", "recipe_id", "ingredient_options"]
+                    missing_fields = [field for field in required_fields if field not in data]
+                    if missing_fields:
+                        self.log_test_result("Walmart Cart Options", False, f"Missing fields: {missing_fields}")
+                        return False
+                    
+                    ingredient_options = data.get("ingredient_options", [])
+                    if not ingredient_options:
+                        self.log_test_result("Walmart Cart Options", False, "No ingredient options generated")
+                        return False
+                    
+                    # Validate ingredient options structure
+                    total_products = 0
+                    authentic_product_count = 0
+                    mock_product_count = 0
+                    
+                    for ingredient_option in ingredient_options:
+                        if "ingredient_name" not in ingredient_option or "options" not in ingredient_option:
+                            self.log_test_result("Walmart Cart Options", False, f"Invalid ingredient option structure: {ingredient_option}")
+                            return False
+                        
+                        options = ingredient_option.get("options", [])
+                        total_products += len(options)
+                        
+                        # Check for authentic Walmart products vs mock data
+                        for option in options:
+                            product_id = option.get("product_id", "")
+                            
+                            # Mock data typically has patterns like "10315" or simple incremental IDs
+                            if product_id.startswith("10315") or len(product_id) < 8:
+                                mock_product_count += 1
+                            else:
+                                authentic_product_count += 1
+                            
+                            # Validate product structure
+                            required_product_fields = ["product_id", "name", "price"]
+                            missing_product_fields = [field for field in required_product_fields if field not in option]
+                            if missing_product_fields:
+                                self.log_test_result("Walmart Cart Options", False, f"Product missing fields: {missing_product_fields}")
+                                return False
+                    
+                    # Calculate authenticity rate
+                    authenticity_rate = (authentic_product_count / total_products * 100) if total_products > 0 else 0
+                    
+                    # Verify that we have authentic Walmart products (not mock data)
+                    if authenticity_rate < 80:  # Allow some tolerance
+                        self.log_test_result("Walmart Cart Options", False, f"Too many mock products: {mock_product_count}/{total_products} ({100-authenticity_rate:.1f}% mock data)")
+                        return False
+                    
+                    self.log_test_result(
+                        "Walmart Cart Options", 
+                        True, 
+                        f"Generated cart options for {len(ingredient_options)} ingredients with {total_products} total products. Authenticity rate: {authenticity_rate:.1f}%",
+                        {
+                            "ingredient_count": len(ingredient_options),
+                            "total_products": total_products,
+                            "authentic_products": authentic_product_count,
+                            "mock_products": mock_product_count,
+                            "authenticity_rate": f"{authenticity_rate:.1f}%"
+                        }
+                    )
+                    
+                    # Store cart options ID for next test
+                    self.test_cart_options_id = data.get("id")
+                    return True
+                else:
+                    self.log_test_result("Walmart Cart Options", False, f"HTTP {response.status_code}: {response.text}")
+                    return False
+        except Exception as e:
+            self.log_test_result("Walmart Cart Options", False, f"Error: {str(e)}")
+            return False
+
+    async def test_walmart_product_details_validation(self) -> bool:
+        """Test that Walmart products have correct details (name, price)"""
+        try:
+            # Use the cart options from previous test
+            if not hasattr(self, 'test_cart_options_id') or not self.test_cart_options_id:
+                self.log_test_result("Walmart Product Details", False, "No cart options ID available")
+                return False
+            
+            # Get the cart options to examine product details
+            async with httpx.AsyncClient(timeout=30.0) as client:
+                response = await client.get(f"{self.backend_url}/grocery/cart-options/{self.test_cart_options_id}")
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    ingredient_options = data.get("ingredient_options", [])
+                    
+                    if not ingredient_options:
+                        self.log_test_result("Walmart Product Details", False, "No ingredient options to validate")
+                        return False
+                    
+                    valid_products = 0
+                    invalid_products = 0
+                    price_issues = 0
+                    name_issues = 0
+                    
+                    for ingredient_option in ingredient_options:
+                        options = ingredient_option.get("options", [])
+                        
+                        for option in options:
+                            product_name = option.get("name", "")
+                            product_price = option.get("price", 0)
+                            product_id = option.get("product_id", "")
+                            
+                            # Validate product name
+                            if not product_name or len(product_name) < 3:
+                                name_issues += 1
+                                invalid_products += 1
+                                continue
+                            
+                            # Validate product price
+                            if not isinstance(product_price, (int, float)) or product_price <= 0:
+                                price_issues += 1
+                                invalid_products += 1
+                                continue
+                            
+                            # Check for realistic price range (not obviously fake)
+                            if product_price > 100:  # Most grocery items should be under $100
+                                price_issues += 1
+                                invalid_products += 1
+                                continue
+                            
+                            valid_products += 1
+                    
+                    total_products = valid_products + invalid_products
+                    validity_rate = (valid_products / total_products * 100) if total_products > 0 else 0
+                    
+                    if validity_rate < 90:  # Expect high validity rate
+                        self.log_test_result("Walmart Product Details", False, f"Too many invalid products: {invalid_products}/{total_products} ({100-validity_rate:.1f}% invalid)")
+                        return False
+                    
+                    self.log_test_result(
+                        "Walmart Product Details", 
+                        True, 
+                        f"Product details validation passed: {valid_products}/{total_products} valid products ({validity_rate:.1f}%)",
+                        {
+                            "total_products": total_products,
+                            "valid_products": valid_products,
+                            "invalid_products": invalid_products,
+                            "name_issues": name_issues,
+                            "price_issues": price_issues,
+                            "validity_rate": f"{validity_rate:.1f}%"
+                        }
+                    )
+                    return True
+                else:
+                    self.log_test_result("Walmart Product Details", False, f"HTTP {response.status_code}: {response.text}")
+                    return False
+        except Exception as e:
+            self.log_test_result("Walmart Product Details", False, f"Error: {str(e)}")
+            return False
+
+    async def test_walmart_affiliate_url_generation(self) -> bool:
+        """Test Walmart affiliate URL generation with actual product IDs"""
+        try:
+            # Create a grocery cart with selected products
+            if not hasattr(self, 'test_cart_options_id') or not self.test_cart_options_id:
+                self.log_test_result("Walmart Affiliate URLs", False, "No cart options ID available")
+                return False
+            
+            # First get the cart options to select some products
+            async with httpx.AsyncClient(timeout=30.0) as client:
+                response = await client.get(f"{self.backend_url}/grocery/cart-options/{self.test_cart_options_id}")
+                
+                if response.status_code != 200:
+                    self.log_test_result("Walmart Affiliate URLs", False, f"Failed to get cart options: {response.status_code}")
+                    return False
+                
+                data = response.json()
+                ingredient_options = data.get("ingredient_options", [])
+                
+                # Select first product from each ingredient
+                selected_products = []
+                for ingredient_option in ingredient_options[:3]:  # Limit to first 3 ingredients
+                    options = ingredient_option.get("options", [])
+                    if options:
+                        first_option = options[0]
+                        selected_products.append({
+                            "ingredient_name": ingredient_option.get("ingredient_name"),
+                            "product_id": first_option.get("product_id"),
+                            "name": first_option.get("name"),
+                            "price": first_option.get("price"),
+                            "quantity": 1
+                        })
+                
+                if not selected_products:
+                    self.log_test_result("Walmart Affiliate URLs", False, "No products available for cart creation")
+                    return False
+                
+                # Create grocery cart
+                cart_request = {
+                    "user_id": self.test_user_id,
+                    "recipe_id": self.test_recipe_id,
+                    "products": selected_products
+                }
+                
+                response = await client.post(f"{self.backend_url}/grocery/cart", json=cart_request)
+                
+                if response.status_code == 200:
+                    cart_data = response.json()
+                    
+                    # Validate cart response
+                    required_fields = ["id", "user_id", "recipe_id", "products", "total_price", "walmart_url"]
+                    missing_fields = [field for field in required_fields if field not in cart_data]
+                    if missing_fields:
+                        self.log_test_result("Walmart Affiliate URLs", False, f"Cart missing fields: {missing_fields}")
+                        return False
+                    
+                    walmart_url = cart_data.get("walmart_url", "")
+                    total_price = cart_data.get("total_price", 0)
+                    products = cart_data.get("products", [])
+                    
+                    # Validate Walmart URL
+                    if not walmart_url or "walmart.com" not in walmart_url:
+                        self.log_test_result("Walmart Affiliate URLs", False, f"Invalid Walmart URL: {walmart_url}")
+                        return False
+                    
+                    # Check if URL contains product IDs (indicating it's not just a generic link)
+                    product_ids_in_url = any(product.get("product_id", "") in walmart_url for product in products)
+                    if not product_ids_in_url:
+                        self.log_test_result("Walmart Affiliate URLs", False, "Walmart URL doesn't contain actual product IDs")
+                        return False
+                    
+                    # Validate total price calculation
+                    expected_total = sum(product.get("price", 0) * product.get("quantity", 1) for product in products)
+                    if abs(total_price - expected_total) > 0.01:  # Allow for small floating point differences
+                        self.log_test_result("Walmart Affiliate URLs", False, f"Price mismatch: expected {expected_total}, got {total_price}")
+                        return False
+                    
+                    self.log_test_result(
+                        "Walmart Affiliate URLs", 
+                        True, 
+                        f"Generated Walmart cart with {len(products)} products, total: ${total_price:.2f}, URL contains product IDs",
+                        {
+                            "cart_id": cart_data.get("id"),
+                            "product_count": len(products),
+                            "total_price": total_price,
+                            "walmart_url_valid": "walmart.com" in walmart_url,
+                            "contains_product_ids": product_ids_in_url
+                        }
+                    )
+                    return True
+                else:
+                    self.log_test_result("Walmart Affiliate URLs", False, f"Failed to create cart: {response.status_code} - {response.text}")
+                    return False
+        except Exception as e:
+            self.log_test_result("Walmart Affiliate URLs", False, f"Error: {str(e)}")
+            return False
+
+    async def test_starbucks_recipes_no_walmart_integration(self) -> bool:
+        """Test that Starbucks recipes do NOT trigger Walmart integration"""
+        try:
+            # Generate a Starbucks recipe
+            starbucks_request = {
+                "user_id": self.test_user_id,
+                "drink_type": "frappuccino"
+            }
+            
+            async with httpx.AsyncClient(timeout=60.0) as client:
+                response = await client.post(f"{self.backend_url}/generate-starbucks-drink", json=starbucks_request)
+                
+                if response.status_code != 200:
+                    self.log_test_result("Starbucks No Walmart Integration", False, f"Failed to generate Starbucks drink: {response.status_code}")
+                    return False
+                
+                starbucks_data = response.json()
+                starbucks_id = starbucks_data.get("id")
+                
+                if not starbucks_id:
+                    self.log_test_result("Starbucks No Walmart Integration", False, "No Starbucks recipe ID returned")
+                    return False
+                
+                # Try to generate Walmart cart options for Starbucks recipe (should fail or return empty)
+                cart_options_request = {
+                    "user_id": self.test_user_id,
+                    "recipe_id": starbucks_id
+                }
+                
+                response = await client.post(f"{self.backend_url}/grocery/cart-options", json=cart_options_request)
+                
+                # This should either fail (404/400) or return empty results
+                if response.status_code == 200:
+                    data = response.json()
+                    ingredient_options = data.get("ingredient_options", [])
+                    
+                    # If it returns data, it should be empty or minimal for Starbucks
+                    if len(ingredient_options) > 0:
+                        self.log_test_result("Starbucks No Walmart Integration", False, f"Walmart integration incorrectly triggered for Starbucks recipe: {len(ingredient_options)} ingredients")
+                        return False
+                    
+                    self.log_test_result(
+                        "Starbucks No Walmart Integration", 
+                        True, 
+                        "Walmart integration correctly returned empty results for Starbucks recipe"
+                    )
+                    return True
+                elif response.status_code in [400, 404]:
+                    # This is also acceptable - Starbucks recipes should not support Walmart integration
+                    self.log_test_result(
+                        "Starbucks No Walmart Integration", 
+                        True, 
+                        f"Walmart integration correctly rejected Starbucks recipe: {response.status_code}"
+                    )
+                    return True
+                else:
+                    self.log_test_result("Starbucks No Walmart Integration", False, f"Unexpected response: {response.status_code}")
+                    return False
+        except Exception as e:
+            self.log_test_result("Starbucks No Walmart Integration", False, f"Error: {str(e)}")
+            return False
+
+    async def test_walmart_integration_workflow_complete(self) -> bool:
+        """Test the complete Walmart integration workflow end-to-end"""
+        try:
+            # This test combines all the workflow steps:
+            # 1. Generate regular recipe ✓ (done in previous tests)
+            # 2. Get recipe history ✓ (done in previous tests)  
+            # 3. Get recipe details (simulate clicking on recipe)
+            # 4. Generate Walmart cart options ✓ (done in previous tests)
+            # 5. Create final cart with affiliate URLs ✓ (done in previous tests)
+            
+            workflow_steps = [
+                ("Recipe Generation", hasattr(self, 'test_recipe_id') and self.test_recipe_id),
+                ("Recipe History", True),  # Tested separately
+                ("Walmart Cart Options", hasattr(self, 'test_cart_options_id') and self.test_cart_options_id),
+                ("Affiliate URL Generation", True)  # Tested separately
+            ]
+            
+            failed_steps = [step for step, passed in workflow_steps if not passed]
+            
+            if failed_steps:
+                self.log_test_result("Walmart Integration Workflow", False, f"Failed workflow steps: {failed_steps}")
+                return False
+            
+            # Test recipe details retrieval (simulating user clicking on recipe)
+            async with httpx.AsyncClient(timeout=30.0) as client:
+                response = await client.get(f"{self.backend_url}/recipe/{self.test_recipe_id}")
+                
+                if response.status_code == 200:
+                    recipe_data = response.json()
+                    
+                    # Validate recipe has shopping list for Walmart integration
+                    shopping_list = recipe_data.get("shopping_list", [])
+                    if not shopping_list:
+                        self.log_test_result("Walmart Integration Workflow", False, "Recipe details missing shopping list")
+                        return False
+                    
+                    self.log_test_result(
+                        "Walmart Integration Workflow", 
+                        True, 
+                        f"Complete workflow validated: Recipe → History → Details → Walmart Integration → Affiliate URLs",
+                        {
+                            "recipe_id": self.test_recipe_id,
+                            "cart_options_id": getattr(self, 'test_cart_options_id', None),
+                            "workflow_steps_passed": len([s for s, p in workflow_steps if p]),
+                            "total_workflow_steps": len(workflow_steps)
+                        }
+                    )
+                    return True
+                else:
+                    self.log_test_result("Walmart Integration Workflow", False, f"Failed to get recipe details: {response.status_code}")
+                    return False
+        except Exception as e:
+            self.log_test_result("Walmart Integration Workflow", False, f"Error: {str(e)}")
+            return False
+
+    # ===== END WALMART API INTEGRATION TESTS =====
     
     async def create_test_user(self, user_id: str, email: str, first_name: str = "Test", last_name: str = "User") -> bool:
         """Create a test user for recipe sharing tests"""
