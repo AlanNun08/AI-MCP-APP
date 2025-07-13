@@ -2674,6 +2674,34 @@ async def delete_starbucks_recipe(recipe_id: str):
 # Include the API router
 app.include_router(api_router)
 
+# ========================================
+# 🧱 WALMART INTEGRATION V2 - CLEAN REBUILD
+# Following MCP App Development Blueprint
+# ========================================
+
+# Import the clean V2 integration
+try:
+    import sys
+    sys.path.append('/app')
+    from walmart_integration_v2 import walmart_router, CacheStrategy
+    
+    # Add V2 router to app
+    app.include_router(walmart_router)
+    
+    # Apply cache headers to all responses
+    @app.middleware("http")
+    async def add_cache_headers(request, call_next):
+        response = await call_next(request)
+        cache_headers = CacheStrategy.get_cache_headers()
+        for header, value in cache_headers.items():
+            response.headers[header] = value
+        return response
+    
+    print("✅ Walmart Integration V2 loaded successfully")
+    
+except Exception as e:
+    print(f"⚠️ Walmart Integration V2 failed to load: {str(e)}")
+
 # CORS Middleware
 app.add_middleware(
     CORSMiddleware,
