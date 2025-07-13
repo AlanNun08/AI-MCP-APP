@@ -2344,7 +2344,20 @@ IMPORTANT FOR SPICES: If the recipe uses spices, list each spice individually in
         logging.error(f"Recipe generation error: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to generate recipe")
 
-@api_router.get("/recipes/{recipe_id}")
+@app.get("/api/recipes/{recipe_id}")
+async def get_recipe_by_id(recipe_id: str):
+    """Get a specific recipe by ID"""
+    try:
+        recipe = await db.recipes.find_one({"id": recipe_id})
+        if not recipe:
+            raise HTTPException(status_code=404, detail="Recipe not found")
+        
+        # Convert MongoDB document to dict, handling _id field
+        return mongo_to_dict(recipe)
+    except Exception as e:
+        logging.error(f"Error fetching recipe: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to fetch recipe")
+
 @app.get("/api/recipes/history/{user_id}")
 async def get_recipe_history(user_id: str):
     """Get all recipes for a user including regular recipes and Starbucks drinks"""
