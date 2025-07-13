@@ -215,6 +215,30 @@ backend:
         agent: "testing"
         comment: "USER RECIPE SHARING SYSTEM FULLY OPERATIONAL: ✅ POST /api/share-recipe endpoint working perfectly - successfully creates user-shared recipes with all categories (frappuccino, refresher, lemonade, iced_matcha_latte, random). ✅ Image upload working with base64 format storage. ✅ Tags and difficulty levels properly stored and retrieved. ✅ Validation working correctly - rejects missing required fields and insufficient ingredients. ✅ GET /api/shared-recipes working with category filtering (frappuccino: 1, refresher: 1, others: 0). ✅ Tags filtering operational (sweet/magical tags: 1 recipe). ✅ Pagination working correctly (limit/offset parameters). ✅ POST /api/like-recipe working - like/unlike toggle functionality operational with proper likes count updates. ✅ GET /api/recipe-stats working - returns total shared recipes (2), category breakdown, top tags (magical, sweet, fruity), most liked recipes. ✅ Recipe structure validation passed - all recipes have required fields: recipe_name, description, ingredients, order_instructions, category, shared_by_username, likes_count, liked_by_users, image_base64, tags, difficulty_level. ✅ Social features working: likes count updates correctly, user attribution present. ✅ Database storage and retrieval working perfectly. Community recipe sharing system is production-ready with 100% test success rate (35/35 tests passed)."
 
+  - task: "Individual Recipe Details Endpoint"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "INDIVIDUAL RECIPE ENDPOINT TESTING COMPLETED: ✅ The /api/recipes/{recipe_id} endpoint is now working correctly and returns 200 status (the 422 error mentioned in the review request has been resolved). ✅ Successfully tested retrieval of individual recipe details for generated recipes. ✅ Endpoint properly returns recipe data including id, title, description, ingredients, instructions, and shopping_list. ✅ Integration with recipe history workflow confirmed - users can click on recipes from history and view full details. ✅ This endpoint is essential for the complete Walmart integration workflow and is now fully operational."
+
+  - task: "Complete Walmart Integration Workflow"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "COMPLETE WALMART INTEGRATION WORKFLOW VERIFIED: ✅ Tested the exact 5-step workflow specified in review request: 1) Recipe Generation → 2) Recipe History → 3) Individual Recipe Details → 4) Walmart Cart Options → 5) Affiliate URLs. All steps passed with 100% success rate. ✅ USER EXPERIENCE CONFIRMED: When a user clicks on a recipe from history, they can view the recipe details AND the Walmart integration automatically loads with product options and prices. ✅ AUTHENTIC WALMART PRODUCTS: Generated cart options for 8 ingredients with 23 products, 100% authenticity rate (all real Walmart product IDs, no mock data). ✅ AFFILIATE URL GENERATION: Successfully created Walmart cart with 3 products totaling $7.14, URL contains actual product IDs for proper cart functionality. ✅ END-TO-END REQUIREMENT FULFILLED: The complete user requirement is fully implemented and working: 'after the recipe is generated and when clicking on the recipe in the history, you need to be able to see items, price, and other items and then generated the walmart affiliate link to open the cart using the item ids'. System is production-ready and meets all specified requirements."
+
 frontend:
   - task: "Frontend Testing"
     implemented: true
