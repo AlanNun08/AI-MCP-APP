@@ -2322,7 +2322,7 @@ async def main():
     for result in tester.test_results:
         print(f"{result['status']} - {result['test']}: {result['details']}")
     
-    return passed_walmart == total_walmart
+    return (passed_demo == total_demo) and (passed_walmart == total_walmart)
 
 if __name__ == "__main__":
     success = asyncio.run(main())
