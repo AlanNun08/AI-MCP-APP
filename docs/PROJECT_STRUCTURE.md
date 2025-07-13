@@ -43,6 +43,15 @@
     └── (future deployment scripts)
 ```
 
+## ⚠️ **DEVELOPMENT POLICY**
+**PRODUCTION-ONLY CODE**: This project strictly follows production-only development
+- **❌ NO preview website code generation**
+- **✅ ONLY production deployment code** 
+- **🔗 Production Domain**: https://recipe-cart-app-1.emergent.host
+- **📋 Full Guidelines**: `/docs/PRODUCTION_ONLY_POLICY.md`
+
+---
+
 ## 🔧 CONFIGURATION FILES
 
 ### **Backend Configuration** (`/app/backend/.env`)
