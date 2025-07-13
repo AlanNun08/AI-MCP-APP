@@ -2512,7 +2512,7 @@ async def get_user_recipes(user_id: str):
         logging.error(f"Error fetching user recipes: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to fetch recipes")
 
-# ALL WALMART ENDPOINTS DELETED - WILL BE RECREATED FROM SCRATCH
+# ALL WALMART CLASSES AND ENDPOINTS DELETED - WILL BE RECREATED FROM SCRATCH
 
 # CORS middleware configuration - Production ready
 @api_router.delete("/starbucks-recipes/{recipe_id}")
