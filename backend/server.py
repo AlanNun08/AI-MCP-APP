@@ -1137,7 +1137,7 @@ async def like_recipe(like_request: LikeRecipeRequest):
         logger.error(f"Error liking recipe: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to like recipe")
 
-@app.get("/api/recipe-stats")
+@api_router.get("/recipe-stats")
 async def get_recipe_stats():
     """Get statistics about shared recipes"""
     try:
