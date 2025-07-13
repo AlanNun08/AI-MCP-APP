@@ -1,5 +1,5 @@
 // Service Worker for PWA functionality - PRODUCTION DOMAIN
-const CACHE_NAME = 'v119-auth-fix';
+const CACHE_NAME = 'v120-backend-fix';
 const urlsToCache = [
   '/',
   '/static/js/bundle.js',
