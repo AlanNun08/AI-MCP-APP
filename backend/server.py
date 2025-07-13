@@ -1046,7 +1046,7 @@ async def share_recipe(recipe_request: ShareRecipeRequest, user_id: str):
         logger.error(f"Error sharing recipe: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to share recipe")
 
-@app.get("/api/shared-recipes")
+@api_router.get("/shared-recipes")
 async def get_shared_recipes(
     category: Optional[str] = None,
     user_id: Optional[str] = None,
