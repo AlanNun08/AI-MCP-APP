@@ -993,7 +993,7 @@ def get_curated_recipes_data():
     ]
 
 # User Recipe Sharing Endpoints
-@app.post("/api/share-recipe")
+@api_router.post("/share-recipe")
 async def share_recipe(recipe_request: ShareRecipeRequest, user_id: str):
     """Allow users to share their favorite recipes with the community"""
     try:
