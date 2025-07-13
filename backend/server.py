@@ -1088,7 +1088,7 @@ async def get_shared_recipes(
         logger.error(f"Error getting shared recipes: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to get shared recipes")
 
-@app.post("/api/like-recipe")
+@api_router.post("/like-recipe")
 async def like_recipe(like_request: LikeRecipeRequest):
     """Like or unlike a shared recipe"""
     try:
