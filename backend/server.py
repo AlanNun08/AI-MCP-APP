@@ -2380,7 +2380,7 @@ IMPORTANT FOR SPICES: If the recipe uses spices, list each spice individually in
         logging.error(f"Recipe generation error: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to generate recipe")
 
-@app.get("/api/recipes/{recipe_id}")
+@api_router.get("/recipes/{recipe_id}")
 async def get_recipe_by_id(recipe_id: str):
     """Get a specific recipe by ID"""
     try:
