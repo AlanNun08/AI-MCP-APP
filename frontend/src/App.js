@@ -48,52 +48,44 @@ function App() {
   const [pendingResetEmail, setPendingResetEmail] = useState(null);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
 
-  // Load user session from localStorage on app start
+  // Load user session from localStorage on app start - PRODUCTION FIX
   useEffect(() => {
     const loadUserSession = () => {
       try {
         const savedUser = localStorage.getItem('ai_chef_user');
         if (savedUser) {
           const userData = JSON.parse(savedUser);
+          console.log('🔄 Restoring user session:', userData.email);
           setUser(userData);
-          // Only set to dashboard if we're on landing page
-          if (currentScreen === 'landing') {
-            setCurrentScreen('dashboard');
-          }
-          console.log('User session restored:', userData.email);
+          // Set to dashboard if we're on landing page
+          setCurrentScreen('dashboard');
+        } else {
+          console.log('📱 No saved user session found');
         }
       } catch (error) {
-        console.error('Failed to restore user session:', error);
+        console.error('❌ Failed to restore user session:', error);
         localStorage.removeItem('ai_chef_user');
       } finally {
         setIsLoadingAuth(false);
       }
     };
     
-    // Load user session after cache clearing
-    setTimeout(loadUserSession, 100);
-  }, []);
+    // Load user session after a short delay to ensure cache clearing is done
+    const timer = setTimeout(loadUserSession, 100);
+    return () => clearTimeout(timer);
+  }, []); // Only run once on mount
 
-  // Check and restore user session if lost during navigation
+  // Monitor user state changes and save to localStorage
   useEffect(() => {
-    const checkUserSession = () => {
-      if (!user) {
-        const savedUser = localStorage.getItem('ai_chef_user');
-        if (savedUser) {
-          try {
-            const userData = JSON.parse(savedUser);
-            console.log('Restoring lost user session:', userData.email);
-            setUser(userData);
-          } catch (error) {
-            console.error('Failed to restore lost user session:', error);
-            localStorage.removeItem('ai_chef_user');
-          }
-        }
+    if (user) {
+      try {
+        localStorage.setItem('ai_chef_user', JSON.stringify(user));
+        console.log('💾 User session saved:', user.email);
+      } catch (error) {
+        console.error('❌ Failed to save user session:', error);
       }
-    };
-    
-    checkUserSession();
-  }, [currentScreen, user]);
+    }
+  }, [user]); // Save whenever user changes
 
   // Save user session to localStorage
   const saveUserSession = (userData) => {
