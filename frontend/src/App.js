@@ -87,16 +87,6 @@ function App() {
     }
   }, [user]); // Save whenever user changes
 
-  // Save user session to localStorage
-  const saveUserSession = (userData) => {
-    try {
-      localStorage.setItem('ai_chef_user', JSON.stringify(userData));
-      console.log('User session saved:', userData.email);
-    } catch (error) {
-      console.error('Failed to save user session:', error);
-    }
-  };
-
   // Clear user session from localStorage
   const clearUserSession = () => {
     try {
