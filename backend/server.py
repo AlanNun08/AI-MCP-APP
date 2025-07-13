@@ -2535,10 +2535,18 @@ async def get_grocery_cart_options(
         logging.warning(f"🚨 DEBUG: successful_ingredients = {successful_ingredients}")
         logging.warning(f"🚨 DEBUG: failed_ingredients = {failed_ingredients}")
         
-        # PRODUCTION: Check if we have any ingredient options BEFORE creating cart
+        # PRODUCTION: Check if we have any ingredient options
         if not ingredient_options:
-            logging.error(f"❌ CRITICAL: No ingredient options found for recipe {recipe_id}")
-            raise HTTPException(status_code=500, detail="Unable to generate cart options - Walmart integration unavailable")
+            logging.warning(f"⚠️ PRODUCTION: No ingredient options found for recipe {recipe_id}")
+            # Return a response indicating no products were found instead of throwing 500 error
+            return {
+                "recipe_id": recipe_id,
+                "recipe_title": recipe_title,
+                "ingredient_options": [],
+                "message": "No Walmart products found for this recipe's ingredients",
+                "shopping_mode": "unavailable",
+                "status": "no_products_found"
+            }
 
         # PRODUCTION: Create cart options object - ONLY REAL DATA
         cart_options = GroceryCartOptions(
