@@ -43,7 +43,7 @@ class WalmartIntegrationTester:
     def test_backend_health(self):
         """Test if backend is accessible"""
         try:
-            response = self.session.get(f"{API_BASE}/health", timeout=10)
+            response = self.session.get(f"{API_BASE}/", timeout=10)
             if response.status_code == 200:
                 self.log_result("Backend Health Check", True, "Backend is accessible")
                 return True
