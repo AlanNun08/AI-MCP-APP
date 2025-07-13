@@ -15,7 +15,7 @@ This comprehensive guide documents how the AI Recipe + Grocery Delivery App work
 - **Email Service**: Mailjet for user verification
 
 ### Environment URLs
-- **Preview Environment**: https://310d9b8e-d018-47c6-9b14-e763b8dfbeb2.preview.emergentagent.com
+- **Preview Environment**: https://recipe-cart-app-1.emergent.host
 - **Deployment Environment**: https://recipe-cart-app-1.emergent.host
 - **Backend API**: Both environments use the working preview backend
 
@@ -26,7 +26,7 @@ This comprehensive guide documents how the AI Recipe + Grocery Delivery App work
 
 **Test Case**:
 ```bash
-curl -X POST https://310d9b8e-d018-47c6-9b14-e763b8dfbeb2.preview.emergentagent.com/api/auth/register \
+curl -X POST https://recipe-cart-app-1.emergent.host/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{
     "email": "test@example.com",
@@ -54,7 +54,7 @@ curl -X POST https://310d9b8e-d018-47c6-9b14-e763b8dfbeb2.preview.emergentagent.
 
 **Test Case**:
 ```bash
-curl -X POST https://310d9b8e-d018-47c6-9b14-e763b8dfbeb2.preview.emergentagent.com/api/auth/verify-email \
+curl -X POST https://recipe-cart-app-1.emergent.host/api/auth/verify-email \
   -H "Content-Type: application/json" \
   -d '{
     "email": "test@example.com",
@@ -81,7 +81,7 @@ curl -X POST https://310d9b8e-d018-47c6-9b14-e763b8dfbeb2.preview.emergentagent.
 
 **Test Case**:
 ```bash
-curl -X POST https://310d9b8e-d018-47c6-9b14-e763b8dfbeb2.preview.emergentagent.com/api/auth/login \
+curl -X POST https://recipe-cart-app-1.emergent.host/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{
     "email": "test@example.com",
@@ -129,7 +129,7 @@ curl -X POST https://310d9b8e-d018-47c6-9b14-e763b8dfbeb2.preview.emergentagent.
 
 **Test Case**:
 ```bash
-curl -X POST https://310d9b8e-d018-47c6-9b14-e763b8dfbeb2.preview.emergentagent.com/api/recipes/generate \
+curl -X POST https://recipe-cart-app-1.emergent.host/api/recipes/generate \
   -H "Content-Type: application/json" \
   -d '{
     "user_id": "test-user-id",
@@ -159,7 +159,7 @@ curl -X POST https://310d9b8e-d018-47c6-9b14-e763b8dfbeb2.preview.emergentagent.
 ### 2. Snack Recipe Generation
 **Test Case**:
 ```bash
-curl -X POST https://310d9b8e-d018-47c6-9b14-e763b8dfbeb2.preview.emergentagent.com/api/recipes/generate \
+curl -X POST https://recipe-cart-app-1.emergent.host/api/recipes/generate \
   -H "Content-Type: application/json" \
   -d '{
     "user_id": "test-user-id",
@@ -173,7 +173,7 @@ curl -X POST https://310d9b8e-d018-47c6-9b14-e763b8dfbeb2.preview.emergentagent.
 ### 3. Beverage Recipe Generation
 **Test Case**:
 ```bash
-curl -X POST https://310d9b8e-d018-47c6-9b14-e763b8dfbeb2.preview.emergentagent.com/api/recipes/generate \
+curl -X POST https://recipe-cart-app-1.emergent.host/api/recipes/generate \
   -H "Content-Type: application/json" \
   -d '{
     "user_id": "test-user-id",
@@ -189,7 +189,7 @@ curl -X POST https://310d9b8e-d018-47c6-9b14-e763b8dfbeb2.preview.emergentagent.
 
 **Test Case**:
 ```bash
-curl -X POST https://310d9b8e-d018-47c6-9b14-e763b8dfbeb2.preview.emergentagent.com/api/starbucks/generate \
+curl -X POST https://recipe-cart-app-1.emergent.host/api/starbucks/generate \
   -H "Content-Type: application/json" \
   -d '{
     "user_id": "test-user-id",
@@ -229,13 +229,13 @@ curl -X POST https://310d9b8e-d018-47c6-9b14-e763b8dfbeb2.preview.emergentagent.
 **Test Case**:
 ```bash
 # First generate a recipe
-RECIPE_ID=$(curl -X POST https://310d9b8e-d018-47c6-9b14-e763b8dfbeb2.preview.emergentagent.com/api/recipes/generate \
+RECIPE_ID=$(curl -X POST https://recipe-cart-app-1.emergent.host/api/recipes/generate \
   -H "Content-Type: application/json" \
   -d '{"user_id":"test","recipe_category":"snacks","cuisine_type":"cookies","servings":1,"difficulty":"easy"}' \
   | jq -r '.id')
 
 # Then get cart options
-curl -X POST "https://310d9b8e-d018-47c6-9b14-e763b8dfbeb2.preview.emergentagent.com/api/grocery/cart-options?recipe_id=$RECIPE_ID&user_id=test" \
+curl -X POST "https://recipe-cart-app-1.emergent.host/api/grocery/cart-options?recipe_id=$RECIPE_ID&user_id=test" \
   -H "Content-Type: application/json" \
   -d '{}'
 ```
@@ -283,7 +283,7 @@ curl -X POST "https://310d9b8e-d018-47c6-9b14-e763b8dfbeb2.preview.emergentagent
 
 **Test Case**:
 ```bash
-curl -X POST https://310d9b8e-d018-47c6-9b14-e763b8dfbeb2.preview.emergentagent.com/api/grocery/custom-cart \
+curl -X POST https://recipe-cart-app-1.emergent.host/api/grocery/custom-cart \
   -H "Content-Type: application/json" \
   -d '{
     "user_id": "test",
@@ -388,7 +388,7 @@ curl -X POST https://310d9b8e-d018-47c6-9b14-e763b8dfbeb2.preview.emergentagent.
 ### API Testing Script
 ```bash
 #!/bin/bash
-BASE_URL="https://310d9b8e-d018-47c6-9b14-e763b8dfbeb2.preview.emergentagent.com"
+BASE_URL="https://recipe-cart-app-1.emergent.host"
 
 echo "🧪 Testing API Health"
 curl -X GET $BASE_URL/api/ | jq
@@ -449,7 +449,7 @@ SENDER_EMAIL="..."
 
 **Frontend (.env)**:
 ```env
-REACT_APP_BACKEND_URL=https://310d9b8e-d018-47c6-9b14-e763b8dfbeb2.preview.emergentagent.com
+REACT_APP_BACKEND_URL=https://recipe-cart-app-1.emergent.host
 WDS_SOCKET_PORT=443
 ```
 
