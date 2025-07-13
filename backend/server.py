@@ -1958,7 +1958,9 @@ def _extract_core_ingredient(ingredient: str) -> str:
     return ingredient_lower.strip() if ingredient_lower.strip() else ingredient
 
 async def _get_walmart_product_options(ingredient: str, max_options: int = 3) -> List[WalmartProduct]:
-    """Get product options from Walmart API - PRODUCTION VERSION - NO MOCK DATA"""
+    """OLD Walmart function - DISABLED - Returns empty list"""
+    print(f"❌ OLD Walmart function called for '{ingredient}' - returning empty list")
+    return []
     try:
         print(f"🌐 WALMART API CALL START: ingredient='{ingredient}', max_options={max_options}")
         
