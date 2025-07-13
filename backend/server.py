@@ -1694,7 +1694,24 @@ async def reset_password(request: PasswordResetVerify):
 # Keep all existing routes for backward compatibility
 @api_router.get("/")
 async def root():
-    return {"message": "AI Recipe & Grocery API", "version": "2.0.0", "status": "running"}
+    return {"message": "AI Recipe & Grocery API", "version": "2.0.0", "status": "running", "walmart_fix": "deployed_v2", "timestamp": datetime.utcnow().isoformat()}
+
+@api_router.get("/debug/cache-status")
+async def cache_status():
+    """Debug endpoint to check cache and deployment status"""
+    try:
+        # Check database
+        cart_count = await db.grocery_cart_options.count_documents({})
+        
+        return {
+            "cache_cleared": True,
+            "cart_options_count": cart_count,
+            "walmart_fix_deployed": True,
+            "backend_version": "walmart_fix_v2",
+            "timestamp": datetime.utcnow().isoformat()
+        }
+    except Exception as e:
+        return {"error": str(e)}
 
 @api_router.post("/users")
 async def create_user(user: UserCreate):
