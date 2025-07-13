@@ -726,7 +726,7 @@ class StarbucksAPITester:
         """Test API health check endpoint"""
         try:
             async with httpx.AsyncClient(timeout=30.0) as client:
-                response = await client.get(f"{self.backend_url}/health")
+                response = await client.get(f"{self.backend_url}/")
                 
                 if response.status_code == 200:
                     data = response.json()
@@ -782,7 +782,7 @@ class StarbucksAPITester:
             }
             
             async with httpx.AsyncClient(timeout=60.0) as client:
-                response = await client.post(f"{self.backend_url}/generate-recipe", json=request_data)
+                response = await client.post(f"{self.backend_url}/recipes/generate", json=request_data)
                 
                 if response.status_code == 200:
                     data = response.json()
@@ -845,7 +845,7 @@ class StarbucksAPITester:
             }
             
             async with httpx.AsyncClient(timeout=60.0) as client:
-                response = await client.post(f"{self.backend_url}/generate-recipe", json=request_data)
+                response = await client.post(f"{self.backend_url}/recipes/generate", json=request_data)
                 
                 if response.status_code == 200:
                     data = response.json()
@@ -897,7 +897,7 @@ class StarbucksAPITester:
             }
             
             async with httpx.AsyncClient(timeout=60.0) as client:
-                response = await client.post(f"{self.backend_url}/generate-recipe", json=request_data)
+                response = await client.post(f"{self.backend_url}/recipes/generate", json=request_data)
                 
                 if response.status_code == 200:
                     data = response.json()
@@ -936,7 +936,7 @@ class StarbucksAPITester:
         """Test recipe history retrieval for user"""
         try:
             async with httpx.AsyncClient(timeout=30.0) as client:
-                response = await client.get(f"{self.backend_url}/recipes/{self.test_user_id}")
+                response = await client.get(f"{self.backend_url}/recipes/history/{self.test_user_id}")
                 
                 if response.status_code == 200:
                     data = response.json()
