@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 from motor.motor_asyncio import AsyncIOMotorClient
 
 # Load environment variables
-load_dotenv('.env')
+load_dotenv('./backend/.env')
 
 # MongoDB connection
 mongo_url = os.environ['MONGO_URL']
