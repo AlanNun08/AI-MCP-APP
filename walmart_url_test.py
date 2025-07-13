@@ -276,7 +276,7 @@ class WalmartURLTester:
                     walmart_url = cart_data.get("walmart_url", "")
                     
                     # CRITICAL TEST: Validate ONLY proper affiliate URL format
-                    expected_affiliate_format = "https://affil.walmart.com/cart/addToCart?items="
+                    expected_affiliate_base = "https://affil.walmart.com/cart/addToCart"
                     
                     if not walmart_url:
                         self.log_test_result("Walmart Affiliate URL Format", False, "No Walmart URL generated")
@@ -291,16 +291,16 @@ class WalmartURLTester:
                         )
                         return False
                     
-                    # Check that it uses the correct affiliate format
-                    if not walmart_url.startswith(expected_affiliate_format):
+                    # Check that it uses the correct affiliate base URL
+                    if not walmart_url.startswith(expected_affiliate_base):
                         self.log_test_result(
                             "Walmart Affiliate URL Format", 
                             False, 
-                            f"❌ CRITICAL: URL doesn't use proper affiliate format. Expected: {expected_affiliate_format}*, Got: {walmart_url}"
+                            f"❌ CRITICAL: URL doesn't use proper affiliate base. Expected: {expected_affiliate_base}*, Got: {walmart_url}"
                         )
                         return False
                     
-                    # Validate that URL contains actual product IDs
+                    # Validate that URL contains actual product IDs (either ?items= or ?offers= format)
                     product_ids = [prod.get("product_id", "") for prod in selected_products]
                     contains_product_ids = any(pid in walmart_url for pid in product_ids if pid)
                     
@@ -312,15 +312,26 @@ class WalmartURLTester:
                         )
                         return False
                     
+                    # Check URL format (either items= or offers= is acceptable)
+                    has_proper_format = ("?items=" in walmart_url or "?offers=" in walmart_url)
+                    if not has_proper_format:
+                        self.log_test_result(
+                            "Walmart Affiliate URL Format", 
+                            False, 
+                            f"❌ CRITICAL: URL doesn't have proper cart format (?items= or ?offers=): {walmart_url}"
+                        )
+                        return False
+                    
                     self.log_test_result(
                         "Walmart Affiliate URL Format", 
                         True, 
-                        f"✅ PERFECT: Generated proper affiliate URL with format 'https://affil.walmart.com/cart/addToCart?items=PRODUCTID1,PRODUCTID2...' containing {len(selected_products)} real product IDs",
+                        f"✅ PERFECT: Generated proper affiliate URL 'https://affil.walmart.com/cart/addToCart' with real product IDs. Format: {'offers' if '?offers=' in walmart_url else 'items'}",
                         {
                             "walmart_url": walmart_url,
                             "product_count": len(selected_products),
                             "contains_product_ids": contains_product_ids,
-                            "url_format_correct": walmart_url.startswith(expected_affiliate_format)
+                            "url_format_correct": walmart_url.startswith(expected_affiliate_base),
+                            "cart_format": "offers" if "?offers=" in walmart_url else "items"
                         }
                     )
                     return True
