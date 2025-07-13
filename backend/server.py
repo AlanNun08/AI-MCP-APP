@@ -523,7 +523,7 @@ Respond with JSON in this exact format:
         print(f"Error generating Starbucks drink: {e}")
         raise HTTPException(status_code=500, detail="Failed to generate Starbucks drink")
 
-@app.get("/api/curated-starbucks-recipes")
+@api_router.get("/curated-starbucks-recipes")
 async def get_curated_starbucks_recipes(category: Optional[str] = None):
     """Get curated Starbucks recipes, optionally filtered by category"""
     try:
