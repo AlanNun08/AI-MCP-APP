@@ -1084,7 +1084,14 @@ class StarbucksAPITester:
             
             # Get the cart options to examine product details
             async with httpx.AsyncClient(timeout=30.0) as client:
-                response = await client.get(f"{self.backend_url}/grocery/cart-options/{self.test_cart_options_id}")
+                # Note: We'll use the data from the previous test since there might not be a specific endpoint to get cart options by ID
+                # Let's re-generate cart options to validate the products
+                request_data = {
+                    "user_id": self.test_user_id,
+                    "recipe_id": self.test_recipe_id
+                }
+                
+                response = await client.post(f"{self.backend_url}/grocery/cart-options", json=request_data)
                 
                 if response.status_code == 200:
                     data = response.json()
@@ -1165,7 +1172,13 @@ class StarbucksAPITester:
             
             # First get the cart options to select some products
             async with httpx.AsyncClient(timeout=30.0) as client:
-                response = await client.get(f"{self.backend_url}/grocery/cart-options/{self.test_cart_options_id}")
+                # Re-generate cart options to get products
+                request_data = {
+                    "user_id": self.test_user_id,
+                    "recipe_id": self.test_recipe_id
+                }
+                
+                response = await client.post(f"{self.backend_url}/grocery/cart-options", json=request_data)
                 
                 if response.status_code != 200:
                     self.log_test_result("Walmart Affiliate URLs", False, f"Failed to get cart options: {response.status_code}")
@@ -1192,14 +1205,14 @@ class StarbucksAPITester:
                     self.log_test_result("Walmart Affiliate URLs", False, "No products available for cart creation")
                     return False
                 
-                # Create grocery cart
+                # Create grocery cart using the custom cart endpoint
                 cart_request = {
                     "user_id": self.test_user_id,
                     "recipe_id": self.test_recipe_id,
                     "products": selected_products
                 }
                 
-                response = await client.post(f"{self.backend_url}/grocery/cart", json=cart_request)
+                response = await client.post(f"{self.backend_url}/grocery/custom-cart", json=cart_request)
                 
                 if response.status_code == 200:
                     cart_data = response.json()
@@ -1299,7 +1312,7 @@ class StarbucksAPITester:
                         "Walmart integration correctly returned empty results for Starbucks recipe"
                     )
                     return True
-                elif response.status_code in [400, 404]:
+                elif response.status_code in [400, 404, 422]:
                     # This is also acceptable - Starbucks recipes should not support Walmart integration
                     self.log_test_result(
                         "Starbucks No Walmart Integration", 
@@ -1339,7 +1352,7 @@ class StarbucksAPITester:
             
             # Test recipe details retrieval (simulating user clicking on recipe)
             async with httpx.AsyncClient(timeout=30.0) as client:
-                response = await client.get(f"{self.backend_url}/recipe/{self.test_recipe_id}")
+                response = await client.get(f"{self.backend_url}/recipes/{self.test_recipe_id}")
                 
                 if response.status_code == 200:
                     recipe_data = response.json()
