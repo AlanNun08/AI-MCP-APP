@@ -5,7 +5,7 @@
 ### Environment Setup
 ```bash
 # Preview Environment (Always Working)
-PREVIEW_URL="https://310d9b8e-d018-47c6-9b14-e763b8dfbeb2.preview.emergentagent.com"
+PRODUCTION_URL="https://recipe-cart-app-1.emergent.host"
 
 # Deployment Environment  
 DEPLOY_URL="https://recipe-cart-app-1.emergent.host"
