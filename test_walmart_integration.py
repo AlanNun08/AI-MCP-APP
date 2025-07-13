@@ -41,7 +41,7 @@ class WalmartIntegrationTester:
         """Test API health check"""
         try:
             async with httpx.AsyncClient(timeout=30.0) as client:
-                response = await client.get(f"{self.backend_url.replace('/api', '')}/")
+                response = await client.get(f"{self.backend_url}/")
                 
                 if response.status_code == 200:
                     data = response.json()
