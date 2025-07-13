@@ -39,16 +39,11 @@ gc.disable()  # Disable garbage collection caching
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
-# MongoDB connection - NO CACHING, FRESH CONNECTIONS
+# MongoDB connection
 mongo_url = os.environ['MONGO_URL']
 db_name = os.environ.get('DB_NAME', 'test_database')
 
-def get_db():
-    """Get fresh database connection - NO CACHING"""
-    fresh_client = AsyncIOMotorClient(mongo_url)
-    return fresh_client[db_name]
-
-# Use fresh connection for immediate operations
+# Single, clean database connection
 client = AsyncIOMotorClient(mongo_url)
 db = client[db_name]
 
