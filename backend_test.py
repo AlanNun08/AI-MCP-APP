@@ -1173,12 +1173,7 @@ class StarbucksAPITester:
             # First get the cart options to select some products
             async with httpx.AsyncClient(timeout=30.0) as client:
                 # Re-generate cart options to get products
-                request_data = {
-                    "user_id": self.test_user_id,
-                    "recipe_id": self.test_recipe_id
-                }
-                
-                response = await client.post(f"{self.backend_url}/grocery/cart-options", json=request_data)
+                response = await client.post(f"{self.backend_url}/grocery/cart-options?recipe_id={self.test_recipe_id}&user_id={self.test_user_id}")
                 
                 if response.status_code != 200:
                     self.log_test_result("Walmart Affiliate URLs", False, f"Failed to get cart options: {response.status_code}")
