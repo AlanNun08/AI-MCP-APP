@@ -2688,7 +2688,7 @@ async def create_custom_cart(cart_data: Dict[str, Any]):
         raise HTTPException(status_code=500, detail="Failed to create custom cart")
 
 # CORS middleware configuration - Production ready
-@app.delete("/api/starbucks-recipes/{recipe_id}")
+@api_router.delete("/starbucks-recipes/{recipe_id}")
 async def delete_starbucks_recipe(recipe_id: str):
     """Delete a specific Starbucks recipe"""
     try:
