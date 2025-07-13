@@ -18,6 +18,466 @@ from typing import Dict, List, Any, Optional
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
+class AlanUserDebugTester:
+    """Special tester class to debug alan.nunez0310@icloud.com cart-options 500 error"""
+    
+    def __init__(self):
+        # Get backend URL from frontend .env file
+        self.backend_url = self.get_backend_url()
+        self.test_results = []
+        self.target_user_email = "alan.nunez0310@icloud.com"
+        self.target_user_id = None
+        self.target_user_recipes = []
+        
+    def get_backend_url(self) -> str:
+        """Get backend URL from frontend .env file"""
+        try:
+            frontend_env_path = "/app/frontend/.env"
+            if os.path.exists(frontend_env_path):
+                with open(frontend_env_path, 'r') as f:
+                    for line in f:
+                        if line.startswith('REACT_APP_BACKEND_URL='):
+                            url = line.split('=', 1)[1].strip()
+                            return f"{url}/api"
+            
+            # Fallback to localhost
+            return "http://localhost:8001/api"
+        except Exception as e:
+            logger.warning(f"Could not read frontend .env: {e}, using localhost")
+            return "http://localhost:8001/api"
+    
+    def log_test_result(self, test_name: str, success: bool, details: str = "", response_data: Any = None):
+        """Log test result"""
+        status = "✅ PASS" if success else "❌ FAIL"
+        result = {
+            "test": test_name,
+            "status": status,
+            "success": success,
+            "details": details,
+            "timestamp": datetime.now().isoformat(),
+            "response_data": response_data
+        }
+        self.test_results.append(result)
+        logger.info(f"{status} - {test_name}: {details}")
+    
+    async def test_user_exists_and_accessible(self) -> bool:
+        """Test if user alan.nunez0310@icloud.com exists and can be found"""
+        try:
+            # Try to find user using debug endpoint
+            async with httpx.AsyncClient(timeout=30.0) as client:
+                response = await client.get(f"{self.backend_url}/debug/user/{self.target_user_email}")
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    
+                    if "error" in data:
+                        self.log_test_result(
+                            "User Exists Check", 
+                            False, 
+                            f"User not found: {data['error']}"
+                        )
+                        return False
+                    
+                    user_data = data.get("user", {})
+                    if not user_data:
+                        self.log_test_result(
+                            "User Exists Check", 
+                            False, 
+                            "No user data returned"
+                        )
+                        return False
+                    
+                    # Store user ID for later tests
+                    self.target_user_id = user_data.get("id")
+                    is_verified = user_data.get("is_verified", False)
+                    
+                    self.log_test_result(
+                        "User Exists Check", 
+                        True, 
+                        f"User found - ID: {self.target_user_id}, Verified: {is_verified}",
+                        {
+                            "user_id": self.target_user_id,
+                            "email": user_data.get("email"),
+                            "is_verified": is_verified,
+                            "first_name": user_data.get("first_name"),
+                            "last_name": user_data.get("last_name")
+                        }
+                    )
+                    return True
+                else:
+                    self.log_test_result(
+                        "User Exists Check", 
+                        False, 
+                        f"HTTP {response.status_code}: {response.text}"
+                    )
+                    return False
+        except Exception as e:
+            self.log_test_result("User Exists Check", False, f"Error: {str(e)}")
+            return False
+    
+    async def test_user_recipe_access(self) -> bool:
+        """Test what recipes this user has access to"""
+        try:
+            if not self.target_user_id:
+                self.log_test_result("User Recipe Access", False, "No user ID available")
+                return False
+            
+            async with httpx.AsyncClient(timeout=30.0) as client:
+                response = await client.get(f"{self.backend_url}/recipes/history/{self.target_user_id}")
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    
+                    if not isinstance(data, dict) or "recipes" not in data:
+                        self.log_test_result("User Recipe Access", False, f"Invalid response format: {type(data)}")
+                        return False
+                    
+                    recipes = data.get("recipes", [])
+                    self.target_user_recipes = recipes
+                    
+                    # Categorize recipes
+                    regular_recipes = [r for r in recipes if "shopping_list" in r and "drink_name" not in r]
+                    starbucks_recipes = [r for r in recipes if "drink_name" in r or "ordering_script" in r]
+                    
+                    self.log_test_result(
+                        "User Recipe Access", 
+                        True, 
+                        f"User has {len(recipes)} total recipes: {len(regular_recipes)} regular, {len(starbucks_recipes)} Starbucks",
+                        {
+                            "total_recipes": len(recipes),
+                            "regular_recipes": len(regular_recipes),
+                            "starbucks_recipes": len(starbucks_recipes),
+                            "sample_regular_titles": [r.get("title", "") for r in regular_recipes[:3]],
+                            "sample_starbucks_names": [r.get("drink_name", "") for r in starbucks_recipes[:3]]
+                        }
+                    )
+                    return True
+                else:
+                    self.log_test_result("User Recipe Access", False, f"HTTP {response.status_code}: {response.text}")
+                    return False
+        except Exception as e:
+            self.log_test_result("User Recipe Access", False, f"Error: {str(e)}")
+            return False
+    
+    async def test_cart_options_reproduce_500_error(self) -> bool:
+        """Test cart-options endpoint to reproduce the 500 error for this specific user"""
+        try:
+            if not self.target_user_id:
+                self.log_test_result("Cart Options 500 Error Reproduction", False, "No user ID available")
+                return False
+            
+            if not self.target_user_recipes:
+                self.log_test_result("Cart Options 500 Error Reproduction", False, "No user recipes available")
+                return False
+            
+            # Find regular recipes that should work with Walmart integration
+            regular_recipes = [r for r in self.target_user_recipes if "shopping_list" in r and "drink_name" not in r]
+            
+            if not regular_recipes:
+                self.log_test_result("Cart Options 500 Error Reproduction", False, "No regular recipes found for Walmart integration")
+                return False
+            
+            # Test cart-options for each regular recipe
+            error_count = 0
+            success_count = 0
+            error_details = []
+            
+            for i, recipe in enumerate(regular_recipes[:5]):  # Test first 5 recipes
+                recipe_id = recipe.get("id")
+                recipe_title = recipe.get("title", "Unknown")
+                
+                if not recipe_id:
+                    continue
+                
+                try:
+                    async with httpx.AsyncClient(timeout=60.0) as client:
+                        response = await client.post(f"{self.backend_url}/grocery/cart-options?recipe_id={recipe_id}&user_id={self.target_user_id}")
+                        
+                        if response.status_code == 500:
+                            error_count += 1
+                            error_text = response.text
+                            error_details.append({
+                                "recipe_id": recipe_id,
+                                "recipe_title": recipe_title,
+                                "error_response": error_text,
+                                "shopping_list": recipe.get("shopping_list", [])
+                            })
+                            logger.error(f"500 ERROR for recipe '{recipe_title}' (ID: {recipe_id}): {error_text}")
+                        elif response.status_code == 200:
+                            success_count += 1
+                            logger.info(f"SUCCESS for recipe '{recipe_title}' (ID: {recipe_id})")
+                        else:
+                            error_count += 1
+                            error_details.append({
+                                "recipe_id": recipe_id,
+                                "recipe_title": recipe_title,
+                                "status_code": response.status_code,
+                                "error_response": response.text
+                            })
+                            logger.warning(f"HTTP {response.status_code} for recipe '{recipe_title}' (ID: {recipe_id}): {response.text}")
+                
+                except Exception as e:
+                    error_count += 1
+                    error_details.append({
+                        "recipe_id": recipe_id,
+                        "recipe_title": recipe_title,
+                        "exception": str(e)
+                    })
+                    logger.error(f"Exception for recipe '{recipe_title}' (ID: {recipe_id}): {str(e)}")
+                
+                # Small delay between requests
+                await asyncio.sleep(1)
+            
+            total_tested = error_count + success_count
+            
+            if error_count > 0:
+                self.log_test_result(
+                    "Cart Options 500 Error Reproduction", 
+                    True,  # Success in reproducing the error
+                    f"REPRODUCED 500 ERRORS: {error_count}/{total_tested} recipes failed. Errors captured for analysis.",
+                    {
+                        "total_tested": total_tested,
+                        "errors": error_count,
+                        "successes": success_count,
+                        "error_details": error_details
+                    }
+                )
+                return True
+            else:
+                self.log_test_result(
+                    "Cart Options 500 Error Reproduction", 
+                    False, 
+                    f"Could not reproduce 500 error: {success_count}/{total_tested} recipes succeeded",
+                    {
+                        "total_tested": total_tested,
+                        "all_successful": True
+                    }
+                )
+                return False
+                
+        except Exception as e:
+            self.log_test_result("Cart Options 500 Error Reproduction", False, f"Error: {str(e)}")
+            return False
+    
+    async def test_detailed_error_analysis(self) -> bool:
+        """Get detailed error analysis for the 500 errors"""
+        try:
+            if not self.target_user_id or not self.target_user_recipes:
+                self.log_test_result("Detailed Error Analysis", False, "No user data available")
+                return False
+            
+            # Find a regular recipe to test
+            regular_recipes = [r for r in self.target_user_recipes if "shopping_list" in r and "drink_name" not in r]
+            
+            if not regular_recipes:
+                self.log_test_result("Detailed Error Analysis", False, "No regular recipes for analysis")
+                return False
+            
+            test_recipe = regular_recipes[0]
+            recipe_id = test_recipe.get("id")
+            recipe_title = test_recipe.get("title", "Unknown")
+            shopping_list = test_recipe.get("shopping_list", [])
+            
+            # Analyze the shopping list for potential issues
+            shopping_list_analysis = {
+                "total_items": len(shopping_list),
+                "empty_items": [i for i, item in enumerate(shopping_list) if not item or not item.strip()],
+                "long_items": [item for item in shopping_list if len(item) > 100],
+                "special_chars": [item for item in shopping_list if any(char in item for char in ['&', '<', '>', '"', "'", '\\'])],
+                "non_ascii": [item for item in shopping_list if not all(ord(char) < 128 for char in item)]
+            }
+            
+            # Test with verbose error handling
+            try:
+                async with httpx.AsyncClient(timeout=60.0) as client:
+                    response = await client.post(f"{self.backend_url}/grocery/cart-options?recipe_id={recipe_id}&user_id={self.target_user_id}")
+                    
+                    if response.status_code == 500:
+                        # Try to parse error details
+                        error_text = response.text
+                        
+                        # Look for specific error patterns
+                        error_patterns = {
+                            "walmart_api_error": "walmart" in error_text.lower(),
+                            "json_error": "json" in error_text.lower(),
+                            "timeout_error": "timeout" in error_text.lower(),
+                            "authentication_error": "auth" in error_text.lower() or "key" in error_text.lower(),
+                            "product_search_error": "product" in error_text.lower() or "search" in error_text.lower()
+                        }
+                        
+                        self.log_test_result(
+                            "Detailed Error Analysis", 
+                            True, 
+                            f"Analyzed 500 error for recipe '{recipe_title}'. Error patterns detected: {[k for k, v in error_patterns.items() if v]}",
+                            {
+                                "recipe_id": recipe_id,
+                                "recipe_title": recipe_title,
+                                "shopping_list_analysis": shopping_list_analysis,
+                                "error_response": error_text,
+                                "error_patterns": error_patterns,
+                                "shopping_list_sample": shopping_list[:5]
+                            }
+                        )
+                        return True
+                    else:
+                        self.log_test_result(
+                            "Detailed Error Analysis", 
+                            False, 
+                            f"No 500 error to analyze - got HTTP {response.status_code}",
+                            {
+                                "status_code": response.status_code,
+                                "shopping_list_analysis": shopping_list_analysis
+                            }
+                        )
+                        return False
+            
+            except Exception as e:
+                self.log_test_result(
+                    "Detailed Error Analysis", 
+                    True, 
+                    f"Exception during cart-options call: {str(e)}",
+                    {
+                        "exception": str(e),
+                        "shopping_list_analysis": shopping_list_analysis
+                    }
+                )
+                return True
+                
+        except Exception as e:
+            self.log_test_result("Detailed Error Analysis", False, f"Error: {str(e)}")
+            return False
+    
+    async def test_walmart_integration_debug(self) -> bool:
+        """Debug the Walmart integration specifically for this user's data"""
+        try:
+            if not self.target_user_id or not self.target_user_recipes:
+                self.log_test_result("Walmart Integration Debug", False, "No user data available")
+                return False
+            
+            # Find regular recipes
+            regular_recipes = [r for r in self.target_user_recipes if "shopping_list" in r and "drink_name" not in r]
+            
+            if not regular_recipes:
+                self.log_test_result("Walmart Integration Debug", False, "No regular recipes for Walmart integration")
+                return False
+            
+            # Test different scenarios
+            debug_results = []
+            
+            for i, recipe in enumerate(regular_recipes[:3]):  # Test first 3 recipes
+                recipe_id = recipe.get("id")
+                recipe_title = recipe.get("title", "Unknown")
+                shopping_list = recipe.get("shopping_list", [])
+                
+                # Test individual shopping list items
+                problematic_items = []
+                
+                for item in shopping_list[:5]:  # Test first 5 items
+                    if not item or not item.strip():
+                        problematic_items.append({"item": item, "issue": "empty_or_whitespace"})
+                        continue
+                    
+                    # Check for potential problematic characters or patterns
+                    if len(item) > 100:
+                        problematic_items.append({"item": item, "issue": "too_long"})
+                    elif any(char in item for char in ['&', '<', '>', '"', "'"]):
+                        problematic_items.append({"item": item, "issue": "special_characters"})
+                    elif not all(ord(char) < 128 for char in item):
+                        problematic_items.append({"item": item, "issue": "non_ascii_characters"})
+                
+                debug_results.append({
+                    "recipe_id": recipe_id,
+                    "recipe_title": recipe_title,
+                    "shopping_list_count": len(shopping_list),
+                    "problematic_items": problematic_items,
+                    "sample_items": shopping_list[:3]
+                })
+            
+            # Test if the issue is user-specific or recipe-specific
+            # Try with a different user ID to see if the same recipes work
+            test_user_id = "debug-test-user-id"
+            
+            comparison_results = []
+            for recipe in regular_recipes[:2]:  # Test first 2 recipes with different user
+                recipe_id = recipe.get("id")
+                
+                try:
+                    async with httpx.AsyncClient(timeout=30.0) as client:
+                        response = await client.post(f"{self.backend_url}/grocery/cart-options?recipe_id={recipe_id}&user_id={test_user_id}")
+                        
+                        comparison_results.append({
+                            "recipe_id": recipe_id,
+                            "test_user_status": response.status_code,
+                            "test_user_success": response.status_code == 200
+                        })
+                
+                except Exception as e:
+                    comparison_results.append({
+                        "recipe_id": recipe_id,
+                        "test_user_error": str(e)
+                    })
+            
+            self.log_test_result(
+                "Walmart Integration Debug", 
+                True, 
+                f"Analyzed {len(debug_results)} recipes for Walmart integration issues",
+                {
+                    "recipe_analysis": debug_results,
+                    "user_comparison": comparison_results,
+                    "target_user_id": self.target_user_id,
+                    "test_user_id": test_user_id
+                }
+            )
+            return True
+            
+        except Exception as e:
+            self.log_test_result("Walmart Integration Debug", False, f"Error: {str(e)}")
+            return False
+    
+    async def run_all_debug_tests(self) -> Dict[str, Any]:
+        """Run all debug tests for alan.nunez0310@icloud.com"""
+        logger.info(f"🔍 Starting comprehensive debug testing for user: {self.target_user_email}")
+        
+        tests = [
+            ("User Exists and Accessible", self.test_user_exists_and_accessible),
+            ("User Recipe Access", self.test_user_recipe_access),
+            ("Cart Options 500 Error Reproduction", self.test_cart_options_reproduce_500_error),
+            ("Detailed Error Analysis", self.test_detailed_error_analysis),
+            ("Walmart Integration Debug", self.test_walmart_integration_debug)
+        ]
+        
+        results = {}
+        for test_name, test_func in tests:
+            logger.info(f"Running: {test_name}")
+            try:
+                result = await test_func()
+                results[test_name] = result
+            except Exception as e:
+                logger.error(f"Test {test_name} failed with exception: {e}")
+                results[test_name] = False
+            
+            # Small delay between tests
+            await asyncio.sleep(1)
+        
+        # Summary
+        passed = sum(1 for result in results.values() if result)
+        total = len(results)
+        
+        logger.info(f"🎯 Debug Testing Complete: {passed}/{total} tests passed")
+        
+        return {
+            "target_user": self.target_user_email,
+            "target_user_id": self.target_user_id,
+            "test_results": results,
+            "detailed_results": self.test_results,
+            "summary": {
+                "passed": passed,
+                "total": total,
+                "success_rate": f"{(passed/total*100):.1f}%" if total > 0 else "0%"
+            }
+        }
+
+
 class StarbucksAPITester:
     def __init__(self):
         # Get backend URL from frontend .env file
