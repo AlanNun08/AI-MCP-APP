@@ -1,5 +1,13 @@
 # 🛠️ AI Recipe + Grocery Delivery App - Developer Testing Guide
 
+## ⚠️ **PRODUCTION-ONLY DEVELOPMENT**
+**CRITICAL RULE**: Only develop for production domain `https://recipe-cart-app-1.emergent.host`
+- **❌ NEVER use preview URLs**
+- **✅ ONLY use production domain**
+- **📋 See**: `/docs/PRODUCTION_ONLY_POLICY.md` for complete guidelines
+
+---
+
 ## 📋 Quick Testing Commands
 
 ### **Production Environment Testing**
