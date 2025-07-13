@@ -345,7 +345,7 @@ class GroceryCart(BaseModel):
         }
 
 # Password hashing utilities
-@app.post("/api/generate-starbucks-drink")
+@api_router.post("/generate-starbucks-drink")
 async def generate_starbucks_drink(request: StarbucksRequest):
     """Generate a creative Starbucks secret menu drink with drive-thru ordering script"""
     try:
