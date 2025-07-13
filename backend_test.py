@@ -144,7 +144,7 @@ class WalmartIntegrationTester:
                 "recipe_id": self.recipe_id
             }
             
-            response = self.session.get(f"{API_BASE}/grocery/cart-options", params=params, timeout=30)
+            response = self.session.post(f"{API_BASE}/grocery/cart-options", params=params, timeout=30)
             
             if response.status_code == 200:
                 data = response.json()
