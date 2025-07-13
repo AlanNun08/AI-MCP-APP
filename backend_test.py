@@ -2,6 +2,7 @@
 """
 Comprehensive API Testing Suite
 Testing Starbucks drinks, regular recipes, and Walmart integration workflow
+SPECIAL FOCUS: Debug user alan.nunez0310@icloud.com cart-options 500 error
 """
 
 import asyncio
