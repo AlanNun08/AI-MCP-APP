@@ -2156,7 +2156,7 @@ class StarbucksAPITester:
                                         "products": selected_products
                                     }
                                     
-                                    cart_response = await client.post(f"{self.backend_url}/grocery/create-cart", json=cart_request)
+                                    cart_response = await client.post(f"{self.backend_url}/grocery/custom-cart", json=cart_request)
                                     
                                     if cart_response.status_code == 200:
                                         cart_data = cart_response.json()
