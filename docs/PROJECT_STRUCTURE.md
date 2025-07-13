@@ -67,7 +67,7 @@ OPENAI_API_KEY=your_openai_api_key
 
 ### **Frontend Configuration** (`/app/frontend/.env`)
 ```env
-REACT_APP_BACKEND_URL=https://310d9b8e-d018-47c6-9b14-e763b8dfbeb2.preview.emergentagent.com
+REACT_APP_BACKEND_URL=https://recipe-cart-app-1.emergent.host
 WDS_SOCKET_PORT=443
 ```
 
