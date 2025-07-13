@@ -996,7 +996,8 @@ class StarbucksAPITester:
             }
             
             async with httpx.AsyncClient(timeout=60.0) as client:
-                response = await client.post(f"{self.backend_url}/grocery/cart-options", json=request_data)
+                # Use query parameters as expected by the endpoint
+                response = await client.post(f"{self.backend_url}/grocery/cart-options?recipe_id={self.test_recipe_id}&user_id={self.test_user_id}")
                 
                 if response.status_code == 200:
                     data = response.json()
