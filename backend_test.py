@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Production Deployment Testing Suite for AI Recipe & Grocery App
-Testing the production deployment at https://recipe-cart-app-1.emergent.host
-Focus on critical issues identified in review request
+CRITICAL WALMART INTEGRATION TESTING SUITE
+Testing the Walmart relevance filtering fix as requested in review
+Focus: Verify that Walmart products are now being accepted and returned
 """
 
 import asyncio
