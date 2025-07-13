@@ -1590,6 +1590,16 @@ function App() {
         .then(response => {
           console.log('✅ Cart options response:', response.data);
           
+          // Handle the case where no products are found
+          if (response.data && response.data.status === 'no_products_found') {
+            console.log('⚠️ No Walmart products found for this recipe');
+            setProductOptions({});
+            setSelectedProducts({});
+            setCartItems([]);
+            setFinalWalmartUrl('');
+            return; // Exit early
+          }
+          
           if (response.data && response.data.ingredient_options) {
             // Store all product options per ingredient
             const options = {};
