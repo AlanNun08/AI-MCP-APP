@@ -1712,7 +1712,9 @@ async def reset_password(request: PasswordResetVerify):
 # Keep all existing routes for backward compatibility
 @api_router.get("/")
 async def root():
-    return {"message": "AI Recipe & Grocery API", "version": "2.0.0", "status": "running", "walmart_fix": "deployed_v2", "timestamp": datetime.utcnow().isoformat()}
+    print("🔍 ROOT ENDPOINT CALLED - Console log test working!")
+    logging.info("🔍 ROOT ENDPOINT CALLED - Logging test working!")
+    return {"message": "AI Recipe & Grocery API", "version": "2.0.0", "status": "running", "walmart_fix": "deployed_v3", "timestamp": datetime.utcnow().isoformat()}
 
 @api_router.get("/debug/cache-status")
 async def cache_status():
