@@ -105,7 +105,7 @@ class WalmartIntegrationTester:
                 "difficulty": "medium"
             }
             
-            response = self.session.post(f"{API_BASE}/generate-recipe", json=recipe_data, timeout=30)
+            response = self.session.post(f"{API_BASE}/recipes/generate", json=recipe_data, timeout=30)
             
             if response.status_code == 200:
                 data = response.json()
