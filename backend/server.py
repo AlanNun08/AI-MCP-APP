@@ -2484,20 +2484,26 @@ async def get_grocery_cart_options(
 ):
     """Get grocery cart options for a recipe - PRODUCTION VERSION - ONLY REAL USER RECIPES"""
     try:
+        print(f"🛒🛒🛒 CART OPTIONS REQUEST RECEIVED: recipe_id={recipe_id}, user_id={user_id}")
         logging.info(f"🛒🛒🛒 CART OPTIONS REQUEST RECEIVED: recipe_id={recipe_id}, user_id={user_id}")
         logging.info(f"🛒 PRODUCTION: Cart options request: recipe_id={recipe_id}, user_id={user_id}")
         
         # PRODUCTION: Get recipe from database - ONLY REAL USER RECIPES
+        print(f"🔍 Step 1: Looking for recipe in database...")
         recipe = await db.recipes.find_one({"id": recipe_id, "user_id": user_id})
         if not recipe:
+            print(f"❌ Recipe not found: {recipe_id} for user {user_id}")
             logging.error(f"❌ PRODUCTION: Recipe not found: {recipe_id} for user {user_id}")
             raise HTTPException(status_code=404, detail="Recipe not found")
         
         recipe_title = recipe.get('title', 'Unknown Recipe')
         shopping_list = recipe.get('shopping_list', [])
+        print(f"✅ Step 2: Recipe found: '{recipe_title}'")
+        print(f"📋 Step 3: Shopping list: {shopping_list}")
         logging.info(f"📋 PRODUCTION: Recipe '{recipe_title}' has {len(shopping_list)} ingredients: {shopping_list}")
         
         if not shopping_list:
+            print(f"⚠️ No shopping list found for recipe")
             logging.warning(f"⚠️ PRODUCTION: No shopping list found for recipe {recipe_id}")
             return {
                 "error": "No shopping list available for this recipe",
@@ -2509,6 +2515,7 @@ async def get_grocery_cart_options(
             }
         
         # PRODUCTION: Create ingredient options - ONLY REAL DATA  
+        print(f"🔍 Step 4: Starting Walmart product search for {len(shopping_list)} ingredients...")
         ingredient_options = []
         total_ingredients = len(shopping_list)
         successful_ingredients = 0
@@ -2517,16 +2524,21 @@ async def get_grocery_cart_options(
         logging.info(f"🔍 PRODUCTION: Processing {total_ingredients} ingredients for real Walmart products")
         
         for i, ingredient in enumerate(shopping_list, 1):
+            print(f"🔍 Processing ingredient {i}/{total_ingredients}: '{ingredient}'")
             logging.info(f"🔍 PRODUCTION: Processing ingredient {i}/{total_ingredients}: '{ingredient}'")
             
             # Get Walmart products for this ingredient
             try:
+                print(f"   → Calling Walmart API for '{ingredient}'...")
                 walmart_products = await _get_walmart_product_options(ingredient, max_options=3)
+                print(f"   ← Walmart API returned {len(walmart_products)} products for '{ingredient}'")
                 
                 if walmart_products:
                     # Create ingredient option with validated products
                     validated_products = []
-                    for product in walmart_products:
+                    print(f"   🔍 Validating {len(walmart_products)} products...")
+                    for j, product in enumerate(walmart_products):
+                        print(f"      Product {j+1}: {product.name} - ${product.price} (ID: {product.product_id})")
                         # Additional filtering to ensure only real products
                         if (product.product_id and 
                             product.name and 
@@ -2535,7 +2547,9 @@ async def get_grocery_cart_options(
                             not product.product_id.startswith('mock-') and
                             not product.product_id.startswith('walmart-')):
                             validated_products.append(product)
+                            print(f"      ✅ Product {j+1} validated and added")
                         else:
+                            print(f"      ❌ Product {j+1} filtered out: Invalid ID or price")
                             logging.warning(f"⚠️ PRODUCTION: Filtered out invalid product: {product.name} (ID: {product.product_id})")
                     
                     if validated_products:
@@ -2546,21 +2560,32 @@ async def get_grocery_cart_options(
                         ingredient_options.append(ingredient_option)
                         successful_ingredients += 1
                         
+                        print(f"   ✅ SUCCESS: Added {len(validated_products)} validated products for '{ingredient}'")
                         logging.info(f"✅ PRODUCTION: Found {len(validated_products)} validated products for '{ingredient}'")
                         # Log first 2 products as examples
                         for j, product in enumerate(validated_products[:2]):
                             logging.info(f"   Product {j+1}: {product.name} - ${product.price} (ID: {product.product_id})")
                     else:
+                        print(f"   ❌ FAIL: No valid products after filtering for '{ingredient}'")
                         logging.warning(f"❌ PRODUCTION: No valid products after filtering for ingredient: '{ingredient}'")
                         failed_ingredients.append(ingredient)
                 else:
+                    print(f"   ❌ FAIL: No products returned from Walmart API for '{ingredient}'")
                     logging.warning(f"❌ PRODUCTION: No products returned from Walmart API for ingredient: '{ingredient}'")
                     failed_ingredients.append(ingredient)
                 
                     
             except Exception as e:
+                print(f"   💥 ERROR: Exception processing '{ingredient}': {str(e)}")
                 logging.error(f"❌ PRODUCTION: FIXED VERSION - Error processing ingredient '{ingredient}': {str(e)}")
                 failed_ingredients.append(ingredient)
+        
+        print(f"🏁 FINAL RESULTS:")
+        print(f"   Total ingredients processed: {total_ingredients}")
+        print(f"   Successful ingredients: {successful_ingredients}")
+        print(f"   Failed ingredients: {len(failed_ingredients)}")
+        print(f"   Failed ingredient list: {failed_ingredients}")
+        print(f"   Total ingredient options created: {len(ingredient_options)}")
         
         # PRODUCTION: Enhanced logging
         logging.info(f"📊 PRODUCTION: Cart options completed: {successful_ingredients}/{total_ingredients} ingredients successful")
@@ -2569,6 +2594,7 @@ async def get_grocery_cart_options(
         
         # PRODUCTION: Check if we have any ingredient options
         if not ingredient_options:
+            print(f"❌ NO INGREDIENT OPTIONS FOUND - Returning no_products_found")
             logging.warning(f"⚠️ PRODUCTION: No ingredient options found for recipe {recipe_id}")
             # Return a response indicating no products were found instead of throwing 500 error
             return {
