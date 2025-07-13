@@ -2217,7 +2217,11 @@ async def main():
     
     tester = StarbucksAPITester()
     
-    # Test sequence based on user requirements
+    # Test sequence based on user requirements - DEMO USER TEST FIRST
+    demo_user_test = [
+        ("Demo User Creation and Complete Workflow", tester.test_demo_user_creation_and_workflow),
+    ]
+    
     walmart_integration_tests = [
         ("API Health Check", tester.test_api_health_check),
         ("Regular Recipe Generation - Cuisine", tester.test_regular_recipe_generation_cuisine),
@@ -2230,6 +2234,27 @@ async def main():
         ("Starbucks No Walmart Integration", tester.test_starbucks_recipes_no_walmart_integration),
         ("Walmart Integration Workflow Complete", tester.test_walmart_integration_workflow_complete),
     ]
+    
+    # Run DEMO USER TEST FIRST (as requested in review)
+    print("\n🎯 DEMO USER CREATION AND COMPLETE WORKFLOW TEST")
+    print("-" * 50)
+    
+    demo_results = []
+    for test_name, test_func in demo_user_test:
+        print(f"\n🧪 Running: {test_name}")
+        try:
+            result = await test_func()
+            demo_results.append((test_name, result))
+            if result:
+                print(f"✅ {test_name}: PASSED")
+            else:
+                print(f"❌ {test_name}: FAILED")
+        except Exception as e:
+            print(f"💥 {test_name}: ERROR - {str(e)}")
+            demo_results.append((test_name, False))
+        
+        # Small delay between tests
+        await asyncio.sleep(1)
     
     # Run Walmart integration tests first (as requested by user)
     print("\n🛒 WALMART API INTEGRATION WORKFLOW TESTS")
