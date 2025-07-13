@@ -2672,6 +2672,59 @@ class StarbucksAPITester:
             return False
 
 async def main():
+    """Main function to run debug tests for alan.nunez0310@icloud.com"""
+    print("🚀 Starting Debug Testing for alan.nunez0310@icloud.com Cart-Options 500 Error")
+    print("=" * 80)
+    
+    # Run the specific debug tests for alan.nunez0310@icloud.com
+    debug_tester = AlanUserDebugTester()
+    debug_results = await debug_tester.run_all_debug_tests()
+    
+    print("\n" + "=" * 80)
+    print("🎯 DEBUG TEST RESULTS SUMMARY")
+    print("=" * 80)
+    
+    # Print summary
+    summary = debug_results.get("summary", {})
+    print(f"Target User: {debug_results.get('target_user', 'Unknown')}")
+    print(f"User ID: {debug_results.get('target_user_id', 'Not found')}")
+    print(f"Tests Passed: {summary.get('passed', 0)}/{summary.get('total', 0)}")
+    print(f"Success Rate: {summary.get('success_rate', '0%')}")
+    
+    # Print detailed results
+    print("\n📋 DETAILED TEST RESULTS:")
+    test_results = debug_results.get("test_results", {})
+    for test_name, result in test_results.items():
+        status = "✅ PASS" if result else "❌ FAIL"
+        print(f"  {status} {test_name}")
+    
+    # Print key findings
+    print("\n🔍 KEY FINDINGS:")
+    detailed_results = debug_results.get("detailed_results", [])
+    
+    for result in detailed_results:
+        if not result.get("success", True):
+            print(f"  ❌ {result.get('test', 'Unknown')}: {result.get('details', 'No details')}")
+        elif "500" in result.get("details", "") or "error" in result.get("details", "").lower():
+            print(f"  🚨 {result.get('test', 'Unknown')}: {result.get('details', 'No details')}")
+    
+    # Print response data for critical tests
+    print("\n📊 CRITICAL DATA:")
+    for result in detailed_results:
+        if result.get("test") == "Cart Options 500 Error Reproduction" and result.get("response_data"):
+            data = result.get("response_data", {})
+            if data.get("error_details"):
+                print(f"  🔥 500 Error Details Found:")
+                for error in data["error_details"][:3]:  # Show first 3 errors
+                    print(f"    - Recipe: {error.get('recipe_title', 'Unknown')}")
+                    print(f"      Error: {error.get('error_response', 'No error response')[:200]}...")
+    
+    print("\n" + "=" * 80)
+    print("🏁 Debug Testing Complete")
+    
+    return debug_results
+
+async def main_comprehensive():
     """Main test runner for comprehensive API testing"""
     print("🚀 Starting Comprehensive API Testing Suite")
     print("=" * 60)
@@ -2786,5 +2839,6 @@ async def main():
     return (passed_demo == total_demo) and (passed_walmart == total_walmart)
 
 if __name__ == "__main__":
+    # Run the debug tests for alan.nunez0310@icloud.com
     success = asyncio.run(main())
     sys.exit(0 if success else 1)
