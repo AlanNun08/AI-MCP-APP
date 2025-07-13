@@ -1986,62 +1986,84 @@ class StarbucksAPITester:
         return summary
 
 async def main():
-    """Main test execution"""
+    """Main test runner for comprehensive API testing"""
+    print("🚀 Starting Comprehensive API Testing Suite")
+    print("=" * 60)
+    
     tester = StarbucksAPITester()
     
-    try:
-        summary = await tester.run_starbucks_tests()
+    # Test sequence based on user requirements
+    walmart_integration_tests = [
+        ("API Health Check", tester.test_api_health_check),
+        ("Regular Recipe Generation - Cuisine", tester.test_regular_recipe_generation_cuisine),
+        ("Regular Recipe Generation - Snacks", tester.test_regular_recipe_generation_snacks),
+        ("Regular Recipe Generation - Beverages", tester.test_regular_recipe_generation_beverages),
+        ("Recipe History Retrieval", tester.test_recipe_history_retrieval),
+        ("Walmart Cart Options Generation", tester.test_walmart_cart_options_generation),
+        ("Walmart Product Details Validation", tester.test_walmart_product_details_validation),
+        ("Walmart Affiliate URL Generation", tester.test_walmart_affiliate_url_generation),
+        ("Starbucks No Walmart Integration", tester.test_starbucks_recipes_no_walmart_integration),
+        ("Walmart Integration Workflow Complete", tester.test_walmart_integration_workflow_complete),
+    ]
+    
+    # Run Walmart integration tests first (as requested by user)
+    print("\n🛒 WALMART API INTEGRATION WORKFLOW TESTS")
+    print("-" * 50)
+    
+    walmart_results = []
+    for test_name, test_func in walmart_integration_tests:
+        print(f"\n🧪 Running: {test_name}")
+        try:
+            result = await test_func()
+            walmart_results.append((test_name, result))
+            if result:
+                print(f"✅ {test_name}: PASSED")
+            else:
+                print(f"❌ {test_name}: FAILED")
+        except Exception as e:
+            print(f"💥 {test_name}: ERROR - {str(e)}")
+            walmart_results.append((test_name, False))
         
-        # Print summary
-        print("\n" + "="*80)
-        print("🌟 STARBUCKS DRINK GENERATION & RECIPE SHARING API TESTING SUMMARY")
-        print("="*80)
-        print(f"Backend URL: {summary['backend_url']}")
-        print(f"Total Tests: {summary['total_tests']}")
-        print(f"Passed: {summary['passed']} ✅")
-        print(f"Failed: {summary['failed']} ❌")
-        print(f"Success Rate: {summary['success_rate']}")
-        print(f"Test Completed: {summary['timestamp']}")
-        
-        print("\n📋 DETAILED RESULTS:")
-        print("-" * 80)
-        
-        for result in summary['test_results']:
-            status_icon = "✅" if result['success'] else "❌"
-            print(f"{status_icon} {result['test']}: {result['details']}")
-        
-        print("\n" + "="*80)
-        
-        # Check for critical failures
-        critical_failures = []
-        recipe_sharing_failures = []
-        for result in summary['test_results']:
-            if not result['success']:
-                if any(critical in result['test'].lower() for critical in ['api health', 'generation', 'database']):
-                    critical_failures.append(result['test'])
-                elif any(sharing in result['test'].lower() for sharing in ['share recipe', 'shared recipes', 'like', 'recipe stats']):
-                    recipe_sharing_failures.append(result['test'])
-        
-        if critical_failures:
-            print("🚨 CRITICAL ISSUES DETECTED:")
-            for failure in critical_failures:
-                print(f"   - {failure}")
-            print("\n❌ STARBUCKS API NOT READY")
-        elif recipe_sharing_failures:
-            print("⚠️  RECIPE SHARING ISSUES DETECTED:")
-            for failure in recipe_sharing_failures:
-                print(f"   - {failure}")
-            print("\n🔶 RECIPE SHARING SYSTEM NEEDS ATTENTION")
-        else:
-            print("🎉 ALL API TESTS PASSED")
-            print("✅ STARBUCKS DRINK GENERATION WORKING CORRECTLY")
-            print("✅ USER RECIPE SHARING SYSTEM WORKING CORRECTLY")
-        
-        return summary
-        
-    except Exception as e:
-        logger.error(f"Test execution failed: {str(e)}")
-        return {"error": str(e)}
+        # Small delay between tests
+        await asyncio.sleep(1)
+    
+    # Optional: Run other tests if requested
+    other_tests = [
+        ("Streamlined Prompts Comprehensive", tester.test_streamlined_prompts_comprehensive),
+        ("Curated Recipes - All", tester.test_curated_recipes_all),
+        ("Curated Recipes - Category Filtering", tester.test_curated_recipes_by_category),
+        ("User Recipe Sharing", tester.test_share_recipe_endpoint),
+        ("Get Shared Recipes", tester.test_get_shared_recipes),
+        ("Like/Unlike System", tester.test_like_unlike_system),
+        ("Recipe Stats", tester.test_recipe_stats),
+    ]
+    
+    print(f"\n\n📊 WALMART INTEGRATION TEST RESULTS")
+    print("=" * 60)
+    
+    passed_walmart = sum(1 for _, result in walmart_results if result)
+    total_walmart = len(walmart_results)
+    
+    for test_name, result in walmart_results:
+        status = "✅ PASS" if result else "❌ FAIL"
+        print(f"{status} - {test_name}")
+    
+    print(f"\n🎯 WALMART INTEGRATION SUMMARY:")
+    print(f"   Passed: {passed_walmart}/{total_walmart} ({passed_walmart/total_walmart*100:.1f}%)")
+    
+    if passed_walmart == total_walmart:
+        print("🎉 ALL WALMART INTEGRATION TESTS PASSED!")
+    else:
+        print(f"⚠️  {total_walmart - passed_walmart} Walmart integration tests failed")
+    
+    # Print detailed results
+    print(f"\n📋 DETAILED TEST RESULTS:")
+    print("-" * 40)
+    for result in tester.test_results:
+        print(f"{result['status']} - {result['test']}: {result['details']}")
+    
+    return passed_walmart == total_walmart
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    success = asyncio.run(main())
+    sys.exit(0 if success else 1)
