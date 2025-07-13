@@ -32,10 +32,33 @@ import os
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from email_service import email_service
 
-# DISABLE ALL CACHING AND ENSURE FRESH DATA
+# Standard imports
 import gc
-gc.disable()  # Disable garbage collection caching
+from pathlib import Path
+from pydantic import BaseModel, Field, EmailStr
+from typing import List, Optional, Dict, Any
+import uuid
+from datetime import datetime, timedelta
+from dateutil import parser
+import openai
+from openai import OpenAI
+import json
+import httpx
+import asyncio
+import time
+import base64
+import re
+from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.hazmat.primitives.asymmetric import padding
+import bcrypt
+import sys
+import os
 
+# Add backend to path for email service
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+from email_service import email_service
+
+# Load environment variables
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
