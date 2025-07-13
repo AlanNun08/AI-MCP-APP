@@ -2530,11 +2530,6 @@ async def get_grocery_cart_options(
         if failed_ingredients:
             logging.warning(f"⚠️ PRODUCTION: Failed ingredients: {failed_ingredients}")
         
-        # CRITICAL DEBUG: Log the state before checking
-        logging.warning(f"🚨 DEBUG: ingredient_options length = {len(ingredient_options)}")
-        logging.warning(f"🚨 DEBUG: successful_ingredients = {successful_ingredients}")
-        logging.warning(f"🚨 DEBUG: failed_ingredients = {failed_ingredients}")
-        
         # PRODUCTION: Check if we have any ingredient options
         if not ingredient_options:
             logging.warning(f"⚠️ PRODUCTION: No ingredient options found for recipe {recipe_id}")
