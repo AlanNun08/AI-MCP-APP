@@ -434,7 +434,7 @@ class WalmartWorkflowTester:
                     "products": selected_products
                 }
                 
-                response = await client.post(f"{self.backend_url}/grocery/create-cart", json=cart_request)
+                response = await client.post(f"{self.backend_url}/grocery/custom-cart", json=cart_request)
                 
                 if response.status_code == 200:
                     cart_data = response.json()
