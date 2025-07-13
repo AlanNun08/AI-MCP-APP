@@ -1284,12 +1284,7 @@ class StarbucksAPITester:
                     return False
                 
                 # Try to generate Walmart cart options for Starbucks recipe (should fail or return empty)
-                cart_options_request = {
-                    "user_id": self.test_user_id,
-                    "recipe_id": starbucks_id
-                }
-                
-                response = await client.post(f"{self.backend_url}/grocery/cart-options", json=cart_options_request)
+                response = await client.post(f"{self.backend_url}/grocery/cart-options?recipe_id={starbucks_id}&user_id={self.test_user_id}")
                 
                 # This should either fail (404/400) or return empty results
                 if response.status_code == 200:
