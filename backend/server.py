@@ -1961,8 +1961,6 @@ async def _get_walmart_product_options(ingredient: str, max_options: int = 3) ->
     """OLD Walmart function - DISABLED - Returns empty list"""
     print(f"❌ OLD Walmart function called for '{ingredient}' - returning empty list")
     return []
-        logging.error(f"❌ PRODUCTION: All attempts failed for '{clean_ingredient}' - returning empty list")
-        return []
                 
     except Exception as e:
         print(f"💥 Critical error fetching Walmart products for '{ingredient}': {str(e)}")
