@@ -2529,7 +2529,7 @@ async def get_grocery_cart_options(
         if not recipe:
             print(f"❌ Recipe not found: {recipe_id} for user {user_id}")
             logging.error(f"❌ PRODUCTION: Recipe not found: {recipe_id} for user {user_id}")
-            raise HTTPException(status_code=404, detail="Recipe not found")
+            raise HTTPException(status_code=404, detail="CUSTOM_ERROR_TEST: Recipe not found")
         
         recipe_title = recipe.get('title', 'Unknown Recipe')
         shopping_list = recipe.get('shopping_list', [])
