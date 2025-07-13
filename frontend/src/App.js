@@ -57,8 +57,11 @@ function App() {
           const userData = JSON.parse(savedUser);
           console.log('🔄 Restoring user session:', userData.email);
           setUser(userData);
-          // Set to dashboard if we're on landing page
-          setCurrentScreen('dashboard');
+          // Only set to dashboard if we're on landing page or if currentScreen is a protected route
+          if (currentScreen === 'landing' || !['landing', 'register', 'verify-email', 'login', 'forgot-password', 'reset-password'].includes(currentScreen)) {
+            console.log('📱 Setting screen to dashboard after session restore');
+            setCurrentScreen('dashboard');
+          }
         } else {
           console.log('📱 No saved user session found');
         }
