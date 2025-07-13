@@ -2394,7 +2394,7 @@ async def get_recipe_by_id(recipe_id: str):
         logging.error(f"Error fetching recipe: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to fetch recipe")
 
-@app.get("/api/recipes/history/{user_id}")
+@api_router.get("/recipes/history/{user_id}")
 async def get_recipe_history(user_id: str):
     """Get all recipes for a user including regular recipes and Starbucks drinks"""
     try:
