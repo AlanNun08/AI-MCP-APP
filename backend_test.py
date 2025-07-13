@@ -2288,23 +2288,33 @@ async def main():
         ("Recipe Stats", tester.test_recipe_stats),
     ]
     
-    print(f"\n\n📊 WALMART INTEGRATION TEST RESULTS")
+    print(f"\n\n📊 DEMO USER AND WALMART INTEGRATION TEST RESULTS")
     print("=" * 60)
     
+    passed_demo = sum(1 for _, result in demo_results if result)
+    total_demo = len(demo_results)
     passed_walmart = sum(1 for _, result in walmart_results if result)
     total_walmart = len(walmart_results)
     
+    print("🎯 DEMO USER TEST RESULTS:")
+    for test_name, result in demo_results:
+        status = "✅ PASS" if result else "❌ FAIL"
+        print(f"{status} - {test_name}")
+    
+    print(f"\n🛒 WALMART INTEGRATION TEST RESULTS:")
     for test_name, result in walmart_results:
         status = "✅ PASS" if result else "❌ FAIL"
         print(f"{status} - {test_name}")
     
-    print(f"\n🎯 WALMART INTEGRATION SUMMARY:")
-    print(f"   Passed: {passed_walmart}/{total_walmart} ({passed_walmart/total_walmart*100:.1f}%)")
+    print(f"\n🎯 OVERALL SUMMARY:")
+    print(f"   Demo User Tests: {passed_demo}/{total_demo} ({passed_demo/total_demo*100:.1f}%)")
+    print(f"   Walmart Tests: {passed_walmart}/{total_walmart} ({passed_walmart/total_walmart*100:.1f}%)")
     
-    if passed_walmart == total_walmart:
-        print("🎉 ALL WALMART INTEGRATION TESTS PASSED!")
+    if passed_demo == total_demo and passed_walmart == total_walmart:
+        print("🎉 ALL TESTS PASSED! Demo user created and complete Walmart workflow verified!")
     else:
-        print(f"⚠️  {total_walmart - passed_walmart} Walmart integration tests failed")
+        failed_tests = (total_demo - passed_demo) + (total_walmart - passed_walmart)
+        print(f"⚠️  {failed_tests} tests failed")
     
     # Print detailed results
     print(f"\n📋 DETAILED TEST RESULTS:")
