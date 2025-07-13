@@ -1,7 +1,8 @@
 # 🏗️ Complete System Architecture Guide
 ## AI Recipe + Grocery Delivery App with Community Features
+### Production Application: https://recipe-cart-app-1.emergent.host
 
-This document provides a comprehensive overview of how the entire application works, from backend APIs to frontend interfaces, preview environments to production deployment.
+This document provides a comprehensive overview of how the entire application works, from backend APIs to frontend interfaces, and production deployment.
 
 ---
 
