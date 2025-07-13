@@ -1,5 +1,5 @@
-// Service Worker for PWA functionality - PRODUCTION BACKEND FIXED
-const CACHE_NAME = 'buildyoursmartcart-v115-production-backend-fix';
+// Service Worker for PWA functionality - PRODUCTION ONLY
+const CACHE_NAME = 'buildyoursmartcart-v116-production-only';
 const urlsToCache = [
   '/',
   '/static/js/bundle.js',
