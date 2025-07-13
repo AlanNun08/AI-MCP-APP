@@ -19,6 +19,12 @@ This document provides a comprehensive overview of how the entire application wo
 9. [Community Features](#-community-features)
 10. [Troubleshooting](#-troubleshooting)
 
+## ⚠️ **IMPORTANT: PRODUCTION-ONLY POLICY**
+**See `/docs/PRODUCTION_ONLY_POLICY.md` for strict guidelines:**
+- **❌ NEVER generate preview website code**
+- **✅ ONLY create production deployment code**
+- **✅ ONLY use production domain: https://recipe-cart-app-1.emergent.host**
+
 ---
 
 ## 🎯 System Overview
