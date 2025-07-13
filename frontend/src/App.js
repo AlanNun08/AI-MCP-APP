@@ -715,7 +715,6 @@ function App() {
         // Successful login
         if (response.data.status === 'success') {
           setUser(response.data.user);
-          saveUserSession(response.data.user); // Save to localStorage
           setCurrentScreen('dashboard');
           
           // Mark user as onboarded to skip tutorial for returning users
