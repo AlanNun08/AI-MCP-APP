@@ -93,7 +93,7 @@ grep -E "MONGO_URL|WALMART_|MAILJET_|OPENAI_" backend/.env
 sudo supervisorctl status
 
 # 5. Verify Frontend Build
-curl -s https://310d9b8e-d018-47c6-9b14-e763b8dfbeb2.preview.emergentagent.com/ | head -5
+curl -s https://recipe-cart-app-1.emergent.host/ | head -5
 ```
 
 ### **Environment Configuration**
