@@ -109,7 +109,7 @@
 # Testing Protocol for AI Recipe + Grocery Delivery App
 
 ## Current Application Status
-- **Preview URL**: https://310d9b8e-d018-47c6-9b14-e763b8dfbeb2.preview.emergentagent.com
+- **Production URL**: https://recipe-cart-app-1.emergent.host
 - **Backend**: FastAPI (Version 2.0.0) - Running
 - **Frontend**: React 19 - Running  
 - **Database**: MongoDB - Connected and RESET (66 documents cleared)
