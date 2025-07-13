@@ -1,5 +1,5 @@
 // Service Worker for PWA functionality - PRODUCTION DOMAIN
-const CACHE_NAME = 'v120-backend-fix';
+const CACHE_NAME = 'v121-walmart-fix-deployed';
 const urlsToCache = [
   '/',
   '/static/js/bundle.js',
