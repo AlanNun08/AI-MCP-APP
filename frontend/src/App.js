@@ -124,11 +124,10 @@ function App() {
   }, [user, currentScreen]);
 
   // Debug logging for user state changes
+  // Debug user state changes (for development only)
   useEffect(() => {
     if (user) {
-      console.log('User state updated:', user.email, 'Screen:', currentScreen);
-    } else {
-      console.log('User state cleared, Screen:', currentScreen);
+      console.log('✅ User logged in:', user.email, 'Screen:', currentScreen);
     }
   }, [user, currentScreen]);
 
