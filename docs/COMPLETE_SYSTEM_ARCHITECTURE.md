@@ -355,15 +355,8 @@ WDS_SOCKET_PORT=443
 
 ## 🚀 Deployment Workflow
 
-### **Preview Deployment Process**
-1. **Code Changes**: Made in local development environment
-2. **Backend Restart**: `sudo supervisorctl restart backend`
-3. **Frontend Restart**: `sudo supervisorctl restart frontend`
-4. **Cache Update**: Service worker cache version increment
-5. **Preview Testing**: Test on preview URL before production
-
 ### **Production Deployment Process**
-1. **Code Finalization**: All features tested in preview
+1. **Code Finalization**: All features tested locally
 2. **Environment Config**: Update `.env.production` if needed
 3. **Build Process**: React production build generation
 4. **Container Update**: Kubernetes container deployment
