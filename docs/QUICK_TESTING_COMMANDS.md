@@ -107,7 +107,7 @@ echo "starbucks: $STARBUCKS"
 
 ```bash
 # Complete test in one command
-curl -X POST https://310d9b8e-d018-47c6-9b14-e763b8dfbeb2.preview.emergentagent.com/api/grocery/cart-options?recipe_id={}&user_id=test" -H "Content-Type: application/json" -d '{}' -s | jq -r '.ingredient_options[0].options[0].product_id // "FAILED"'
+curl -X POST https://recipe-cart-app-1.emergent.host/api/grocery/cart-options?recipe_id={}&user_id=test" -H "Content-Type: application/json" -d '{}' -s | jq -r '.ingredient_options[0].options[0].product_id // "FAILED"'
 ```
 
 **Expected Output**: A real Walmart product ID like `10403017` (SUCCESS) or `FAILED`/`manual` (BROKEN)
