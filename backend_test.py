@@ -190,7 +190,7 @@ class CriticalIssueTester:
                 return False
             
             async with httpx.AsyncClient(timeout=30.0) as client:
-                response = await client.get(f"{self.backend_url}/recipes/history?user_id={self.demo_user_id}")
+                response = await client.get(f"{self.backend_url}/recipes/history/{self.demo_user_id}")
                 
                 if response.status_code == 200:
                     data = response.json()
