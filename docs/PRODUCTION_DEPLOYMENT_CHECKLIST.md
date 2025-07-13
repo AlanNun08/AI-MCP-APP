@@ -1,5 +1,13 @@
 # 🚀 PRODUCTION DEPLOYMENT CHECKLIST
 
+## ⚠️ **PRODUCTION-ONLY DEPLOYMENT**
+**STRICT POLICY**: Only deploy to production domain `https://recipe-cart-app-1.emergent.host`
+- **❌ NO preview environments**
+- **✅ PRODUCTION deployment only**
+- **📋 Full Policy**: `/docs/PRODUCTION_ONLY_POLICY.md`
+
+---
+
 ## ✅ PRE-DEPLOYMENT VERIFICATION
 
 ### **1. System Status Check**
