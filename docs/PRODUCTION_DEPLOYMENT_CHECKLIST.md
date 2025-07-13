@@ -286,7 +286,7 @@ If any critical issues are found after deployment:
    sudo supervisorctl restart all
    
    # Verify rollback
-   curl -s https://310d9b8e-d018-47c6-9b14-e763b8dfbeb2.preview.emergentagent.com/api/ | jq .
+   curl -s https://recipe-cart-app-1.emergent.host/api/ | jq .
    ```
 
 2. **Communication**
