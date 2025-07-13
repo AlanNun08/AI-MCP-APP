@@ -560,7 +560,6 @@ function App() {
         });
 
         setUser(response.data.user);
-        saveUserSession(response.data.user); // Save to localStorage
         setCurrentScreen('dashboard');
         showNotification('🎉 Email verified successfully! Welcome to AI Chef!', 'success');
         
