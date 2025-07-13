@@ -1091,12 +1091,7 @@ class StarbucksAPITester:
             async with httpx.AsyncClient(timeout=30.0) as client:
                 # Note: We'll use the data from the previous test since there might not be a specific endpoint to get cart options by ID
                 # Let's re-generate cart options to validate the products
-                request_data = {
-                    "user_id": self.test_user_id,
-                    "recipe_id": self.test_recipe_id
-                }
-                
-                response = await client.post(f"{self.backend_url}/grocery/cart-options", json=request_data)
+                response = await client.post(f"{self.backend_url}/grocery/cart-options?recipe_id={self.test_recipe_id}&user_id={self.test_user_id}")
                 
                 if response.status_code == 200:
                     data = response.json()
