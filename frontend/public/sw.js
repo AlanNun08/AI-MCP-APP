@@ -1,5 +1,5 @@
 // Service Worker for PWA functionality - PRODUCTION DOMAIN
-const CACHE_NAME = 'recipe-cart-app-production-v117';
+const CACHE_NAME = 'v118-production-only';
 const urlsToCache = [
   '/',
   '/static/js/bundle.js',
