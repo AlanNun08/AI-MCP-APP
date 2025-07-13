@@ -3,6 +3,12 @@
 ## Production Application
 **Live URL**: https://recipe-cart-app-1.emergent.host
 
+## ⚠️ **DEVELOPMENT POLICY**
+**CRITICAL**: This application uses PRODUCTION-ONLY development
+- **❌ NO preview website code generation**
+- **✅ ONLY production deployment code**
+- **📋 Full Policy**: See `/docs/PRODUCTION_ONLY_POLICY.md`
+
 ---
 
 ## 📱 **What This App Does**
