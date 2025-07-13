@@ -2575,23 +2575,44 @@ function App() {
 
   // Main render function
   const renderScreen = () => {
-    // If user is logged in but on landing page, redirect to dashboard
+    // Show loading screen while checking authentication
+    if (isLoadingAuth) {
+      return (
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 flex items-center justify-center">
+          <div className="text-center">
+            <div className="text-6xl mb-4">👨‍🍳</div>
+            <div className="w-8 h-8 border-3 border-green-500 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+            <p className="text-gray-600">Loading AI Chef...</p>
+          </div>
+        </div>
+      );
+    }
+    
+    // If user is logged in, show dashboard by default
     if (user && currentScreen === 'landing') {
       setCurrentScreen('dashboard');
       return <DashboardScreen />;
     }
     
-    // DON'T redirect if user is temporarily null during navigation - let the session restore first
     // Only redirect to landing if we're sure there's no saved session and user is on protected screen
     if (!user && !['landing', 'register', 'verify-email', 'login', 'forgot-password', 'reset-password'].includes(currentScreen)) {
       const savedUser = localStorage.getItem('ai_chef_user');
       if (!savedUser) {
-        console.log('No saved session found, redirecting to landing from:', currentScreen);
+        console.log('🔄 No saved session found, redirecting to landing from:', currentScreen);
         setCurrentScreen('landing');
         return <LandingScreen />;
       }
       // If there is a saved session, don't redirect - let the useEffect restore it
-      console.log('User session exists in localStorage, waiting for restoration...');
+      console.log('⏳ User session exists in localStorage, waiting for restoration...');
+      return (
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 flex items-center justify-center">
+          <div className="text-center">
+            <div className="text-6xl mb-4">👨‍🍳</div>
+            <div className="w-8 h-8 border-3 border-green-500 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+            <p className="text-gray-600">Restoring your session...</p>
+          </div>
+        </div>
+      );
     }
     
     switch (currentScreen) {
