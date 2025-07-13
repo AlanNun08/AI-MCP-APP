@@ -339,9 +339,9 @@ MAILJET_SECRET_KEY=your_mailjet_secret_key
 OPENAI_API_KEY=your_openai_api_key
 ```
 
-#### **Frontend (.env for preview)**
+#### **Frontend (.env for development)**
 ```env
-REACT_APP_BACKEND_URL=https://[preview-id].preview.emergentagent.com
+REACT_APP_BACKEND_URL=http://localhost:8001
 WDS_SOCKET_PORT=443
 ```
 
