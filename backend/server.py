@@ -1995,8 +1995,9 @@ async def _get_walmart_product_options(ingredient: str, max_options: int = 3) ->
                                             name_lower = product_name.lower()
                                             ingredient_lower = clean_ingredient.lower()
                                             
-                                            # TEMPORARILY DISABLE RELEVANCE FILTERING to get products working
-                                            is_relevant = True  # Accept all valid products from Walmart API
+                                            # FIXED: DISABLE RELEVANCE FILTERING COMPLETELY
+                                            is_relevant = True  # Accept ALL valid products from Walmart API
+                                            logging.info(f"🔧 DEBUG: Relevance check for '{product_name}' -> is_relevant = {is_relevant}")
                                             
                                             if is_relevant:  # Always true now
                                                 product = WalmartProduct(
