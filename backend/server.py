@@ -2449,6 +2449,7 @@ async def get_grocery_cart_options(
 ):
     """Get grocery cart options for a recipe - PRODUCTION VERSION - ONLY REAL USER RECIPES"""
     try:
+        logging.info(f"🛒🛒🛒 CART OPTIONS REQUEST RECEIVED: recipe_id={recipe_id}, user_id={user_id}")
         logging.info(f"🛒 PRODUCTION: Cart options request: recipe_id={recipe_id}, user_id={user_id}")
         
         # PRODUCTION: Get recipe from database - ONLY REAL USER RECIPES
