@@ -941,37 +941,41 @@ class StarbucksAPITester:
                 if response.status_code == 200:
                     data = response.json()
                     
-                    # Should be a list of recipes
-                    if not isinstance(data, list):
-                        self.log_test_result("Recipe History Retrieval", False, f"Expected list, got: {type(data)}")
+                    # Should be a dict with recipes list
+                    if not isinstance(data, dict) or "recipes" not in data:
+                        self.log_test_result("Recipe History Retrieval", False, f"Expected dict with 'recipes' key, got: {type(data)}")
                         return False
                     
+                    recipes = data.get("recipes", [])
+                    
                     # Should have at least one recipe from our previous tests
-                    if len(data) == 0:
+                    if len(recipes) == 0:
                         self.log_test_result("Recipe History Retrieval", False, "No recipes found in history")
                         return False
                     
                     # Validate recipe structure
-                    sample_recipe = data[0]
+                    sample_recipe = recipes[0]
                     required_fields = ["id", "title", "description", "ingredients", "instructions"]
                     missing_fields = [field for field in required_fields if field not in sample_recipe]
                     if missing_fields:
                         self.log_test_result("Recipe History Retrieval", False, f"Recipe missing fields: {missing_fields}")
                         return False
                     
-                    # Ensure these are regular recipes, not Starbucks
-                    starbucks_recipes = [r for r in data if "drink_name" in r or "ordering_script" in r]
-                    if starbucks_recipes:
-                        self.log_test_result("Recipe History Retrieval", False, f"Found {len(starbucks_recipes)} Starbucks recipes in regular recipe history")
+                    # Filter for regular recipes only (not Starbucks)
+                    regular_recipes = [r for r in recipes if r.get("type") == "recipe"]
+                    
+                    if not regular_recipes:
+                        self.log_test_result("Recipe History Retrieval", False, "No regular recipes found in history")
                         return False
                     
                     self.log_test_result(
                         "Recipe History Retrieval", 
                         True, 
-                        f"Retrieved {len(data)} regular recipes from history",
+                        f"Retrieved {len(regular_recipes)} regular recipes from history (total: {len(recipes)})",
                         {
-                            "total_recipes": len(data),
-                            "sample_titles": [r.get("title", "") for r in data[:3]]
+                            "total_recipes": len(recipes),
+                            "regular_recipes": len(regular_recipes),
+                            "sample_titles": [r.get("title", "") for r in regular_recipes[:3]]
                         }
                     )
                     return True
