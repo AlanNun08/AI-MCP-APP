@@ -319,13 +319,7 @@ users (many) ──── (many) user_shared_recipes [liked_by_users array]
 - **Database**: `mongodb://localhost:27017`
 - **Purpose**: Development and testing
 
-#### **2. Preview Environment**
-- **URL**: `https://[preview-id].preview.emergentagent.com`
-- **Backend**: Kubernetes container with preview backend
-- **Frontend**: React build served from preview
-- **Purpose**: Testing latest features before production
-
-#### **3. Production Environment**
+#### **2. Production Environment**
 - **URL**: `https://recipe-cart-app-1.emergent.host`
 - **Backend**: Production Kubernetes backend
 - **Frontend**: Optimized React build
