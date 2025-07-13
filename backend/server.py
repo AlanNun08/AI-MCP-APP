@@ -1713,8 +1713,16 @@ async def reset_password(request: PasswordResetVerify):
 @api_router.get("/")
 async def root():
     print("🔍 ROOT ENDPOINT CALLED - Console log test working!")
-    logging.info("🔍 ROOT ENDPOINT CALLED - Logging test working!")
-    return {"message": "AI Recipe & Grocery API", "version": "2.0.0", "status": "running", "walmart_fix": "deployed_v3", "timestamp": datetime.utcnow().isoformat()}
+    logging.info("Root endpoint accessed")
+    return {
+        "message": "AI Recipe & Grocery API", 
+        "version": "2.0.0", 
+        "status": "running", 
+        "walmart_fix": "deployed_v3", 
+        "v2_integration": "LOADED",
+        "blueprint_status": "ACTIVE", 
+        "timestamp": datetime.utcnow().isoformat()
+    }
 
 @api_router.get("/debug/cache-status")
 async def cache_status():
