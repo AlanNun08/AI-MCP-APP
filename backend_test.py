@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Starbucks Drink Generation API Testing Suite
-Testing the updated creative prompts and new features
+Comprehensive API Testing Suite
+Testing Starbucks drinks, regular recipes, and Walmart integration workflow
 """
 
 import asyncio
