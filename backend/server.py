@@ -2537,21 +2537,9 @@ async def get_grocery_cart_options(
         
         # PRODUCTION: Check if we have any ingredient options BEFORE creating cart
         if not ingredient_options:
-            logging.warning(f"🚨 EMERGENCY: Creating basic shopping cart without Walmart integration for recipe {recipe_id}")
-            
-            # Create basic ingredient list for manual shopping
-            basic_cart = {
-                "recipe_id": recipe_id,
-                "recipe_title": recipe_title,
-                "ingredients_list": shopping_list,
-                "shopping_mode": "manual",
-                "message": "Shopping list ready - visit Walmart.com to purchase these ingredients",
-                "walmart_search_url": f"https://www.walmart.com/search?q={'+'.join(shopping_list)}",
-                "manual_shopping_instructions": "Copy this ingredient list and search for these items on Walmart.com or visit your local store."
-            }
-            
-            return basic_cart
-        
+            logging.error(f"❌ CRITICAL: No ingredient options found for recipe {recipe_id}")
+            raise HTTPException(status_code=500, detail="Unable to generate cart options - Walmart integration unavailable")
+
         # PRODUCTION: Create cart options object - ONLY REAL DATA
         cart_options = GroceryCartOptions(
             id=str(uuid.uuid4()),
