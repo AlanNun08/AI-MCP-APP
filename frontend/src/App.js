@@ -1223,20 +1223,32 @@ function App() {
     const handleSubmit = async (e) => {
       e.preventDefault();
       
+      console.log('🚀 =================================');
+      console.log('🚀 RECIPE GENERATION FORM SUBMITTED');
+      console.log('🚀 =================================');
+      console.log('🔍 Form submission event:', e);
+      console.log('🔍 Current form data:', formData);
+      console.log('🔍 Current user:', user);
+      console.log('🔍 Timestamp:', new Date().toISOString());
+      
       // Validate that a recipe type and specific type are selected
       if (!formData.recipe_type) {
+        console.log('❌ Validation failed: No recipe type selected');
         showNotification('❌ Please select a recipe category (Cuisine, Snack, or Beverage)', 'error');
         return;
       }
 
       let selectedType = '';
       if (formData.recipe_type === 'cuisine' && !formData.cuisine_type) {
+        console.log('❌ Validation failed: No cuisine type selected');
         showNotification('❌ Please select a cuisine type', 'error');
         return;
       } else if (formData.recipe_type === 'snack' && !formData.snack_type) {
+        console.log('❌ Validation failed: No snack type selected');
         showNotification('❌ Please select a snack type', 'error');
         return;
       } else if (formData.recipe_type === 'beverage' && !formData.beverage_type) {
+        console.log('❌ Validation failed: No beverage type selected');
         showNotification('❌ Please select a beverage type', 'error');
         return;
       }
