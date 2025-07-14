@@ -1574,7 +1574,7 @@ function App() {
     );
   };
 
-  // Recipe Detail Screen Component - COMPLETELY NEW DESIGN
+  // Recipe Detail Screen Component - COMPLETELY NEW INGREDIENT SELECTION FOCUSED DESIGN
   const RecipeDetailScreen = ({ recipe, showBackButton = false }) => {
     const [productOptions, setProductOptions] = useState({}); // Store all product options per ingredient
     const [selectedProducts, setSelectedProducts] = useState({}); // Store user selections
@@ -1762,42 +1762,6 @@ function App() {
       const updatedItems = cartItems.map((item, i) => 
         i === index ? { ...item, quantity: newQuantity } : item
       );
-      setCartItems(updatedItems);
-      
-      // Generate Walmart URL with correct format: items=ID1,ID2_quantity,ID3
-      const walmartItems = [];
-      const finalQuantities = {};
-      
-      // Count quantities for each product
-      updatedItems.forEach(item => {
-        if (item.product_id) {
-          const quantity = (typeof item.quantity === 'number' && item.quantity > 0) ? item.quantity : 1;
-          const qty = finalQuantities[item.product_id] || 0;
-          finalQuantities[item.product_id] = qty + quantity;
-        }
-      });
-      
-      // Format for Walmart URL: productId or productId_quantity
-      Object.entries(finalQuantities).forEach(([productId, quantity]) => {
-        if (productId) {
-          if (quantity === 1) {
-            walmartItems.push(productId);
-          } else {
-            walmartItems.push(`${productId}_${Math.floor(quantity)}`);
-          }
-        }
-      });
-      
-      if (walmartItems.length > 0) {
-        setFinalWalmartUrl(`https://affil.walmart.com/cart/addToCart?items=${walmartItems.join(',')}`);
-      } else {
-        setFinalWalmartUrl('');
-      }
-    };
-
-    // Remove item and regenerate URL
-    const removeItem = (index) => {
-      const updatedItems = cartItems.filter((_, i) => i !== index);
       setCartItems(updatedItems);
       
       // Generate Walmart URL with correct format: items=ID1,ID2_quantity,ID3
