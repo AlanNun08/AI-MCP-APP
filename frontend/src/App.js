@@ -1267,11 +1267,34 @@ function App() {
           max_budget: formData.is_budget_friendly ? formData.max_budget : null
         };
 
+        console.log('🚀 =================================');
+        console.log('🚀 RECIPE GENERATION - OPENAI CALL');
+        console.log('🚀 =================================');
+        console.log('🔍 REQUEST DATA:', requestData);
+        console.log('🔍 API URL:', `${API}/api/recipes/generate`);
+        console.log('🔍 USER:', user);
+        console.log('🔍 FORM DATA:', formData);
+
         const response = await axios.post(`${API}/api/recipes/generate`, requestData);
+        
+        console.log('🚀 =================================');
+        console.log('🚀 RECIPE GENERATION - RESPONSE RECEIVED');
+        console.log('🚀 =================================');
+        console.log('✅ Recipe generation response:', response.data);
+        console.log('🔍 Response status:', response.status);
+        console.log('🔍 Recipe ID:', response.data?.id);
+        console.log('🔍 Recipe title:', response.data?.title);
+        console.log('🔍 Recipe shopping_list:', response.data?.shopping_list);
+        console.log('🔍 Recipe ingredients:', response.data?.ingredients);
+        console.log('🔍 Recipe instructions:', response.data?.instructions);
         
         // Store recipe and navigate to detail
         window.currentRecipe = response.data;
+        console.log('🔍 Stored in window.currentRecipe:', window.currentRecipe);
+        
         setCurrentScreen('recipe-detail');
+        console.log('🔍 Navigating to recipe-detail screen');
+        
         showNotification('🎉 Recipe generated successfully!', 'success');
         
       } catch (error) {
