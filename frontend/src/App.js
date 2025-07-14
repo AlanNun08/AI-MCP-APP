@@ -83,13 +83,13 @@ function App() {
         const savedUser = localStorage.getItem('ai_chef_user');
         if (savedUser) {
           const userData = JSON.parse(savedUser);
-          console.log('🔄 Restoring user session:', userData.email);
+          debugLog('🔄 Restoring user session:', userData.email);
           setUser(userData);
           setCurrentScreen('dashboard'); // ← FIX: Navigate to dashboard when user is restored
-          console.log('📱 Setting screen to dashboard after session restore');
+          debugLog('📱 Setting screen to dashboard after session restore');
         }
       } catch (error) {
-        console.error('❌ Failed to restore user session:', error);
+        debugLog('❌ Failed to restore user session:', error);
         localStorage.removeItem('ai_chef_user');
       } finally {
         setIsLoadingAuth(false);
@@ -101,14 +101,14 @@ function App() {
     return () => clearTimeout(timer);
   }, []); // Only run once on mount
 
-  // Monitor user state changes and save to localStorage
+  // Monitor user state changes and save to localStorage (silent)
   useEffect(() => {
     if (user) {
       try {
         localStorage.setItem('ai_chef_user', JSON.stringify(user));
-        console.log('💾 User session saved:', user.email);
+        debugLog('💾 User session saved:', user.email);
       } catch (error) {
-        console.error('❌ Failed to save user session:', error);
+        debugLog('❌ Failed to save user session:', error);
       }
     }
   }, [user]); // Save whenever user changes
