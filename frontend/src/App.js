@@ -1629,9 +1629,13 @@ function App() {
             // Process correct format: ingredient_options array with options sub-arrays
             response.data.ingredient_options.forEach((ingredientOption, index) => {
               const ingredientName = ingredientOption.ingredient_name || ingredientOption.original_ingredient;
+              console.log(`🔍 DEBUG - Processing ingredient ${index + 1}: ${ingredientName}`);
               
               // Backend uses 'options' field (not 'products')
               if (ingredientOption.options && ingredientOption.options.length > 0) {
+                console.log(`🔍 DEBUG - Found ${ingredientOption.options.length} products for ${ingredientName}`);
+                console.log(`🔍 DEBUG - First product:`, ingredientOption.options[0]);
+                
                 // Store all options for this ingredient
                 options[ingredientName] = ingredientOption.options;
                 
@@ -1647,6 +1651,10 @@ function App() {
                   product_id: firstProduct.product_id,
                   ingredient_name: ingredientName
                 });
+                
+                console.log(`🔍 DEBUG - Added to cart: ${firstProduct.name} - $${firstProduct.price}`);
+              } else {
+                console.log(`🔍 DEBUG - No products found for ingredient: ${ingredientName}`);
               }
             });
             
