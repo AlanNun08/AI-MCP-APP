@@ -1600,6 +1600,8 @@ function App() {
             return; // Exit early
           }
           
+          console.log('🛒 Cart options response:', response.data);
+          
           if (response.data && response.data.ingredients) {
             // Store all product options per ingredient - UPDATED FOR ACTUAL BACKEND FORMAT
             const options = {};
