@@ -1933,7 +1933,7 @@ function App() {
 
     if (!recipe) {
       return (
-        <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 p-4">
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-4">
           <div className="max-w-4xl mx-auto">
             <div className="text-center py-20">
               <div className="text-6xl mb-4">🍳</div>
@@ -1945,200 +1945,205 @@ function App() {
       );
     }
 
+    // NEW INGREDIENT SELECTION FOCUSED DESIGN
     return (
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50 p-4">
-        <div className="max-w-6xl mx-auto">
-          {/* Header */}
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-4">
+        <div className="max-w-7xl mx-auto">
+          
+          {/* Header Section */}
           <div className="mb-8">
             {showBackButton && (
               <button
                 onClick={() => setCurrentScreen('dashboard')}
-                className="mb-4 flex items-center space-x-2 text-orange-600 hover:text-orange-700 font-medium"
+                className="mb-6 flex items-center space-x-2 text-blue-600 hover:text-blue-700 font-medium text-lg"
               >
                 <span>←</span>
                 <span>Back to Dashboard</span>
               </button>
             )}
             
-            <div className="text-center">
-              <h1 className="text-4xl font-bold text-gray-800 mb-2">
+            <div className="text-center bg-white rounded-2xl shadow-lg p-8 mb-8">
+              <div className="text-6xl mb-4">🛒</div>
+              <h1 className="text-4xl font-bold text-gray-800 mb-3">
                 {recipe.title || 'Delicious Recipe'}
               </h1>
-              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                {recipe.description || 'A wonderful recipe created just for you!'}
+              <p className="text-lg text-gray-600 mb-6 max-w-2xl mx-auto">
+                Choose your preferred products from Walmart for each ingredient
               </p>
-            </div>
-          </div>
-
-          {/* Recipe Info Cards */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-            
-            {/* Recipe Details Card */}
-            <div className="lg:col-span-2">
-              <div className="bg-white rounded-2xl shadow-lg p-6">
-                
-                {/* Recipe Stats */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                  <div className="text-center p-3 bg-orange-50 rounded-xl">
-                    <div className="text-2xl mb-1">⏱️</div>
-                    <div className="text-sm text-gray-600">Prep Time</div>
-                    <div className="font-bold text-gray-800">{recipe.prep_time || '30 min'}</div>
-                  </div>
-                  <div className="text-center p-3 bg-blue-50 rounded-xl">
-                    <div className="text-2xl mb-1">🍽️</div>
-                    <div className="text-sm text-gray-600">Servings</div>
-                    <div className="font-bold text-gray-800">{recipe.servings || '4'}</div>
-                  </div>
-                  <div className="text-center p-3 bg-green-50 rounded-xl">
-                    <div className="text-2xl mb-1">🔥</div>
-                    <div className="text-sm text-gray-600">Calories</div>
-                    <div className="font-bold text-gray-800">{recipe.calories || '350'}</div>
-                  </div>
-                  <div className="text-center p-3 bg-purple-50 rounded-xl">
-                    <div className="text-2xl mb-1">💰</div>
-                    <div className="text-sm text-gray-600">Est. Cost</div>
-                    <div className="font-bold text-gray-800">${calculateTotal().toFixed(2)}</div>
-                  </div>
+              
+              {/* Quick Stats */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-2xl mx-auto">
+                <div className="text-center p-3 bg-blue-50 rounded-xl">
+                  <div className="text-2xl mb-1">🥘</div>
+                  <div className="text-sm text-gray-600">Ingredients</div>
+                  <div className="font-bold text-gray-800">{Object.keys(productOptions).length}</div>
                 </div>
-
-                {/* Ingredients Section with Product Selection */}
-                <div className="mb-8">
-                  <h3 className="text-2xl font-bold text-gray-800 mb-4 flex items-center">
-                    <span className="mr-2">🥘</span>
-                    Ingredients & Product Selection
-                  </h3>
-                  
-                  {loadingCart ? (
-                    <div className="text-center py-8">
-                      <div className="w-8 h-8 border-3 border-green-500 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
-                      <p className="text-gray-600">Loading product options from Walmart...</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-6">
-                      {Object.entries(productOptions).map(([ingredientName, ingredientOptions], index) => {
-                        const selectedProductId = selectedProducts[ingredientName];
-                        
-                        return (
-                          <div key={index} className="bg-gray-50 rounded-xl p-4">
-                            {/* Ingredient Header */}
-                            <div className="flex items-center mb-3">
-                              <span className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center text-orange-600 font-bold text-sm mr-3">
-                                {index + 1}
-                              </span>
-                              <h4 className="text-lg font-semibold text-gray-800">{ingredientName}</h4>
-                            </div>
-                            
-                            {/* Product Options */}
-                            {ingredientOptions.length > 0 ? (
-                              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                                {ingredientOptions.slice(0, 3).map((product, productIndex) => (
-                                  <div
-                                    key={productIndex}
-                                    className={`border-2 rounded-lg p-3 cursor-pointer transition-all duration-200 ${
-                                      selectedProductId === product.product_id
-                                        ? 'border-green-500 bg-green-50'
-                                        : 'border-gray-200 bg-white hover:border-green-300'
-                                    }`}
-                                    onClick={() => handleProductSelection(ingredientName, product.product_id)}
-                                  >
-                                    <div className="flex items-start justify-between mb-2">
-                                      <div className="flex-1">
-                                        <h5 className="font-medium text-gray-800 text-sm leading-tight mb-1">
-                                          {product.name}
-                                        </h5>
-                                        <p className="text-lg font-bold text-green-600">
-                                          ${parseFloat(product.price).toFixed(2)}
-                                        </p>
-                                      </div>
-                                      <div className="ml-2">
-                                        {selectedProductId === product.product_id ? (
-                                          <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
-                                            <span className="text-white text-xs">✓</span>
-                                          </div>
-                                        ) : (
-                                          <div className="w-5 h-5 border-2 border-gray-300 rounded-full"></div>
-                                        )}
-                                      </div>
-                                    </div>
-                                    
-                                    <div className="text-xs text-gray-500 mb-2">
-                                      Product ID: {product.product_id}
-                                    </div>
-                                    
-                                    {product.image_url && (
-                                      <img 
-                                        src={product.image_url} 
-                                        alt={product.name}
-                                        className="w-full h-16 object-cover rounded"
-                                        onError={(e) => { e.target.style.display = 'none'; }}
-                                      />
-                                    )}
-                                  </div>
-                                ))}
-                              </div>
-                            ) : (
-                              <div className="text-center py-4 text-gray-500">
-                                <p className="text-sm">No product options available for this ingredient</p>
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
+                <div className="text-center p-3 bg-green-50 rounded-xl">
+                  <div className="text-2xl mb-1">🍽️</div>
+                  <div className="text-sm text-gray-600">Servings</div>
+                  <div className="font-bold text-gray-800">{recipe.servings || '4'}</div>
                 </div>
-
-                {/* Instructions Section */}
-                <div>
-                  <h3 className="text-2xl font-bold text-gray-800 mb-4 flex items-center">
-                    <span className="mr-2">📋</span>
-                    Instructions
-                  </h3>
-                  <div className="space-y-4">
-                    {recipe.instructions && recipe.instructions.map((instruction, index) => (
-                      <div key={index} className="flex items-start p-4 bg-gray-50 rounded-lg">
-                        <span className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold text-sm mr-4 mt-0.5">
-                          {index + 1}
-                        </span>
-                        <p className="text-gray-800 leading-relaxed">{instruction}</p>
-                      </div>
-                    ))}
-                  </div>
+                <div className="text-center p-3 bg-purple-50 rounded-xl">
+                  <div className="text-2xl mb-1">⏱️</div>
+                  <div className="text-sm text-gray-600">Prep Time</div>
+                  <div className="font-bold text-gray-800">{recipe.prep_time || '30 min'}</div>
+                </div>
+                <div className="text-center p-3 bg-yellow-50 rounded-xl">
+                  <div className="text-2xl mb-1">💰</div>
+                  <div className="text-sm text-gray-600">Total Cost</div>
+                  <div className="font-bold text-green-600">${calculateTotal().toFixed(2)}</div>
                 </div>
               </div>
             </div>
+          </div>
 
-            {/* Shopping Cart Card */}
+          {/* Main Content Area */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            {/* Left Column - Ingredient Selection */}
+            <div className="lg:col-span-2">
+              <div className="bg-white rounded-2xl shadow-lg p-6">
+                <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                  <span className="mr-3">🎯</span>
+                  Select Your Products
+                  <span className="ml-auto text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+                    Choose 1 of 3 options per ingredient
+                  </span>
+                </h2>
+                
+                {loadingCart ? (
+                  <div className="text-center py-12">
+                    <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                    <p className="text-gray-600 text-lg">Loading Walmart products...</p>
+                    <p className="text-gray-500 text-sm mt-2">Finding the best deals for your ingredients</p>
+                  </div>
+                ) : (
+                  <div className="space-y-8">
+                    {Object.keys(productOptions).length === 0 ? (
+                      <div className="text-center py-12">
+                        <div className="text-6xl mb-4">🔍</div>
+                        <h3 className="text-xl font-bold text-gray-800 mb-2">No Products Found</h3>
+                        <p className="text-gray-600">We couldn't find Walmart products for this recipe's ingredients.</p>
+                      </div>
+                    ) : (
+                      Object.entries(productOptions).map(([ingredientName, ingredientOptions], index) => {
+                        const selectedProductId = selectedProducts[ingredientName];
+                        
+                        return (
+                          <div key={index} className="border-2 border-gray-200 rounded-xl p-6 hover:border-blue-300 transition-colors">
+                            {/* Ingredient Header */}
+                            <div className="flex items-center mb-6">
+                              <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-lg mr-4">
+                                {index + 1}
+                              </div>
+                              <div>
+                                <h3 className="text-xl font-bold text-gray-800">{ingredientName}</h3>
+                                <p className="text-gray-600 text-sm">Choose your preferred option below</p>
+                              </div>
+                            </div>
+                            
+                            {/* Product Options Grid */}
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                              {ingredientOptions.slice(0, 3).map((product, productIndex) => (
+                                <div
+                                  key={productIndex}
+                                  className={`relative border-2 rounded-xl p-4 cursor-pointer transition-all duration-200 transform hover:scale-105 ${
+                                    selectedProductId === product.product_id
+                                      ? 'border-green-500 bg-green-50 shadow-lg'
+                                      : 'border-gray-200 bg-white hover:border-blue-300 hover:shadow-md'
+                                  }`}
+                                  onClick={() => handleProductSelection(ingredientName, product.product_id)}
+                                >
+                                  {/* Selection Indicator */}
+                                  <div className="absolute top-3 right-3">
+                                    {selectedProductId === product.product_id ? (
+                                      <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                                        <span className="text-white text-sm font-bold">✓</span>
+                                      </div>
+                                    ) : (
+                                      <div className="w-6 h-6 border-2 border-gray-300 rounded-full hover:border-blue-500"></div>
+                                    )}
+                                  </div>
+                                  
+                                  {/* Product Image */}
+                                  {product.image_url && (
+                                    <div className="mb-3">
+                                      <img 
+                                        src={product.image_url} 
+                                        alt={product.name}
+                                        className="w-full h-32 object-cover rounded-lg"
+                                        onError={(e) => { e.target.style.display = 'none'; }}
+                                      />
+                                    </div>
+                                  )}
+                                  
+                                  {/* Product Name */}
+                                  <h4 className="font-semibold text-gray-800 text-sm leading-tight mb-3 min-h-[40px]">
+                                    {product.name}
+                                  </h4>
+                                  
+                                  {/* Price */}
+                                  <div className="text-center">
+                                    <div className="text-2xl font-bold text-green-600 mb-1">
+                                      ${parseFloat(product.price).toFixed(2)}
+                                    </div>
+                                    <div className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+                                      ID: {product.product_id}
+                                    </div>
+                                  </div>
+                                  
+                                  {/* Selection Button */}
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleProductSelection(ingredientName, product.product_id);
+                                    }}
+                                    className={`w-full mt-3 py-2 rounded-lg font-medium transition-colors ${
+                                      selectedProductId === product.product_id
+                                        ? 'bg-green-500 text-white'
+                                        : 'bg-gray-100 text-gray-700 hover:bg-blue-100'
+                                    }`}
+                                  >
+                                    {selectedProductId === product.product_id ? 'Selected' : 'Select'}
+                                  </button>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Right Column - Shopping Cart & Checkout */}
             <div className="lg:col-span-1">
               <div className="bg-white rounded-2xl shadow-lg p-6 sticky top-4">
                 
                 {/* Cart Header */}
                 <div className="text-center mb-6">
-                  <h3 className="text-2xl font-bold text-gray-800 mb-2">🛒 Selected Items</h3>
-                  <p className="text-sm text-gray-600">Your chosen products from Walmart</p>
+                  <div className="text-4xl mb-2">🛍️</div>
+                  <h3 className="text-2xl font-bold text-gray-800 mb-2">Your Cart</h3>
+                  <p className="text-sm text-gray-600">Selected Walmart products</p>
                 </div>
 
-                {/* Selected Products Summary */}
+                {/* Selected Products List */}
                 <div className="space-y-3 mb-6 max-h-64 overflow-y-auto">
                   {loadingCart ? (
                     <div className="text-center py-8">
-                      <div className="w-8 h-8 border-3 border-green-500 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
-                      <p className="text-gray-600 text-sm">Loading products...</p>
+                      <div className="w-8 h-8 border-3 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+                      <p className="text-gray-600 text-sm">Loading cart...</p>
                     </div>
                   ) : cartItems.length > 0 ? (
                     cartItems.map((item, index) => (
-                      <div key={index} className="p-3 bg-gray-50 rounded-lg">
+                      <div key={index} className="border border-gray-200 rounded-lg p-3">
                         <div className="flex justify-between items-start mb-2">
                           <div className="flex-1">
-                            <h4 className="font-medium text-gray-800 text-sm leading-tight mb-1">{item.name}</h4>
-                            <p className="text-xs text-gray-500">For: {item.ingredient_name}</p>
+                            <h4 className="font-medium text-gray-800 text-sm leading-tight">{item.name}</h4>
+                            <p className="text-xs text-gray-500 mt-1">For: {item.ingredient_name}</p>
                           </div>
-                          <button
-                            onClick={() => removeItem(index)}
-                            className="text-red-500 hover:text-red-700 text-xs ml-2"
-                          >
-                            ✕
-                          </button>
                         </div>
                         
                         <div className="flex justify-between items-center">
@@ -2146,20 +2151,20 @@ function App() {
                             <button
                               onClick={() => updateQuantity(index, item.quantity - 1)}
                               disabled={item.quantity <= 1}
-                              className="w-6 h-6 bg-red-500 text-white rounded-full hover:bg-red-600 disabled:opacity-50 flex items-center justify-center text-xs"
+                              className="w-7 h-7 bg-red-500 text-white rounded-full hover:bg-red-600 disabled:opacity-50 flex items-center justify-center text-sm"
                             >
                               -
                             </button>
-                            <span className="w-8 text-center font-bold text-sm">{item.quantity}</span>
+                            <span className="w-10 text-center font-bold text-sm">{item.quantity}</span>
                             <button
                               onClick={() => updateQuantity(index, item.quantity + 1)}
-                              className="w-6 h-6 bg-green-500 text-white rounded-full hover:bg-green-600 flex items-center justify-center text-xs"
+                              className="w-7 h-7 bg-green-500 text-white rounded-full hover:bg-green-600 flex items-center justify-center text-sm"
                             >
                               +
                             </button>
                           </div>
                           <div className="text-right">
-                            <div className="font-bold text-green-600">${(item.price * item.quantity).toFixed(2)}</div>
+                            <div className="font-bold text-green-600 text-lg">${(item.price * item.quantity).toFixed(2)}</div>
                             <div className="text-xs text-gray-500">${item.price.toFixed(2)} each</div>
                           </div>
                         </div>
@@ -2167,6 +2172,7 @@ function App() {
                     ))
                   ) : (
                     <div className="text-center py-8 text-gray-500">
+                      <div className="text-3xl mb-2">🛒</div>
                       <p>No items selected</p>
                     </div>
                   )}
@@ -2179,60 +2185,54 @@ function App() {
                     <span className="font-bold">{cartItems.reduce((total, item) => total + item.quantity, 0)}</span>
                   </div>
                   <div className="flex justify-between items-center mb-4">
-                    <span className="text-lg font-bold text-gray-800">Total:</span>
-                    <span className="text-2xl font-bold text-green-600">${calculateTotal().toFixed(2)}</span>
+                    <span className="text-xl font-bold text-gray-800">Total:</span>
+                    <span className="text-3xl font-bold text-green-600">${calculateTotal().toFixed(2)}</span>
+                  </div>
+                  <div className="text-xs text-gray-500 text-center">
+                    <p>✅ Real Walmart prices & products</p>
+                    <p>🔗 Affiliate link generated automatically</p>
                   </div>
                 </div>
 
-                {/* Walmart Link Section */}
-                <div className="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-4 mb-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <h4 className="font-bold text-yellow-800">🔗 Walmart Affiliate Link</h4>
-                    <div className="flex items-center space-x-2">
-                      {cartItems.length > 0 && !loadingCart ? (
-                        <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
-                          Authentic Walmart Products
-                        </span>
-                      ) : (
-                        <span className="text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded-full">
-                          Loading...
-                        </span>
-                      )}
-                      <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
-                        💾 Selections Saved
-                      </span>
-                    </div>
+                {/* Walmart Checkout Section */}
+                <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border-2 border-yellow-200 rounded-xl p-4 mb-4">
+                  <div className="text-center mb-3">
+                    <div className="text-2xl mb-1">🏪</div>
+                    <h4 className="font-bold text-yellow-800 text-lg">Walmart Checkout</h4>
+                    <p className="text-xs text-yellow-700 mb-3">Your personalized shopping link</p>
                   </div>
-                  <textarea
-                    value={finalWalmartUrl || 'Loading...'}
-                    readOnly
-                    className="w-full h-16 p-2 border border-yellow-300 rounded-lg bg-white text-xs resize-none mb-3"
-                    onClick={(e) => e.target.select()}
-                  />
+                  
+                  <div className="bg-white rounded-lg p-3 mb-3">
+                    <textarea
+                      value={finalWalmartUrl || 'Loading...'}
+                      readOnly
+                      className="w-full h-20 p-2 border border-yellow-300 rounded-lg bg-gray-50 text-xs resize-none font-mono"
+                      onClick={(e) => e.target.select()}
+                    />
+                  </div>
+                  
                   <button
                     onClick={copyUrlToClipboard}
-                    disabled={!finalWalmartUrl}
-                    className="w-full bg-yellow-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-yellow-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={!finalWalmartUrl || cartItems.length === 0}
+                    className="w-full bg-yellow-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-yellow-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                   >
-                    📋 Copy Link & Continue Shopping
+                    📋 Copy & Shop at Walmart
                   </button>
                 </div>
 
                 {/* Instructions */}
                 <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-                  <h4 className="font-bold text-blue-800 mb-2 text-sm">How to Order:</h4>
+                  <h4 className="font-bold text-blue-800 mb-2 text-sm">🎯 How to Shop:</h4>
                   <ol className="text-xs text-blue-700 space-y-1">
-                    <li>1. Select your preferred product for each ingredient</li>
-                    <li>2. Adjust quantities if needed</li>
-                    <li>3. Click "Copy Link & Continue Shopping"</li>
-                    <li>4. Open new tab and paste the link</li>
-                    <li>5. All selected items will be in your cart</li>
-                    <li>6. Return here to modify selections anytime</li>
+                    <li>1. Choose your preferred products above</li>
+                    <li>2. Adjust quantities using +/- buttons</li>
+                    <li>3. Click "Copy & Shop at Walmart"</li>
+                    <li>4. Open new tab & paste the link</li>
+                    <li>5. All items will be in your Walmart cart</li>
                   </ol>
                   <div className="mt-3 p-2 bg-blue-100 rounded-lg">
                     <p className="text-xs text-blue-600">
-                      <strong>Persistent Selections:</strong> Your product choices remain saved after copying the link. 
-                      You can continue adjusting quantities, changing products, or generating new URLs as needed.
+                      <strong>💡 Pro Tip:</strong> Your selections are saved! You can change products or quantities and generate a new link anytime.
                     </p>
                   </div>
                 </div>
