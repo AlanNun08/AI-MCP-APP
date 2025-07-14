@@ -295,7 +295,8 @@ class WalmartIntegrationTester:
                             "product_id": product_id,
                             "name": product.get("name", ""),
                             "price": product.get("price", 0),
-                            "is_authentic": is_authentic
+                            "is_authentic": is_authentic,
+                            "id_length": len(product_id)
                         })
             
             authenticity_rate = (authentic_products / total_products * 100) if total_products > 0 else 0
