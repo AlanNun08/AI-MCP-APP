@@ -1591,7 +1591,7 @@ function App() {
         axios.post(`${API}/api/grocery/cart-options`, {}, {
           params: {
             recipe_id: recipe.id,
-            user_id: user?.id || 'demo_user'
+            user_id: user.id
           }
         })
         .then(response => {

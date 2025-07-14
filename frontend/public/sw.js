@@ -8,26 +8,6 @@ const urlsToCache = [
 ];
 
 // Install event - MANUAL SHOPPING MODE SUPPORT
-self.addEventListener('install', (event) => {
-  console.log('🔄 MANUAL SHOPPING MODE SUPPORT - CLEARING ALL CACHES...');
-  event.waitUntil(
-    caches.keys().then(cacheNames => {
-      console.log('🗑️ DELETING OLD CACHES FOR MANUAL SHOPPING SUPPORT:', cacheNames);
-      return Promise.all(
-        cacheNames.map(cacheName => {
-          console.log('💥 DELETING CACHE:', cacheName);
-          return caches.delete(cacheName);
-        })
-      );
-    }).then(() => {
-      console.log('✅ CACHES DELETED - CREATING MANUAL SHOPPING CACHE');
-      return caches.open(CACHE_NAME);
-    }).then(() => {
-      console.log('🎉 MANUAL SHOPPING CACHE v110 CREATED');
-      return self.skipWaiting();
-    })
-  );
-});
 
 // Activate event - IMMEDIATE CONTROL
 self.addEventListener('activate', (event) => {
