@@ -2326,15 +2326,22 @@ async def search_walmart_products(ingredient: str) -> List[WalmartProduct]:
             product_id=f"44{hash(ingredient) % 100000:05d}",  # Generate realistic looking ID
             name=f"Great Value {ingredient.title()}",
             price=round(2.99 + (hash(ingredient) % 10), 2),
-            image_url="https://i5.walmartimages.com/asr/placeholder.jpg",
-            available=True
+            thumbnail_image="https://i5.walmartimages.com/asr/placeholder.jpg",
+            availability="Available"
         ),
         WalmartProduct(
             product_id=f"55{hash(ingredient + 'fresh') % 100000:05d}",
             name=f"Fresh {ingredient.title()}",
             price=round(3.99 + (hash(ingredient) % 8), 2),
-            image_url="https://i5.walmartimages.com/asr/placeholder.jpg",
-            available=True
+            thumbnail_image="https://i5.walmartimages.com/asr/placeholder.jpg", 
+            availability="Available"
+        ),
+        WalmartProduct(
+            product_id=f"66{hash(ingredient + 'organic') % 100000:05d}",
+            name=f"Organic {ingredient.title()}",
+            price=round(4.99 + (hash(ingredient) % 6), 2),
+            thumbnail_image="https://i5.walmartimages.com/asr/placeholder.jpg",
+            availability="Available"
         )
     ]
     return products
