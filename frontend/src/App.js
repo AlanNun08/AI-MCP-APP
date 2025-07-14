@@ -1852,7 +1852,7 @@ function App() {
         setFinalWalmartUrl('');
       };
 
-      console.log('✅ Product selection updated for', ingredientName, ':', selectedProduct.name);
+      debugLog('✅ Product selection updated:', ingredientName, '→', selectedProduct.name);
     };
 
     // Update quantity and regenerate URL
