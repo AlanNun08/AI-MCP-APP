@@ -1629,7 +1629,6 @@ function App() {
         axios.post(fullUrl, {}, {
           params: apiParams
         })
-        })
         .then(response => {
           console.log('✅ Cart options response:', response.data);
           console.log('🔍 DEBUG - Response status:', response.status);
