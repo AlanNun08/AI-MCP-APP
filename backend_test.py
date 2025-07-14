@@ -454,7 +454,81 @@ class WalmartIntegrationTester:
                 first_product = first_ingredient["options"][0]
                 structure["product_structure"] = list(first_product.keys()) if isinstance(first_product, dict) else []
         
-        return structure
+    async def test_existing_recipe_from_history(self):
+        """Test cart options with an existing recipe from demo user's history"""
+        try:
+            # Get demo user's recipe history
+            response = await self.client.get(f"{API_BASE}/recipes/history/{self.demo_user_id}")
+            
+            if response.status_code == 200:
+                data = response.json()
+                recipes = data.get("recipes", [])
+                
+                if not recipes:
+                    await self.log_result(
+                        "Existing Recipe Test", 
+                        False, 
+                        "No existing recipes found in demo user's history",
+                        {"response": data}
+                    )
+                    return False
+                
+                # Use the first recipe from history
+                existing_recipe = recipes[0]
+                existing_recipe_id = existing_recipe.get("id")
+                
+                if not existing_recipe_id:
+                    await self.log_result(
+                        "Existing Recipe Test", 
+                        False, 
+                        "Recipe from history missing ID",
+                        {"recipe": existing_recipe}
+                    )
+                    return False
+                
+                # Test cart options with existing recipe
+                cart_response = await self.client.post(f"{API_BASE}/grocery/cart-options?recipe_id={existing_recipe_id}&user_id={self.demo_user_id}")
+                
+                if cart_response.status_code == 200:
+                    cart_data = cart_response.json()
+                    
+                    # Verify structure
+                    has_ingredient_options = "ingredient_options" in cart_data
+                    ingredient_count = len(cart_data.get("ingredient_options", []))
+                    
+                    await self.log_result(
+                        "Existing Recipe Test", 
+                        has_ingredient_options and ingredient_count > 0, 
+                        f"Successfully generated cart options for existing recipe: {existing_recipe.get('title', 'Unknown')}",
+                        {
+                            "recipe_id": existing_recipe_id,
+                            "recipe_title": existing_recipe.get("title"),
+                            "ingredient_count": ingredient_count,
+                            "has_ingredient_options": has_ingredient_options
+                        }
+                    )
+                    
+                    return has_ingredient_options and ingredient_count > 0
+                else:
+                    await self.log_result(
+                        "Existing Recipe Test", 
+                        False, 
+                        f"Cart options failed for existing recipe with status {cart_response.status_code}",
+                        {"response": cart_response.text}
+                    )
+                    return False
+            else:
+                await self.log_result(
+                    "Existing Recipe Test", 
+                    False, 
+                    f"Failed to get recipe history with status {response.status_code}",
+                    {"response": response.text}
+                )
+                return False
+                
+        except Exception as e:
+            await self.log_result("Existing Recipe Test", False, f"Exception: {str(e)}")
+            return False
 
     def _analyze_structure(self, data: Any, max_depth: int = 3) -> Dict:
         """Analyze data structure for debugging"""
