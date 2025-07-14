@@ -2136,6 +2136,46 @@ function App() {
               </div>
             </div>
           </div>
+          
+          {/* Recipe Description Section */}
+          {recipe.description && (
+            <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
+              <h2 className="text-2xl font-bold text-gray-800 mb-4 flex items-center">
+                <span className="mr-3">📖</span>
+                About This Recipe
+              </h2>
+              <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-6 border-l-4 border-blue-400">
+                <p className="text-lg text-gray-700 leading-relaxed italic">
+                  "{recipe.description}"
+                </p>
+              </div>
+              
+              {/* Quick Recipe Highlights */}
+              <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="text-center p-4 bg-orange-50 rounded-lg">
+                  <div className="text-3xl mb-2">🔥</div>
+                  <div className="font-semibold text-gray-800">Flavor Profile</div>
+                  <div className="text-sm text-gray-600 mt-1">
+                    {recipe.cuisine_type || 'Delicious'} cuisine with authentic flavors
+                  </div>
+                </div>
+                <div className="text-center p-4 bg-green-50 rounded-lg">
+                  <div className="text-3xl mb-2">✨</div>
+                  <div className="font-semibold text-gray-800">AI Generated</div>
+                  <div className="text-sm text-gray-600 mt-1">
+                    Crafted by AI with perfect ingredient combinations
+                  </div>
+                </div>
+                <div className="text-center p-4 bg-purple-50 rounded-lg">
+                  <div className="text-3xl mb-2">🛒</div>
+                  <div className="font-semibold text-gray-800">Walmart Ready</div>
+                  <div className="text-sm text-gray-600 mt-1">
+                    All ingredients available with real pricing
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Main Content Area */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
