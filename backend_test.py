@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Backend API Testing Script for Walmart Integration
-Tests the /api/grocery/cart-options endpoint and related functionality
+Backend API Testing Script for Walmart Integration - Mock Data Removal Testing
+Tests that mock data has been removed and system returns appropriate empty responses
 """
 
 import asyncio
