@@ -29,17 +29,17 @@ function App() {
     console.log('  Build timestamp:', new Date().toISOString());
   }
 
-  // Simple cache clearing (no excessive logging) - ONLY CLEAR CACHES, NOT AUTH DATA
+  // Cache clearing (silent in production)
   useEffect(() => {
     const clearCaches = async () => {
       try {
         // Clear service worker caches AGGRESSIVELY
         if ('caches' in window) {
           const cacheNames = await caches.keys();
-          console.log('🧹 Clearing caches:', cacheNames);
+          debugLog('🧹 Clearing caches:', cacheNames);
           await Promise.all(
             cacheNames.map(cacheName => {
-              console.log('🧹 Deleting cache:', cacheName);
+              debugLog('🧹 Deleting cache:', cacheName);
               return caches.delete(cacheName);
             })
           );
@@ -48,19 +48,16 @@ function App() {
         // Force reload if we detect old environment variables
         const backendUrl = process.env.REACT_APP_BACKEND_URL;
         if (backendUrl === 'https://recipe-cart-app-1.emergent.host') {
-          console.log('🚨 DETECTED OLD BACKEND URL - FORCING HARD RELOAD');
+          debugLog('🚨 DETECTED OLD BACKEND URL - FORCING HARD RELOAD');
           window.location.reload(true);
           return;
         }
         
         // DON'T clear auth storage on app load - let user stay logged in
-        // localStorage.removeItem('authToken');
-        // localStorage.removeItem('userSession');
-        // localStorage.removeItem('user_auth_data');
         
       } catch (error) {
-        // Silent error handling
-        console.error('Cache clearing error:', error);
+        // Silent error handling in production
+        debugLog('Cache clearing error:', error);
       }
     };
     
