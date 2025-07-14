@@ -2318,33 +2318,14 @@ class CartOptions(BaseModel):
 
 # Simple Walmart API function without complex authentication
 async def search_walmart_products(ingredient: str) -> List[WalmartProduct]:
-    """Simple Walmart product search - Returns mock data for now to ensure it works"""
-    # For now, return realistic mock data to ensure the endpoint works
-    # This can be replaced with real API calls later
-    products = [
-        WalmartProduct(
-            product_id=f"44{hash(ingredient) % 100000:05d}",  # Generate realistic looking ID
-            name=f"Great Value {ingredient.title()}",
-            price=round(2.99 + (hash(ingredient) % 10), 2),
-            image_url="https://i5.walmartimages.com/asr/placeholder.jpg",
-            available=True
-        ),
-        WalmartProduct(
-            product_id=f"55{hash(ingredient + 'fresh') % 100000:05d}",
-            name=f"Fresh {ingredient.title()}",
-            price=round(3.99 + (hash(ingredient) % 8), 2),
-            image_url="https://i5.walmartimages.com/asr/placeholder.jpg", 
-            available=True
-        ),
-        WalmartProduct(
-            product_id=f"66{hash(ingredient + 'organic') % 100000:05d}",
-            name=f"Organic {ingredient.title()}",
-            price=round(4.99 + (hash(ingredient) % 6), 2),
-            image_url="https://i5.walmartimages.com/asr/placeholder.jpg",
-            available=True
-        )
-    ]
-    return products
+    """
+    Walmart product search - Currently returns empty results as real API integration needed
+    TODO: Implement real Walmart API integration with proper credentials
+    """
+    # Return empty list since we don't have real Walmart API integration
+    # This prevents mock data from being returned
+    print(f"🔍 Walmart search for '{ingredient}' - Real API integration needed")
+    return []
 
 @api_router.post("/grocery/cart-options")
 async def get_cart_options(
