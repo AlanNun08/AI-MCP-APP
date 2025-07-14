@@ -2110,11 +2110,16 @@ BEVERAGE EXAMPLES for reference (create one specific recipe based on user select
 - Thai Tea: Coconut Mango Thai Tea with layered presentation and tropical fruit
 - Boba: Taro Coconut Milk Tea with homemade taro paste and chewy tapioca pearls
 
-IMPORTANT FOR SPICES: If the recipe uses spices, list each spice individually in the shopping_list instead of using generic terms like "spices" or "seasoning". For example:
+IMPORTANT FOR SPICES AND SEASONINGS: If the recipe uses spices, seasonings, or herbs, list each one individually and specifically in the shopping_list instead of using generic terms like "spices", "seasoning", "herbs", or "seasoning blend". For example:
 - If ingredients include "2 tsp mixed spices (turmeric, cumin, coriander)", the shopping_list should include ["turmeric", "cumin", "coriander"]
 - If ingredients include "1 tbsp garam masala and chili powder", the shopping_list should include ["garam masala", "chili powder"] 
 - If ingredients include "salt, pepper, and paprika to taste", the shopping_list should include ["salt", "pepper", "paprika"]
-- This ensures users can select specific spices and brands from Walmart rather than searching for generic "spices"
+- If ingredients include "Italian seasoning blend", the shopping_list should include ["oregano", "basil", "thyme", "rosemary"]
+- If ingredients include "Cajun seasoning", the shopping_list should include ["paprika", "cayenne pepper", "garlic powder", "onion powder", "oregano", "thyme"]
+- If ingredients include "taco seasoning", the shopping_list should include ["cumin", "chili powder", "paprika", "oregano", "garlic powder"]
+- If ingredients include "Chinese five-spice", the shopping_list should include ["star anise", "cloves", "cinnamon", "fennel seeds", "szechuan peppercorns"]
+- If ingredients include "fresh herbs", specify exactly which herbs like ["parsley", "cilantro", "basil"] instead of generic "herbs"
+- This ensures users can select specific spices and brands from Walmart rather than searching for generic "spices" or pre-made seasoning blends
 """)
         
         prompt = " ".join(prompt_parts)
