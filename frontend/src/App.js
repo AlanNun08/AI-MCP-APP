@@ -1600,21 +1600,21 @@ function App() {
             return; // Exit early
           }
           
-          if (response.data && response.data.ingredient_options) {
-            // Store all product options per ingredient
+          if (response.data && response.data.ingredients) {
+            // Store all product options per ingredient - UPDATED FOR ACTUAL BACKEND FORMAT
             const options = {};
             const defaultSelections = {};
             const newCartItems = [];
             
-            response.data.ingredient_options.forEach((ingredientOption, index) => {
+            response.data.ingredients.forEach((ingredientOption, index) => {
               const ingredientName = ingredientOption.ingredient_name || ingredientOption.original_ingredient;
               
-              if (ingredientOption.options && ingredientOption.options.length > 0) {
-                // Store all options for this ingredient
-                options[ingredientName] = ingredientOption.options;
+              if (ingredientOption.products && ingredientOption.products.length > 0) {
+                // Store all options for this ingredient - CHANGED: products instead of options
+                options[ingredientName] = ingredientOption.products;
                 
                 // Default to first option
-                const firstProduct = ingredientOption.options[0];
+                const firstProduct = ingredientOption.products[0];
                 defaultSelections[ingredientName] = firstProduct.product_id;
                 
                 // Add to cart with first option
