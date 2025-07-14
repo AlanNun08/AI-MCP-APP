@@ -6,17 +6,18 @@ import WelcomeOnboarding from './components/WelcomeOnboarding';
 import TutorialScreen from './components/TutorialScreen';
 
 function App() {
-  // BUILDYOURSMARTCART - PRODUCTION VERSION
+  // BUILDYOURSMARTCART - PRODUCTION VERSION - v1.2.2-backend-fix
   
   // API Configuration - Debug version
   const API = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
   
   // Debug logging for environment variables
-  console.log('🔧 Environment Debug:');
+  console.log('🔧 Environment Debug - VERSION 1.2.2:');
   console.log('  REACT_APP_BACKEND_URL:', process.env.REACT_APP_BACKEND_URL);
   console.log('  NODE_ENV:', process.env.NODE_ENV);
   console.log('  API URL being used:', API);
   console.log('  All REACT_APP vars:', Object.keys(process.env).filter(key => key.startsWith('REACT_APP_')));
+  console.log('  Build timestamp:', new Date().toISOString());
 
   // Simple cache clearing (no excessive logging) - ONLY CLEAR CACHES, NOT AUTH DATA
   useEffect(() => {
