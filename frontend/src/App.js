@@ -1264,7 +1264,12 @@ function App() {
         selectedType = formData.beverage_type;
       }
 
+      console.log('🔍 Selected type determined:', selectedType);
+      console.log('🔍 Recipe type:', formData.recipe_type);
+
       setIsGenerating(true);
+      console.log('🔍 Set isGenerating to true - UI should show loading state');
+      
       try {
         const requestData = {
           user_id: user.id,
