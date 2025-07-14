@@ -71,6 +71,42 @@ backend:
         agent: "testing"
         comment: "✅ RE-VERIFIED: Recipe generation fully operational. Successfully generated 'Italian Tomato Bruschetta' with 8-item shopping list (tomatoes, basil, garlic, balsamic vinegar, olive oil, salt, pepper, baguette). OpenAI integration working perfectly, recipe format compatible with Walmart API search."
 
+  - task: "Enhanced Authentication Persistence"
+    implemented: true
+    working: true
+    file: "frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "development"
+        comment: "✅ NEW FEATURE: Implemented persistent authentication system. Users now stay signed in across browser sessions and automatically redirect to dashboard. Session data saved to localStorage with proper restoration on app load. 'Welcome Back' messaging for returning users."
+
+  - task: "Enhanced Spice Naming in AI Recipes"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "development"
+        comment: "✅ NEW FEATURE: Enhanced AI recipe generation to use specific spice names instead of generic terms. Backend now generates individual spices like 'turmeric', 'garam masala', 'oregano' instead of 'mixed spices' or 'seasoning blend'. Significantly improves Walmart product matching."
+
+  - task: "Cooking Instructions on Ingredient Page"
+    implemented: true
+    working: true
+    file: "frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "development"
+        comment: "✅ NEW FEATURE: Added comprehensive cooking instructions display directly on ingredient selection page. Users now see step-by-step cooking instructions, pro tips, and recipe summary while selecting Walmart products. Beautiful gradient styling with numbered steps creates complete cooking experience."
+
 frontend:
   - task: "Landing Page & User Authentication"
     implemented: true
