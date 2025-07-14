@@ -1630,33 +1630,19 @@ function App() {
 
     // Auto-generate product options when recipe loads using real Walmart API
     useEffect(() => {
-      console.log('🚀 =================================');
-      console.log('🚀 RECIPE DETAIL SCREEN - useEffect TRIGGERED');
-      console.log('🚀 =================================');
-      console.log('🔍 RECIPE OBJECT:', recipe);
-      console.log('🔍 RECIPE ID:', recipe?.id);
-      console.log('🔍 RECIPE TITLE:', recipe?.title);
-      console.log('🔍 RECIPE SHOPPING LIST:', recipe?.shopping_list);
-      console.log('🔍 RECIPE INGREDIENTS:', recipe?.ingredients);
-      console.log('🔍 USER OBJECT:', user);
-      console.log('🔍 USER ID:', user?.id);
-      console.log('🔍 BACKEND API URL:', API);
-      console.log('🔍 ENVIRONMENT VARIABLES:', {
-        REACT_APP_BACKEND_URL: process.env.REACT_APP_BACKEND_URL,
-        NODE_ENV: process.env.NODE_ENV
-      });
+      debugLog('🚀 Recipe detail screen useEffect triggered');
+      debugLog('🔍 Recipe:', recipe?.title);
+      debugLog('🔍 Recipe ID:', recipe?.id);
+      debugLog('🔍 Shopping list length:', recipe?.shopping_list?.length || 0);
+      debugLog('🔍 User ID:', user?.id);
+      debugLog('🔍 Backend API URL:', API);
       
       if (recipe?.id && (recipe?.shopping_list?.length > 0 || recipe?.ingredients?.length > 0)) {
-        console.log('✅ CONDITIONS MET - Starting cart options call');
-        console.log('🔍 Recipe has ID:', !!recipe.id);
-        console.log('🔍 Shopping list length:', recipe?.shopping_list?.length || 0);
-        console.log('🔍 Ingredients length:', recipe?.ingredients?.length || 0);
+        debugLog('✅ Conditions met - starting cart options call');
         
         setLoadingCart(true);
         
-        console.log('🚀 =================================');
-        console.log('🚀 MAKING CART OPTIONS API CALL');
-        console.log('🚀 =================================');
+        debugLog('🚀 Making cart options API call');
         
         const apiParams = {
           recipe_id: recipe.id,
@@ -1665,11 +1651,7 @@ function App() {
         
         const fullUrl = `${API}/api/grocery/cart-options`;
         
-        console.log('🔍 API CALL DETAILS:');
-        console.log('  - URL:', fullUrl);
-        console.log('  - Params:', apiParams);
-        console.log('  - Method: POST');
-        console.log('  - Headers: application/json');
+        debugLog('🔍 API call details:', { url: fullUrl, params: apiParams });
         
         // Call the backend API to get real Walmart product options
         axios.post(fullUrl, {}, {
