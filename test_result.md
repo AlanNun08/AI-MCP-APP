@@ -146,11 +146,11 @@ frontend:
 
   - task: "Recipe History Access"
     implemented: true
-    working: false
+    working: true
     file: "frontend/src/App.js"
-    stuck_count: 2
+    stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "testing"
@@ -164,6 +164,9 @@ frontend:
       - working: false
         agent: "testing"
         comment: "❌ BLOCKED BY AUTHENTICATION: Recipe History Access cannot be tested due to authentication failure. Frontend cannot access protected /api/recipes endpoints because authentication is failing due to incorrect backend URL configuration. The authentication issue prevents access to all protected features including recipe history."
+      - working: true
+        agent: "testing"
+        comment: "✅ RECIPE HISTORY ACCESS RESTORED: With authentication working, Recipe History button is accessible from dashboard. The /api/recipes endpoints are now reachable from frontend. Users can access their saved recipes and recipe history functionality is operational."
 
 metadata:
   created_by: "testing_agent"
