@@ -132,10 +132,8 @@ class WalmartIntegrationTester:
     async def test_cart_options_endpoint(self):
         """Test the main /api/grocery/cart-options endpoint"""
         try:
-            response = await self.client.post(f"{API_BASE}/grocery/cart-options", json={
-                "recipe_id": self.test_recipe_id,
-                "user_id": self.demo_user_id
-            })
+            response = await self.client.post(f"{API_BASE}/grocery/cart-options?recipe_id={self.test_recipe_id}&user_id={self.demo_user_id}")
+            
             
             if response.status_code == 200:
                 data = response.json()
