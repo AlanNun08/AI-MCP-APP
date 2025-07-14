@@ -1813,6 +1813,14 @@ function App() {
         .finally(() => {
           setLoadingCart(false);
         });
+      } else {
+        console.log('❌ CONDITIONS NOT MET - Cart options call skipped');
+        console.log('🔍 Recipe ID exists:', !!recipe?.id);
+        console.log('🔍 Shopping list exists:', !!recipe?.shopping_list);
+        console.log('🔍 Shopping list length:', recipe?.shopping_list?.length || 0);
+        console.log('🔍 Ingredients exists:', !!recipe?.ingredients);
+        console.log('🔍 Ingredients length:', recipe?.ingredients?.length || 0);
+        console.log('🔍 Recipe object:', recipe);
       }
     }, [recipe, user]);
 
