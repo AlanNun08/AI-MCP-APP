@@ -1658,15 +1658,12 @@ function App() {
           params: apiParams
         })
         .then(response => {
-          console.log('✅ Cart options response:', response.data);
-          console.log('🔍 DEBUG - Response status:', response.status);
-          console.log('🔍 DEBUG - Response headers:', response.headers);
-          console.log('🔍 DEBUG - Full response object:', response);
+          debugLog('✅ Cart options response received');
+          debugLog('🔍 Response status:', response.status);
           
           // Handle the case where no products are found
           if (response.data && response.data.status === 'no_products_found') {
-            console.log('⚠️ No Walmart products found for this recipe');
-            console.log('🔍 DEBUG - No products message:', response.data.message);
+            debugLog('⚠️ No Walmart products found for this recipe');
             setProductOptions({});
             setSelectedProducts({});
             setCartItems([]);
@@ -1674,15 +1671,15 @@ function App() {
             return; // Exit early
           }
           
-          console.log('🛒 Cart options response:', response.data);
-          console.log('🔍 DEBUG - Recipe ID used:', recipe.id);
-          console.log('🔍 DEBUG - User ID used:', user?.id || 'demo_user');
-          console.log('🔍 DEBUG - Shopping list from recipe:', recipe.shopping_list);
+          debugLog('🛒 Processing cart options response');
+          debugLog('🔍 Recipe ID:', recipe.id);
+          debugLog('🔍 User ID:', user?.id || 'demo_user');
+          debugLog('🔍 Shopping list items:', recipe.shopping_list?.length);
           
           // Check for correct backend format: response.data.ingredient_options
           if (response.data && response.data.ingredient_options) {
-            console.log('🔍 DEBUG - Ingredient options found:', response.data.ingredient_options.length);
-            console.log('🔍 DEBUG - Total products:', response.data.total_products);
+            debugLog('🔍 Ingredient options found:', response.data.ingredient_options.length);
+            debugLog('🔍 Total products:', response.data.total_products);
             
             // Store all product options per ingredient - CORRECT BACKEND FORMAT
             const options = {};
@@ -1692,12 +1689,12 @@ function App() {
             // Process correct format: ingredient_options array with options sub-arrays
             response.data.ingredient_options.forEach((ingredientOption, index) => {
               const ingredientName = ingredientOption.ingredient_name || ingredientOption.original_ingredient;
-              console.log(`🔍 DEBUG - Processing ingredient ${index + 1}: ${ingredientName}`);
+              debugLog(`🔍 Processing ingredient ${index + 1}: ${ingredientName}`);
               
               // Backend uses 'options' field (not 'products')
               if (ingredientOption.options && ingredientOption.options.length > 0) {
-                console.log(`🔍 DEBUG - Found ${ingredientOption.options.length} products for ${ingredientName}`);
-                console.log(`🔍 DEBUG - First product:`, ingredientOption.options[0]);
+                debugLog(`🔍 Found ${ingredientOption.options.length} products for ${ingredientName}`);
+                debugLog(`🔍 First product: ${ingredientOption.options[0]?.name} - $${ingredientOption.options[0]?.price}`);
                 
                 // Store all options for this ingredient
                 options[ingredientName] = ingredientOption.options;
@@ -1715,9 +1712,9 @@ function App() {
                   ingredient_name: ingredientName
                 });
                 
-                console.log(`🔍 DEBUG - Added to cart: ${firstProduct.name} - $${firstProduct.price}`);
+                debugLog(`🔍 Added to cart: ${firstProduct.name} - $${firstProduct.price}`);
               } else {
-                console.log(`🔍 DEBUG - No products found for ingredient: ${ingredientName}`);
+                debugLog(`🔍 No products found for ingredient: ${ingredientName}`);
               }
             });
             
