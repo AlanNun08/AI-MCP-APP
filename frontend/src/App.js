@@ -1239,37 +1239,33 @@ function App() {
     const handleSubmit = async (e) => {
       e.preventDefault();
       
-      console.log('🚀 =================================');
-      console.log('🚀 RECIPE GENERATION FORM SUBMITTED');
-      console.log('🚀 =================================');
-      console.log('🔍 Form submission event:', e);
-      console.log('🔍 Current form data:', formData);
-      console.log('🔍 Current user:', user);
-      console.log('🔍 Timestamp:', new Date().toISOString());
+      debugLog('🚀 Recipe generation form submitted');
+      debugLog('🔍 Form data:', formData);
+      debugLog('🔍 Current user:', user);
       
       // Validate that a recipe type and specific type are selected
       if (!formData.recipe_type) {
-        console.log('❌ Validation failed: No recipe type selected');
+        debugLog('❌ Validation failed: No recipe type selected');
         showNotification('❌ Please select a recipe category (Cuisine, Snack, or Beverage)', 'error');
         return;
       }
 
       let selectedType = '';
       if (formData.recipe_type === 'cuisine' && !formData.cuisine_type) {
-        console.log('❌ Validation failed: No cuisine type selected');
+        debugLog('❌ Validation failed: No cuisine type selected');
         showNotification('❌ Please select a cuisine type', 'error');
         return;
       } else if (formData.recipe_type === 'snack' && !formData.snack_type) {
-        console.log('❌ Validation failed: No snack type selected');
+        debugLog('❌ Validation failed: No snack type selected');
         showNotification('❌ Please select a snack type', 'error');
         return;
       } else if (formData.recipe_type === 'beverage' && !formData.beverage_type) {
-        console.log('❌ Validation failed: No beverage type selected');
+        debugLog('❌ Validation failed: No beverage type selected');
         showNotification('❌ Please select a beverage type', 'error');
         return;
       }
 
-      console.log('✅ Form validation passed');
+      debugLog('✅ Form validation passed');
 
       // Determine the final type for the API
       if (formData.recipe_type === 'cuisine') {
@@ -1280,11 +1276,11 @@ function App() {
         selectedType = formData.beverage_type;
       }
 
-      console.log('🔍 Selected type determined:', selectedType);
-      console.log('🔍 Recipe type:', formData.recipe_type);
+      debugLog('🔍 Selected type determined:', selectedType);
+      debugLog('🔍 Recipe type:', formData.recipe_type);
 
       setIsGenerating(true);
-      console.log('🔍 Set isGenerating to true - UI should show loading state');
+      debugLog('🔍 Set isGenerating to true - UI should show loading state');
       
       try {
         const requestData = {
