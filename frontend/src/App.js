@@ -2879,11 +2879,23 @@ function App() {
       {/* Global Notification */}
       {notification && (
         <div className={`fixed top-4 left-1/2 transform -translate-x-1/2 z-50 px-6 py-3 rounded-2xl shadow-lg text-white font-medium max-w-sm text-center ${
-          notification.type === 'success' ? 'bg-green-500' : 'bg-red-500'
+          notification.type === 'success' ? 'bg-green-500' : 
+          notification.type === 'info' ? 'bg-blue-500' : 'bg-red-500'
         }`}>
           {notification.message}
         </div>
       )}
+      
+      {/* Debug Mode Toggle - Only for development/testing */}
+      <div 
+        className="fixed bottom-4 right-4 opacity-20 hover:opacity-100 transition-opacity"
+        onClick={toggleDebugMode}
+        title="Toggle Debug Mode"
+      >
+        <div className="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center cursor-pointer text-white text-xs">
+          {DEBUG_MODE ? '🔧' : '📱'}
+        </div>
+      </div>
     </div>
   );
 }
