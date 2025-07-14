@@ -1253,6 +1253,8 @@ function App() {
         return;
       }
 
+      console.log('✅ Form validation passed');
+
       // Determine the final type for the API
       if (formData.recipe_type === 'cuisine') {
         selectedType = formData.cuisine_type;
