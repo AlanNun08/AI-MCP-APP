@@ -1755,33 +1755,33 @@ function App() {
             if (walmartItems.length > 0) {
               const finalUrl = `https://affil.walmart.com/cart/addToCart?items=${walmartItems.join(',')}`;
               setFinalWalmartUrl(finalUrl);
-              console.log('✅ Walmart URL generated with SELECTED items only:', walmartItems.length, 'items');
-              console.log('🔍 DEBUG - Generated URL:', finalUrl);
-              console.log('🔍 DEBUG - URL items:', walmartItems);
+              debugLog('✅ Walmart URL generated:', walmartItems.length, 'items');
+              debugLog('🔍 Generated URL:', finalUrl);
             } else {
-              console.warn('⚠️ No selected items for Walmart URL generation');
+              debugLog('⚠️ No selected items for Walmart URL generation');
               setFinalWalmartUrl('');
             };
             
-            console.log('✅ Product options loaded:', Object.keys(options).length, 'ingredients');
+            debugLog('✅ Product options loaded:', Object.keys(options).length, 'ingredients');
           } else {
             // No valid API response - check for different formats
-            console.log('⚠️ API Response Debug:', response.data);
-            console.log('🔍 DEBUG - Response data keys:', Object.keys(response.data || {}));
+            debugLog('⚠️ API Response Debug - no ingredient_options found');
+            debugLog('🔍 Response data keys:', Object.keys(response.data || {}));
             if (response.data && response.data.ingredients) {
-              console.log('⚠️ Found ingredients format (old), expected ingredient_options format');
+              debugLog('⚠️ Found old ingredients format, expected ingredient_options');
             } else {
-              console.log('⚠️ Invalid API response - only real Walmart products are used');
+              debugLog('⚠️ Invalid API response - only real Walmart products are used');
             }
           }
         })
         .catch(error => {
-          console.error('❌ Error fetching cart options:', error);
-          console.log('🔍 DEBUG - Error details:', error.response?.data);
-          console.log('🔍 DEBUG - Error status:', error.response?.status);
-          console.log('🔍 DEBUG - Request URL:', `${API}/api/grocery/cart-options`);
-          console.log('🔍 DEBUG - Request params:', { recipe_id: recipe.id, user_id: user?.id || 'demo_user' });
-          console.log('ℹ️ No cart generated - only real Walmart products are used');
+          debugLog('❌ Error fetching cart options:', error.message);
+          if (error.response) {
+            debugLog('🔍 Error details:', {
+              status: error.response.status,
+              data: error.response.data
+            });
+          }
         })
         .finally(() => {
           setLoadingCart(false);
