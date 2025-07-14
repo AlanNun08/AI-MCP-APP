@@ -2664,6 +2664,8 @@ function App() {
       default:
         return <LandingScreen />;
     }
+  };
+
   return (
     <div className="relative">
       {renderScreen()}
