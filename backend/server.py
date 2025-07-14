@@ -2370,6 +2370,19 @@ async def get_cart_options(
                 ))
                 total_products += len(products)
                 print(f"✅ Found {len(products)} products for {ingredient}")
+            else:
+                print(f"⚠️ No products found for {ingredient}")
+        
+        # If no products found for any ingredients, return appropriate response
+        if total_products == 0:
+            print("⚠️ No Walmart products found for any ingredients")
+            return {
+                "recipe_id": recipe_id,
+                "user_id": user_id,
+                "ingredient_options": [],
+                "total_products": 0,
+                "message": "No Walmart products found for this recipe's ingredients. Real Walmart API integration needed."
+            }
         
         # Create response in format frontend expects - convert models to dicts manually
         ingredient_options_list = []
