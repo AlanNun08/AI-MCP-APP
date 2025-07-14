@@ -1602,24 +1602,24 @@ function App() {
           
           console.log('🛒 Cart options response:', response.data);
           
-          // Check for V2 backend format: response.data.ingredients (not ingredient_options)
-          if (response.data && response.data.ingredients) {
-            // Store all product options per ingredient - UPDATED FOR V2 BACKEND FORMAT
+          // Check for correct backend format: response.data.ingredient_options
+          if (response.data && response.data.ingredient_options) {
+            // Store all product options per ingredient - CORRECT BACKEND FORMAT
             const options = {};
             const defaultSelections = {};
             const newCartItems = [];
             
-            // Process V2 format: ingredients array with products sub-arrays
-            response.data.ingredients.forEach((ingredientOption, index) => {
+            // Process correct format: ingredient_options array with options sub-arrays
+            response.data.ingredient_options.forEach((ingredientOption, index) => {
               const ingredientName = ingredientOption.ingredient_name || ingredientOption.original_ingredient;
               
-              // V2 backend uses 'products' field instead of 'options'
-              if (ingredientOption.products && ingredientOption.products.length > 0) {
-                // Store all products for this ingredient
-                options[ingredientName] = ingredientOption.products;
+              // Backend uses 'options' field (not 'products')
+              if (ingredientOption.options && ingredientOption.options.length > 0) {
+                // Store all options for this ingredient
+                options[ingredientName] = ingredientOption.options;
                 
-                // Default to first product
-                const firstProduct = ingredientOption.products[0];
+                // Default to first option
+                const firstProduct = ingredientOption.options[0];
                 defaultSelections[ingredientName] = firstProduct.product_id;
                 
                 // Add to cart with first product
