@@ -269,13 +269,14 @@ class WalmartIntegrationTester:
                 for product in ingredient_option.get("options", []):
                     total_products += 1
                     
-                    # Check product_id format (Walmart IDs are typically 8-11 digits)
+                    # Check product_id format (Walmart IDs can be 6-11 digits)
                     product_id = str(product.get("product_id", ""))
                     is_authentic = (
                         product_id.isdigit() and 
-                        len(product_id) >= 8 and 
+                        len(product_id) >= 6 and 
                         len(product_id) <= 11 and
-                        not product_id.startswith("10315")  # Avoid mock data pattern
+                        not product_id.startswith("10315") and  # Avoid mock data pattern
+                        not product_id.startswith("12345")      # Avoid test data pattern
                     )
                     
                     if is_authentic:
