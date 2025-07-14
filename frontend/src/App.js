@@ -1618,13 +1618,9 @@ function App() {
 
   // Recipe Detail Screen Component - COMPLETELY NEW INGREDIENT SELECTION FOCUSED DESIGN
   const RecipeDetailScreen = ({ recipe, showBackButton = false }) => {
-    console.log('🚀 =================================');
-    console.log('🚀 RECIPE DETAIL SCREEN COMPONENT MOUNTED');
-    console.log('🚀 =================================');
-    console.log('🔍 Props received:');
-    console.log('  - recipe:', recipe);
-    console.log('  - showBackButton:', showBackButton);
-    console.log('🔍 Component render time:', new Date().toISOString());
+    debugLog('🚀 Recipe detail screen component mounted');
+    debugLog('🔍 Recipe:', recipe?.title);
+    debugLog('🔍 Show back button:', showBackButton);
     
     const [productOptions, setProductOptions] = useState({}); // Store all product options per ingredient
     const [selectedProducts, setSelectedProducts] = useState({}); // Store user selections
