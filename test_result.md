@@ -157,8 +157,9 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Recipe History Access"
-  stuck_tasks: []
+    - "Landing Page & User Authentication"
+  stuck_tasks:
+    - "Landing Page & User Authentication"
   test_all: false
   test_priority: "high_first"
 
