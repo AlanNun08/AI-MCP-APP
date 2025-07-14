@@ -377,6 +377,85 @@ class WalmartIntegrationTester:
             await self.log_result("Response Format Consistency", False, f"Exception: {str(e)}")
             return False
 
+    async def test_specific_field_requirements(self):
+        """Test specific field requirements from review request"""
+        try:
+            response = await self.client.post(f"{API_BASE}/grocery/cart-options?recipe_id={self.test_recipe_id}&user_id={self.demo_user_id}")
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                issues = []
+                
+                # 1. Verify response contains 'ingredient_options' (not 'ingredients')
+                if "ingredients" in data:
+                    issues.append("Response contains 'ingredients' field - should be 'ingredient_options'")
+                if "ingredient_options" not in data:
+                    issues.append("Response missing 'ingredient_options' field")
+                
+                # 2. Verify each ingredient option contains 'options' field (not 'products')
+                if "ingredient_options" in data:
+                    for i, ingredient_option in enumerate(data["ingredient_options"]):
+                        if "products" in ingredient_option:
+                            issues.append(f"Ingredient {i} contains 'products' field - should be 'options'")
+                        if "options" not in ingredient_option:
+                            issues.append(f"Ingredient {i} missing 'options' field")
+                        
+                        # 3. Verify each product has correct fields
+                        if "options" in ingredient_option:
+                            for j, product in enumerate(ingredient_option["options"]):
+                                required_fields = ["product_id", "name", "price", "image_url", "available"]
+                                for field in required_fields:
+                                    if field not in product:
+                                        issues.append(f"Product {j} in ingredient {i} missing required field '{field}'")
+                
+                success = len(issues) == 0
+                
+                await self.log_result(
+                    "Specific Field Requirements", 
+                    success, 
+                    "All field requirements met" if success else f"Field issues: {'; '.join(issues[:3])}",
+                    {
+                        "total_issues": len(issues),
+                        "issues": issues,
+                        "has_ingredient_options": "ingredient_options" in data,
+                        "has_ingredients": "ingredients" in data,
+                        "sample_structure": self._get_field_structure(data)
+                    }
+                )
+                
+                return success
+            else:
+                await self.log_result(
+                    "Specific Field Requirements", 
+                    False, 
+                    f"Request failed with status {response.status_code}",
+                    {"response": response.text}
+                )
+                return False
+                
+        except Exception as e:
+            await self.log_result("Specific Field Requirements", False, f"Exception: {str(e)}")
+            return False
+
+    def _get_field_structure(self, data: Dict) -> Dict:
+        """Get field structure for analysis"""
+        structure = {
+            "top_level_fields": list(data.keys()) if isinstance(data, dict) else [],
+            "ingredient_structure": {},
+            "product_structure": {}
+        }
+        
+        if "ingredient_options" in data and isinstance(data["ingredient_options"], list) and len(data["ingredient_options"]) > 0:
+            first_ingredient = data["ingredient_options"][0]
+            structure["ingredient_structure"] = list(first_ingredient.keys()) if isinstance(first_ingredient, dict) else []
+            
+            if "options" in first_ingredient and isinstance(first_ingredient["options"], list) and len(first_ingredient["options"]) > 0:
+                first_product = first_ingredient["options"][0]
+                structure["product_structure"] = list(first_product.keys()) if isinstance(first_product, dict) else []
+        
+        return structure
+
     def _analyze_structure(self, data: Any, max_depth: int = 3) -> Dict:
         """Analyze data structure for debugging"""
         if max_depth <= 0:
