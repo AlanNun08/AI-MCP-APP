@@ -2437,44 +2437,36 @@ async def get_cart_options(
             if products:
                 ingredient_options.append(IngredientOptions(
                     ingredient_name=ingredient,
-                    options=products  # Changed from products to options
+                    options=products
                 ))
                 total_products += len(products)
-                print(f"✅ Found {len(products)} products for {ingredient}")
+                print(f"✅ Found {len(products)} real Walmart products for {ingredient}")
             else:
                 print(f"⚠️ No products found for {ingredient}")
         
-        # If no products found for any ingredients, return appropriate response
-        if total_products == 0:
-            print("⚠️ No Walmart products found for any ingredients")
-            return {
-                "recipe_id": recipe_id,
-                "user_id": user_id,
-                "ingredient_options": [],
-                "total_products": 0,
-                "message": "No Walmart products found for this recipe's ingredients. Real Walmart API integration needed."
-            }
-        
-        # Create response in format frontend expects - convert models to dicts manually
+        # Create response - always return structure, even if no products found
         ingredient_options_list = []
         for ingredient_option in ingredient_options:
-            # Convert each IngredientOptions model to dict with proper field names
             ingredient_dict = {
                 "ingredient_name": ingredient_option.ingredient_name,
-                "options": [product.dict() for product in ingredient_option.options]  # Convert products to dicts
+                "options": [product.dict() for product in ingredient_option.options]
             }
             ingredient_options_list.append(ingredient_dict)
         
-        cart_options_response = {
+        response_data = {
             "recipe_id": recipe_id,
             "user_id": user_id,
-            "ingredient_options": ingredient_options_list,  # Frontend expects this field name
+            "ingredient_options": ingredient_options_list,
             "total_products": total_products
         }
         
-        print(f"🎉 Cart options created: {total_products} total products for {len(ingredient_options)} ingredients")
+        if total_products == 0:
+            response_data["message"] = "No Walmart products found for this recipe's ingredients."
+            print("⚠️ No Walmart products found for any ingredients")
+        else:
+            print(f"🎉 Cart options created: {total_products} total products for {len(ingredient_options)} ingredients")
         
-        return cart_options_response
+        return response_data
         
     except HTTPException:
         raise
