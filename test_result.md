@@ -80,15 +80,18 @@ frontend:
 
   - task: "Walmart Integration - API Calls"
     implemented: true
-    working: true
+    working: false
     file: "frontend/src/App.js"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: true
         agent: "testing"
         comment: "Walmart API integration is functional. API calls are made successfully to /api/grocery/cart-options endpoint. Backend responds with proper structure."
+      - working: false
+        agent: "testing"
+        comment: "❌ BLOCKED BY AUTHENTICATION: Walmart integration cannot be tested due to authentication failure. Frontend cannot access protected /api/grocery/cart-options endpoint because authentication is failing due to incorrect backend URL configuration. Backend testing confirms Walmart API returns 17+ products successfully, but frontend cannot access this functionality."
 
   - task: "Walmart Integration - Product Display"
     implemented: true
