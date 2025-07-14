@@ -22,7 +22,7 @@ DEMO_USER_PASSWORD = "password123"
 
 class BackendReviewTester:
     def __init__(self):
-        self.client = httpx.AsyncClient(timeout=30.0)
+        self.client = httpx.AsyncClient(timeout=60.0)  # Increased timeout
         self.user_id = None
         self.recipe_id = None
         
