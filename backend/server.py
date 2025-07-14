@@ -2390,11 +2390,20 @@ async def get_cart_options(
                 total_products += len(products)
                 print(f"✅ Found {len(products)} products for {ingredient}")
         
-        # Create response in format frontend expects
+        # Create response in format frontend expects - convert models to dicts manually
+        ingredient_options_list = []
+        for ingredient_option in ingredient_options:
+            # Convert each IngredientOptions model to dict with proper field names
+            ingredient_dict = {
+                "ingredient_name": ingredient_option.ingredient_name,
+                "options": [product.dict() for product in ingredient_option.options]  # Convert products to dicts
+            }
+            ingredient_options_list.append(ingredient_dict)
+        
         cart_options_response = {
             "recipe_id": recipe_id,
             "user_id": user_id,
-            "ingredient_options": ingredient_options,  # Frontend expects this field name
+            "ingredient_options": ingredient_options_list,  # Frontend expects this field name
             "total_products": total_products
         }
         
