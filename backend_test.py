@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Backend Testing Script for Walmart API Integration Debug
-Focus: Debug the Walmart API integration that's failing to return products
+Backend Testing Script for Cheesecake Recipe Generation & Walmart Pricing
+Focus: Test end-to-end cheesecake recipe generation with real Walmart pricing
 """
 
 import asyncio
