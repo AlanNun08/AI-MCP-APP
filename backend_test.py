@@ -306,7 +306,7 @@ class WalmartAPITester:
                 "difficulty": "medium"
             }
             
-            response = await self.client.post(f"{BACKEND_URL}/generate-recipe", json=recipe_data)
+            response = await self.client.post(f"{BACKEND_URL}/recipes/generate", json=recipe_data)
             
             if response.status_code == 200:
                 result = response.json()
