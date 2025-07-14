@@ -580,7 +580,10 @@ class WalmartIntegrationTester:
         # Test 6: Response format consistency
         await self.test_response_format_consistency(cart_data)
         
-        # Test 7: Edge cases
+        # Test 7: Test with existing recipe from history
+        await self.test_existing_recipe_from_history()
+        
+        # Test 8: Edge cases
         await self.test_cart_options_invalid_recipe_id()
         await self.test_cart_options_invalid_user_id()
         
