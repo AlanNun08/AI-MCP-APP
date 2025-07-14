@@ -82,7 +82,7 @@ class WalmartIntegrationTester:
     async def test_recipe_generation(self):
         """Generate a test recipe for Walmart integration testing"""
         try:
-            response = await self.client.post(f"{API_BASE}/generate-recipe", json={
+            response = await self.client.post(f"{API_BASE}/recipes/generate", json={
                 "user_id": self.demo_user_id,
                 "recipe_category": "cuisine",
                 "cuisine_type": "Italian",
