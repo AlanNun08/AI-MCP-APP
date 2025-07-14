@@ -131,11 +131,11 @@ frontend:
 
   - task: "Recipe History Access"
     implemented: true
-    working: true
+    working: false
     file: "frontend/src/App.js"
-    stuck_count: 0
+    stuck_count: 2
     priority: "medium"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "NA"
         agent: "testing"
@@ -146,6 +146,9 @@ frontend:
       - working: true
         agent: "testing"
         comment: "✅ AUTHENTICATION RESOLVED: Comprehensive authentication testing reveals that demo@test.com/password123 credentials are working perfectly. User exists in database, is verified, and login returns 200 status with success. All protected endpoints (recipe generation, grocery cart options) are accessible with these credentials. The previous authentication failures were likely temporary or due to testing methodology issues."
+      - working: false
+        agent: "testing"
+        comment: "❌ BLOCKED BY AUTHENTICATION: Recipe History Access cannot be tested due to authentication failure. Frontend cannot access protected /api/recipes endpoints because authentication is failing due to incorrect backend URL configuration. The authentication issue prevents access to all protected features including recipe history."
 
 metadata:
   created_by: "testing_agent"
