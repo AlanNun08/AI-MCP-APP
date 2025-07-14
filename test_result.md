@@ -50,15 +50,18 @@ backend:
 frontend:
   - task: "Landing Page & User Authentication"
     implemented: true
-    working: true
+    working: false
     file: "frontend/src/App.js"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
     needs_retesting: false
     status_history:
       - working: true
         agent: "testing"
         comment: "Landing page loads successfully. User session simulation works. Authentication flow is functional but requires email verification for new users."
+      - working: false
+        agent: "testing"
+        comment: "🚨 CRITICAL CONFIGURATION ISSUE: Frontend authentication is failing due to incorrect backend URL usage. Frontend makes API calls to https://recipe-cart-app-1.emergent.host/api/auth/login (frontend domain) instead of the correct backend URL https://9e62e04a-638f-4447-9e5b-339823cf6f32.preview.emergentagent.com/api/auth/login. Direct backend testing confirms demo@test.com/password123 credentials work perfectly (200 success), but frontend gets 401 errors. The REACT_APP_BACKEND_URL environment variable is not being properly loaded or used in production. This blocks all authentication and protected features."
 
   - task: "Recipe Generation Workflow"
     implemented: true
