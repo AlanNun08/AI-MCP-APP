@@ -70,6 +70,9 @@ class BackendReviewTester:
                 self.log(f"❌ Login failed with status {response.status_code}: {response.text}")
                 return False
                 
+        except httpx.TimeoutException:
+            self.log(f"❌ Login request timed out", "ERROR")
+            return False
         except Exception as e:
             self.log(f"❌ Error testing login: {str(e)}", "ERROR")
             return False
