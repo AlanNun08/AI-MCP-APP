@@ -68,6 +68,8 @@ React environment variable hierarchy where `.env.production` was overriding `.en
 - ✅ **API Integration** - Proper backend communication established
 - ✅ **User Experience** - Intuitive product selection with visual feedback
 - ✅ **Shopping Cart** - Real-time price calculation and affiliate URLs
+- ✅ **Authentication Persistence** - Users stay signed in across sessions
+- ✅ **Cooking Instructions Display** - Step-by-step instructions on ingredient page
 
 ### **Deployment (Emergent.sh + Kubernetes)**
 - ✅ **Environment Configuration** - Production variables correctly set
