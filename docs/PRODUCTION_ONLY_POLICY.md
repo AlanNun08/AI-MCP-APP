@@ -20,7 +20,7 @@
 REACT_APP_BACKEND_URL=https://recipe-cart-app-1.emergent.host
 
 # ❌ FORBIDDEN - Never use preview URLs
-REACT_APP_BACKEND_URL=https://142302c8-79a4-4ce9-afcd-9780360c7f94.preview.emergentagent.com
+REACT_APP_BACKEND_URL=https://9e62e04a-638f-4447-9e5b-339823cf6f32.preview.emergentagent.com
 ```
 
 ### **Documentation Standards**
@@ -35,7 +35,7 @@ REACT_APP_BACKEND_URL=https://142302c8-79a4-4ce9-afcd-9780360c7f94.preview.emerg
 const API_URL = process.env.REACT_APP_BACKEND_URL; // Points to production
 
 // ❌ FORBIDDEN - Hardcoded preview URLs
-const API_URL = "https://142302c8-79a4-4ce9-afcd-9780360c7f94.preview.emergentagent.com";
+const API_URL = "https://9e62e04a-638f-4447-9e5b-339823cf6f32.preview.emergentagent.com";
 ```
 
 ### **CORS Configuration Standards**
@@ -48,7 +48,7 @@ allow_origins=[
 
 # ❌ FORBIDDEN - Preview domains
 allow_origins=[
-    "https://142302c8-79a4-4ce9-afcd-9780360c7f94.preview.emergentagent.com"
+    "https://9e62e04a-638f-4447-9e5b-339823cf6f32.preview.emergentagent.com"
 ]
 ```
 
