@@ -229,10 +229,8 @@ class WalmartIntegrationTester:
     async def test_cart_options_invalid_user_id(self):
         """Test cart options with invalid user_id"""
         try:
-            response = await self.client.post(f"{API_BASE}/grocery/cart-options", json={
-                "recipe_id": self.test_recipe_id,
-                "user_id": "invalid-user-id-12345"
-            })
+            response = await self.client.post(f"{API_BASE}/grocery/cart-options?recipe_id={self.test_recipe_id}&user_id=invalid-user-id-12345")
+            
             
             # Should return 404 or appropriate error
             if response.status_code in [404, 422, 400]:
