@@ -2317,15 +2317,86 @@ class CartOptions(BaseModel):
     total_products: int = 0
 
 # Simple Walmart API function without complex authentication
+import os
+import time
+import base64
+import requests
+from typing import List
+from cryptography.hazmat.primitives import serialization, hashes
+from cryptography.hazmat.primitives.asymmetric import padding
+
 async def search_walmart_products(ingredient: str) -> List[WalmartProduct]:
     """
-    Walmart product search - Currently returns empty results as real API integration needed
-    TODO: Implement real Walmart API integration with proper credentials
+    Real Walmart API product search using ingredient names
     """
-    # Return empty list since we don't have real Walmart API integration
-    # This prevents mock data from being returned
-    print(f"🔍 Walmart search for '{ingredient}' - Real API integration needed")
-    return []
+    print(f"🔍 Searching Walmart API for: '{ingredient}'")
+    
+    try:
+        # Get credentials from environment
+        consumer_id = os.environ.get('WALMART_CONSUMER_ID')
+        private_key_pem = os.environ.get('WALMART_PRIVATE_KEY')
+        key_version = os.environ.get('WALMART_KEY_VERSION', '1')
+        
+        if not all([consumer_id, private_key_pem]):
+            print("❌ Missing Walmart API credentials")
+            return []
+        
+        # Load private key
+        private_key = serialization.load_pem_private_key(
+            private_key_pem.encode(), 
+            password=None
+        )
+        
+        # Generate authentication signature
+        timestamp = str(int(time.time() * 1000))
+        message = f"{consumer_id}\n{timestamp}\n{key_version}\n".encode("utf-8")
+        signature = private_key.sign(message, padding.PKCS1v15(), hashes.SHA256())
+        signature_b64 = base64.b64encode(signature).decode("utf-8")
+        
+        # Set up headers
+        headers = {
+            "WM_CONSUMER.ID": consumer_id,
+            "WM_CONSUMER.INTIMESTAMP": timestamp,
+            "WM_SEC.KEY_VERSION": key_version,
+            "WM_SEC.AUTH_SIGNATURE": signature_b64,
+            "Content-Type": "application/json"
+        }
+        
+        # Make API request
+        url = f"https://developer.api.walmart.com/api-proxy/service/affil/product/v2/search"
+        params = {
+            "query": ingredient.replace(' ', '+'),
+            "numItems": 4
+        }
+        
+        response = requests.get(url, headers=headers, params=params, timeout=10)
+        
+        if response.status_code == 200:
+            data = response.json()
+            items = data.get("items", [])
+            
+            products = []
+            for item in items[:3]:  # Take top 3 results
+                if "itemId" in item:
+                    product = WalmartProduct(
+                        product_id=str(item.get("itemId")),
+                        name=item.get("name", "Unknown Product"),
+                        price=float(item.get("salePrice", 0)),
+                        image_url=item.get("thumbnailImage", ""),
+                        available=True
+                    )
+                    products.append(product)
+            
+            print(f"✅ Found {len(products)} real Walmart products for '{ingredient}'")
+            return products
+            
+        else:
+            print(f"⚠️ Walmart API error {response.status_code} for '{ingredient}': {response.text}")
+            return []
+            
+    except Exception as e:
+        print(f"❌ Error searching Walmart for '{ingredient}': {str(e)}")
+        return []
 
 @api_router.post("/grocery/cart-options")
 async def get_cart_options(
