@@ -1669,8 +1669,13 @@ function App() {
             
             console.log('✅ Product options loaded:', Object.keys(options).length, 'ingredients');
           } else {
-            // No valid API response
-            console.log('⚠️ Invalid API response - only real Walmart products are used');
+            // No valid API response - check for different formats
+            console.log('⚠️ API Response Debug:', response.data);
+            if (response.data && response.data.ingredient_options) {
+              console.log('⚠️ Found ingredient_options format (old), expected ingredients format');
+            } else {
+              console.log('⚠️ Invalid API response - only real Walmart products are used');
+            }
           }
         })
         .catch(error => {
