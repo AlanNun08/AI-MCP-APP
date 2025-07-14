@@ -497,13 +497,16 @@ class WalmartIntegrationTester:
             print("❌ Main endpoint test failed")
             return False
         
-        # Test 4: Product authenticity
+        # Test 4: Specific field requirements from review request
+        await self.test_specific_field_requirements()
+        
+        # Test 5: Product authenticity
         await self.test_product_authenticity(cart_data)
         
-        # Test 5: Response format consistency
+        # Test 6: Response format consistency
         await self.test_response_format_consistency(cart_data)
         
-        # Test 6: Edge cases
+        # Test 7: Edge cases
         await self.test_cart_options_invalid_recipe_id()
         await self.test_cart_options_invalid_user_id()
         
