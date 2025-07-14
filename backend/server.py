@@ -2308,7 +2308,7 @@ class WalmartProduct(BaseModel):
 
 class IngredientOptions(BaseModel):
     ingredient_name: str
-    products: List[WalmartProduct]
+    options: List[WalmartProduct]  # Frontend expects 'options', not 'products'
 
 class CartOptions(BaseModel):
     recipe_id: str
