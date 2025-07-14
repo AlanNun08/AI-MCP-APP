@@ -1602,24 +1602,27 @@ function App() {
           
           console.log('🛒 Cart options response:', response.data);
           
+          // Check for V2 backend format: response.data.ingredients (not ingredient_options)
           if (response.data && response.data.ingredients) {
-            // Store all product options per ingredient - UPDATED FOR ACTUAL BACKEND FORMAT
+            // Store all product options per ingredient - UPDATED FOR V2 BACKEND FORMAT
             const options = {};
             const defaultSelections = {};
             const newCartItems = [];
             
+            // Process V2 format: ingredients array with products sub-arrays
             response.data.ingredients.forEach((ingredientOption, index) => {
               const ingredientName = ingredientOption.ingredient_name || ingredientOption.original_ingredient;
               
+              // V2 backend uses 'products' field instead of 'options'
               if (ingredientOption.products && ingredientOption.products.length > 0) {
-                // Store all options for this ingredient - CHANGED: products instead of options
+                // Store all products for this ingredient
                 options[ingredientName] = ingredientOption.products;
                 
-                // Default to first option
+                // Default to first product
                 const firstProduct = ingredientOption.products[0];
                 defaultSelections[ingredientName] = firstProduct.product_id;
                 
-                // Add to cart with first option
+                // Add to cart with first product
                 newCartItems.push({
                   name: firstProduct.name || ingredientName,
                   price: parseFloat(firstProduct.price) || 2.99,
