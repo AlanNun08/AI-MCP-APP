@@ -2385,7 +2385,7 @@ async def get_cart_options(
             if products:
                 ingredient_options.append(IngredientOptions(
                     ingredient_name=ingredient,
-                    products=products
+                    options=products  # Changed from products to options
                 ))
                 total_products += len(products)
                 print(f"✅ Found {len(products)} products for {ingredient}")
