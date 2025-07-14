@@ -175,9 +175,8 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Landing Page & User Authentication"
-  stuck_tasks:
-    - "Landing Page & User Authentication"
+    - "Complete end-to-end testing verification"
+  stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 
