@@ -2571,6 +2571,24 @@ function App() {
     </div>
   );
 
+  // Handle automatic screen navigation with useEffect to prevent render loops
+  useEffect(() => {
+    // If user is logged in and on landing, redirect to dashboard
+    if (user && currentScreen === 'landing') {
+      setCurrentScreen('dashboard');
+    }
+    
+    // If user is not logged in and on protected screen, redirect to landing
+    const protectedScreens = ['dashboard', 'generate-recipe', 'all-recipes', 'recipe-detail', 'starbucks-generator', 'welcome-onboarding', 'tutorial'];
+    if (!user && protectedScreens.includes(currentScreen)) {
+      const savedUser = localStorage.getItem('ai_chef_user');
+      if (!savedUser) {
+        console.log('🔄 No saved session found, redirecting to landing from:', currentScreen);
+        setCurrentScreen('landing');
+      }
+    }
+  }, [user, currentScreen]);
+
   // Main render function
   const renderScreen = () => {
     // Show loading screen while checking authentication
@@ -2586,31 +2604,22 @@ function App() {
       );
     }
     
-    // If user is logged in, show dashboard by default
-    if (user && currentScreen === 'landing') {
-      setCurrentScreen('dashboard');
-      return <DashboardScreen />;
-    }
-    
-    // Only redirect to landing if we're sure there's no saved session and user is on protected screen
-    if (!user && !['landing', 'register', 'verify-email', 'login', 'forgot-password', 'reset-password'].includes(currentScreen)) {
+    // Show loading if waiting for session restoration
+    const protectedScreens = ['dashboard', 'generate-recipe', 'all-recipes', 'recipe-detail', 'starbucks-generator', 'welcome-onboarding', 'tutorial'];
+    if (!user && protectedScreens.includes(currentScreen)) {
       const savedUser = localStorage.getItem('ai_chef_user');
-      if (!savedUser) {
-        console.log('🔄 No saved session found, redirecting to landing from:', currentScreen);
-        setCurrentScreen('landing');
-        return <LandingScreen />;
-      }
-      // If there is a saved session, don't redirect - let the useEffect restore it
-      console.log('⏳ User session exists in localStorage, waiting for restoration...');
-      return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 flex items-center justify-center">
-          <div className="text-center">
-            <div className="text-6xl mb-4">👨‍🍳</div>
-            <div className="w-8 h-8 border-3 border-green-500 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
-            <p className="text-gray-600">Restoring your session...</p>
+      if (savedUser) {
+        console.log('⏳ User session exists in localStorage, waiting for restoration...');
+        return (
+          <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 flex items-center justify-center">
+            <div className="text-center">
+              <div className="text-6xl mb-4">👨‍🍳</div>
+              <div className="w-8 h-8 border-3 border-green-500 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+              <p className="text-gray-600">Restoring your session...</p>
+            </div>
           </div>
-        </div>
-      );
+        );
+      }
     }
     
     switch (currentScreen) {
