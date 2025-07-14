@@ -65,15 +65,18 @@ frontend:
 
   - task: "Recipe Generation Workflow"
     implemented: true
-    working: true
+    working: false
     file: "frontend/src/App.js"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: true
         agent: "testing"
         comment: "Recipe generation works successfully. Italian cuisine selection generates 'Pasta Carbonara' recipe with proper instructions and ingredients."
+      - working: false
+        agent: "testing"
+        comment: "❌ BLOCKED BY AUTHENTICATION: Recipe generation cannot be tested due to authentication failure. Frontend cannot access protected /api/recipes/generate endpoint because authentication is failing due to incorrect backend URL configuration. All protected features are inaccessible until the REACT_APP_BACKEND_URL environment variable issue is resolved."
 
   - task: "Walmart Integration - API Calls"
     implemented: true
