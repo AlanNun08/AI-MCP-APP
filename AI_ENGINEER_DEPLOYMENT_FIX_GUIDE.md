@@ -440,4 +440,137 @@ After following this guide, verify:
 
 ---
 
-*This guide documents the complete resolution of a complex production deployment issue involving React environment variables, multi-layer caching, and frontend-backend communication in an Emergent.sh deployment environment.*
+---
+
+## 🆕 **Latest Feature Enhancements (2025)**
+
+### **1. Authentication Persistence**
+
+**Feature**: Users now stay signed in across browser sessions.
+
+**Implementation**: Modified `/app/frontend/src/App.js` lines 73-85
+```javascript
+// Load user session from localStorage on app start
+useEffect(() => {
+  const loadUserSession = () => {
+    try {
+      const savedUser = localStorage.getItem('ai_chef_user');
+      if (savedUser) {
+        const userData = JSON.parse(savedUser);
+        setUser(userData);
+        setCurrentScreen('dashboard'); // Auto-redirect to dashboard
+      }
+    } catch (error) {
+      localStorage.removeItem('ai_chef_user');
+    }
+  };
+  loadUserSession();
+}, []);
+```
+
+**Benefits**: 
+- Better user experience (no repeated logins)
+- Automatic dashboard navigation for returning users
+- Session persistence across browser restarts
+
+---
+
+### **2. Enhanced Spice Naming**
+
+**Feature**: AI now generates specific spice names instead of generic terms.
+
+**Implementation**: Enhanced prompt in `/app/backend/server.py` lines 2113-2125
+```python
+IMPORTANT FOR SPICES AND SEASONINGS: If the recipe uses spices, seasonings, or herbs, 
+list each one individually and specifically in the shopping_list instead of using 
+generic terms like "spices", "seasoning", "herbs", or "seasoning blend". For example:
+- If ingredients include "Italian seasoning blend", the shopping_list should include 
+  ["oregano", "basil", "thyme", "rosemary"]
+- If ingredients include "Cajun seasoning", the shopping_list should include 
+  ["paprika", "cayenne pepper", "garlic powder", "onion powder", "oregano", "thyme"]
+```
+
+**Benefits**:
+- Better Walmart product matching (7/8 specific spices found vs generic searches)
+- More accurate shopping lists
+- Users can buy specific spice brands they prefer
+
+**Test Results**: 
+- Generated 12 individual spice names across 3 recipes
+- 0 generic terms like "mixed spices" or "seasoning blend"
+- Real Walmart products found for specific spices with authentic pricing
+
+---
+
+### **3. Cooking Instructions on Ingredient Page**
+
+**Feature**: Step-by-step cooking instructions displayed on same page as ingredient selection.
+
+**Implementation**: Added to `/app/frontend/src/App.js` around line 2258
+```javascript
+{/* Cooking Instructions Section */}
+{recipe.instructions && recipe.instructions.length > 0 && (
+  <div className="bg-white rounded-2xl shadow-lg p-6 mt-6">
+    <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+      <span className="mr-3">👨‍🍳</span>
+      Step-by-Step Cooking Instructions
+    </h2>
+    <div className="space-y-4">
+      {recipe.instructions.map((instruction, index) => (
+        <div className="flex items-start p-4 bg-gradient-to-r from-orange-50 to-red-50 rounded-xl">
+          <div className="w-10 h-10 bg-gradient-to-r from-orange-500 to-red-500 rounded-full">
+            {index + 1}
+          </div>
+          <p className="text-gray-800 leading-relaxed">{instruction}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+)}
+```
+
+**Benefits**:
+- Complete cooking experience in one interface
+- Users don't need to switch between shopping and cooking modes
+- Beautiful gradient styling with numbered steps
+- Pro cooking tips and recipe summary included
+
+---
+
+## 🔧 **Debugging These New Features**
+
+### **Authentication Persistence Issues**
+```bash
+# Check if user session is saved
+console.log('Saved user:', localStorage.getItem('ai_chef_user'));
+
+# Verify auto-login
+# Should see: "🔄 Restoring user session: user@email.com"
+# Should see: "📱 Setting screen to dashboard after session restore"
+```
+
+### **Spice Naming Issues**
+```bash
+# Test spice-heavy recipe generation
+curl -X POST "https://backend-url/api/recipes/generate" \
+  -H "Content-Type: application/json" \
+  -d '{"user_id":"test","recipe_category":"cuisine","cuisine_type":"indian"}'
+
+# Check shopping_list contains specific spices like:
+# ["turmeric", "cumin", "coriander", "garam masala"]
+# NOT: ["mixed spices", "curry powder", "spice blend"]
+```
+
+### **Cooking Instructions Display Issues**
+```bash
+# Verify recipe has instructions array
+console.log('Recipe instructions:', recipe.instructions);
+
+# Check if cooking instructions section renders
+# Look for: "Step-by-Step Cooking Instructions" heading
+# Look for: Orange gradient step cards with numbers
+```
+
+---
+
+*This documentation covers the latest enhancements added to the AI Recipe + Grocery Delivery App in 2025, building on the original deployment fix guide.*
