@@ -2862,13 +2862,8 @@ function App() {
       case 'all-recipes':
         return <RecipeHistoryScreen />;
       case 'recipe-detail':
-        console.log('🚀 =================================');
-        console.log('🚀 RENDERING RECIPE DETAIL SCREEN');
-        console.log('🚀 =================================');
-        console.log('🔍 Current screen state:', currentScreen);
-        console.log('🔍 window.currentRecipe:', window.currentRecipe);
-        console.log('🔍 Passing recipe prop:', window.currentRecipe);
-        console.log('🔍 Render timestamp:', new Date().toISOString());
+        debugLog('🚀 Rendering recipe detail screen');
+        debugLog('🔍 Recipe:', window.currentRecipe?.title);
         return <RecipeDetailScreen recipe={window.currentRecipe} showBackButton={true} />;
       case 'starbucks-generator':
         return <StarbucksGeneratorScreen 
