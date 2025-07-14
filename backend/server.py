@@ -2383,17 +2383,17 @@ async def get_cart_options(
                 total_products += len(products)
                 print(f"✅ Found {len(products)} products for {ingredient}")
         
-        # Create response
-        cart_options = CartOptions(
-            recipe_id=recipe_id,
-            user_id=user_id,
-            ingredients=ingredient_options,
-            total_products=total_products
-        )
+        # Create response in format frontend expects
+        cart_options_response = {
+            "recipe_id": recipe_id,
+            "user_id": user_id,
+            "ingredient_options": ingredient_options,  # Frontend expects this field name
+            "total_products": total_products
+        }
         
         print(f"🎉 Cart options created: {total_products} total products for {len(ingredient_options)} ingredients")
         
-        return cart_options.dict()
+        return cart_options_response
         
     except HTTPException:
         raise
