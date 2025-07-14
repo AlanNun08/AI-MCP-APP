@@ -55,6 +55,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ VERIFIED: Recipe generation via /api/recipes/generate working correctly. Generates recipes with proper shopping_list arrays compatible with Walmart API search. OpenAI integration functional."
+      - working: true
+        agent: "testing"
+        comment: "✅ RE-VERIFIED: Recipe generation fully operational. Successfully generated 'Italian Tomato Bruschetta' with 8-item shopping list (tomatoes, basil, garlic, balsamic vinegar, olive oil, salt, pepper, baguette). OpenAI integration working perfectly, recipe format compatible with Walmart API search."
 
 frontend:
   - task: "Landing Page & User Authentication"
