@@ -2256,6 +2256,89 @@ function App() {
                   </div>
                 )}
               </div>
+              
+              {/* Cooking Instructions Section */}
+              {recipe.instructions && recipe.instructions.length > 0 && (
+                <div className="bg-white rounded-2xl shadow-lg p-6 mt-6">
+                  <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                    <span className="mr-3">👨‍🍳</span>
+                    Step-by-Step Cooking Instructions
+                    <span className="ml-auto text-sm text-gray-500 bg-green-100 px-3 py-1 rounded-full">
+                      AI Generated Recipe
+                    </span>
+                  </h2>
+                  
+                  <div className="space-y-4">
+                    {recipe.instructions.map((instruction, index) => (
+                      <div key={index} className="flex items-start p-4 bg-gradient-to-r from-orange-50 to-red-50 rounded-xl border-l-4 border-orange-400 hover:shadow-md transition-shadow">
+                        <div className="flex-shrink-0 mr-4">
+                          <div className="w-10 h-10 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg">
+                            {index + 1}
+                          </div>
+                        </div>
+                        <div className="flex-1">
+                          <div className="text-xs text-orange-600 font-semibold mb-1 uppercase tracking-wide">
+                            Step {index + 1}
+                          </div>
+                          <p className="text-gray-800 leading-relaxed text-base">{instruction}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  {/* Cooking Tips Section */}
+                  <div className="mt-8 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200">
+                    <h3 className="text-lg font-bold text-blue-800 mb-3 flex items-center">
+                      <span className="mr-2">💡</span>
+                      Pro Cooking Tips
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-blue-700">
+                      <div className="flex items-start">
+                        <span className="text-blue-500 mr-2 mt-0.5">•</span>
+                        <span>Read all instructions before starting to cook</span>
+                      </div>
+                      <div className="flex items-start">
+                        <span className="text-blue-500 mr-2 mt-0.5">•</span>
+                        <span>Prep all ingredients before beginning (mise en place)</span>
+                      </div>
+                      <div className="flex items-start">
+                        <span className="text-blue-500 mr-2 mt-0.5">•</span>
+                        <span>Use your selected Walmart ingredients from the cart above</span>
+                      </div>
+                      <div className="flex items-start">
+                        <span className="text-blue-500 mr-2 mt-0.5">•</span>
+                        <span>Taste and adjust seasoning as you cook</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Recipe Summary */}
+                  <div className="mt-6 p-4 bg-gray-50 rounded-xl">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                      <div>
+                        <div className="text-2xl mb-1">⏱️</div>
+                        <div className="text-xs text-gray-600">Total Time</div>
+                        <div className="font-bold text-gray-800">{recipe.prep_time || '30 min'}</div>
+                      </div>
+                      <div>
+                        <div className="text-2xl mb-1">🍽️</div>
+                        <div className="text-xs text-gray-600">Servings</div>
+                        <div className="font-bold text-gray-800">{recipe.servings || '4'}</div>
+                      </div>
+                      <div>
+                        <div className="text-2xl mb-1">📊</div>
+                        <div className="text-xs text-gray-600">Difficulty</div>
+                        <div className="font-bold text-gray-800">{recipe.difficulty || 'Medium'}</div>
+                      </div>
+                      <div>
+                        <div className="text-2xl mb-1">💰</div>
+                        <div className="text-xs text-gray-600">Ingredients Cost</div>
+                        <div className="font-bold text-green-600">${calculateTotal().toFixed(2)}</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Right Column - Shopping Cart & Checkout */}
