@@ -1722,10 +1722,8 @@ function App() {
             setSelectedProducts(defaultSelections);
             setCartItems(newCartItems);
             
-            console.log('🔍 DEBUG - Final product options:', options);
-            console.log('🔍 DEBUG - Default selections:', defaultSelections);
-            console.log('🔍 DEBUG - Initial cart items:', newCartItems);
-            console.log('🔍 DEBUG - Cart total:', newCartItems.reduce((total, item) => total + (item.price * item.quantity), 0).toFixed(2));
+            debugLog('🔍 Final state set - options, selections, and cart items');
+            debugLog('🔍 Cart total:', newCartItems.reduce((total, item) => total + (item.price * item.quantity), 0).toFixed(2));
             
             // Generate affiliate URL with default selections
             // Generate Walmart URL with correct format using SELECTED items only
@@ -1741,7 +1739,7 @@ function App() {
               }
             });
             
-            console.log('🔍 DEBUG - Final quantities for URL:', finalQuantities);
+            debugLog('🔍 Final quantities for Walmart URL:', Object.keys(finalQuantities).length, 'items');
             
             // Format for Walmart URL: productId or productId_quantity
             Object.entries(finalQuantities).forEach(([productId, quantity]) => {
