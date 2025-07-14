@@ -19,6 +19,17 @@ function App() {
     }
   };
   
+  // Debug mode toggle function
+  const toggleDebugMode = () => {
+    const currentMode = localStorage.getItem('ai_chef_debug') === 'true';
+    const newMode = !currentMode;
+    localStorage.setItem('ai_chef_debug', newMode.toString());
+    showNotification(
+      newMode ? '🔧 Debug mode enabled - refresh page to see console logs' : '🔧 Debug mode disabled - refresh page for clean console', 
+      'info'
+    );
+  };
+  
   // Optional: Environment validation (silent in production)
   if (DEBUG_MODE) {
     console.log('🔧 Environment Debug - VERSION 1.3.0:');
