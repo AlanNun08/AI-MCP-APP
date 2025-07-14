@@ -1596,10 +1596,14 @@ function App() {
         })
         .then(response => {
           console.log('✅ Cart options response:', response.data);
+          console.log('🔍 DEBUG - Response status:', response.status);
+          console.log('🔍 DEBUG - Response headers:', response.headers);
+          console.log('🔍 DEBUG - Full response object:', response);
           
           // Handle the case where no products are found
           if (response.data && response.data.status === 'no_products_found') {
             console.log('⚠️ No Walmart products found for this recipe');
+            console.log('🔍 DEBUG - No products message:', response.data.message);
             setProductOptions({});
             setSelectedProducts({});
             setCartItems([]);
@@ -1608,9 +1612,15 @@ function App() {
           }
           
           console.log('🛒 Cart options response:', response.data);
+          console.log('🔍 DEBUG - Recipe ID used:', recipe.id);
+          console.log('🔍 DEBUG - User ID used:', user?.id || 'demo_user');
+          console.log('🔍 DEBUG - Shopping list from recipe:', recipe.shopping_list);
           
           // Check for correct backend format: response.data.ingredient_options
           if (response.data && response.data.ingredient_options) {
+            console.log('🔍 DEBUG - Ingredient options found:', response.data.ingredient_options.length);
+            console.log('🔍 DEBUG - Total products:', response.data.total_products);
+            
             // Store all product options per ingredient - CORRECT BACKEND FORMAT
             const options = {};
             const defaultSelections = {};
